@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 47 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 48 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -32,13 +32,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 13 (2 rejected, 10 accepted, 1 no candidate)
+- Attempts: 14 (2 rejected, 11 accepted, 1 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
-- Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 10.08%, 6.30%, 4.72%, 3.08%, 2.48%, 1.41%
+- Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 10.08%, 6.30%, 4.72%, 3.11%, 3.08%, 2.48%, 1.41%
 - Why candidates failed: stale (1), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.2639 USD (over 13 attempts with a recorded cost)
+- Median model spend per attempt: 0.2911 USD (over 14 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -53,6 +53,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I read minbpe/base.py, minbpe/basic.py, minbpe/regex.py, and lineage_bench.py. I changed Tokenizer.save in minbpe/base.py lines 158-172 and Tokenizer.load in minbpe/base.py lines 231-239. The change cached the rendered model as UTF-8 bytes for binary writes and parsed merge rows without the extra map/strip call overhead.
+> evaluation 1 on save_load_ir was rejected: "no_improvement: worst ratio 0.9994 vs required 0.9900". Outputs were identical. save_load_ir was parent 929089188, candidate 928486198, ratio 0.9994. That did not help.
+> evaluation 3 on save_load_ir was accepted in sandbox. Outputs were identical. save_load_ir was parent 929089192, candidate 899860459, ratio 0.9685. train_basic_ir was ratio 0.9977. train_regex_ir was ratio 0.9999. encode_ir was ratio 0.9995. decode_ir was ratio 0.9995.
+> I now believe the useful change is in Tokenizer.save, with Tokenizer.load kept plain. Next try fewer moving parts in minbpe/base.py and wait for the independent replay verdict on the submitted 16 changed lines.
+>
+> 2026-10-13, episode `a5b5f4c93dfa` (accepted)
 
 > I changed minbpe/base.py Tokenizer.save. Lines 177-204 replaced 28 lines by 28. Line 195 replaced 1 lines by 1. The vocabulary render is cached as UTF-8 bytes and written in binary mode.
 > save_load_ir was accepted in the sandbox. Equivalence was identical outputs. save_load_ir was parent 983249265, candidate 955479755, ratio 0.9718. train_basic_ir was ratio 1.0024. train_regex_ir was ratio 0.9995. encode_ir was ratio 0.9998. decode_ir was ratio 0.9998. Guard was ok, 1 files, 10 lines.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try waiting for the queued independent replays. If the target holds there, inspect whether the cache keys can stay smaller without changing identical output.
 >
 > 2026-10-13, episode `1310d25a6f6e` (accepted)
-
-> I tried changes in minbpe/base.py, minbpe/basic.py, and minbpe/regex.py. I first changed save and load paths. I then changed encode paths. The submitted change stayed in minbpe/base.py and changed Tokenizer.save to cache rendered model merge lines by merge pair.
-> evaluation 1 was rejected: save_load_ir ratio 1.0350. evaluation 3 was rejected: encode_ir ratio 0.9971. evaluation 5 was accepted in the sandbox: save_load_ir parent 1027305800, candidate 1001945800, ratio 0.9753. Outputs were identical.
-> I believe repeated saves were paying for formatting the same merge pair lines again. The encode change did not help enough. The first save/load change made save_load_ir worse.
-> Next try the same cache shape only where merge dictionaries overlap. Check train_basic_ir, where evaluation 5 had ratio 1.0039. The submitted save_load_ir candidate is queued. Its verdict comes later from independent replays.
->
-> 2026-10-13, episode `385c268c9b50` (accepted)
 
 ## Licence
 
