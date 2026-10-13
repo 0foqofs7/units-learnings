@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 91 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 92 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -26,13 +26,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 17 (8 accepted, 6 no candidate, 3 rejected)
+- Attempts: 18 (8 accepted, 7 no candidate, 3 rejected)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
 - Accepted effects: 24.45%, 20.23%, 13.61%, 10.64%, 9.58%, 6.55%, 1.72%, 1.15%
 - Why candidates failed: stale_conflict (2), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.3377 USD (over 17 attempts with a recorded cost)
+- Median model spend per attempt: 0.3405 USD (over 18 attempts with a recorded cost)
 
 ## Target perf:save_load_ir
 
@@ -57,6 +57,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Tried bounded encode/decode-path changes in minbpe/basic.py and minbpe/regex.py. Read minbpe/base.py, minbpe/basic.py, minbpe/regex.py, minbpe/gpt4.py, and lineage_bench.py.
+> evaluation 1 was rejected: encode_ir parent 635361113, candidate 641461570, ratio 1.0096. evaluation 3 was rejected: decode_ir parent 485033872, candidate 480845482, ratio 0.9914. evaluation 5 was rejected: decode_ir parent 485033878, candidate 480877254, ratio 0.9914. evaluation 7 was rejected: decode_ir parent 485033872, candidate 483684419, ratio 0.9972. All had identical outputs.
+> The decode changes helped some runs but did not meet the required 1% improvement threshold. The later broader change made train_basic_ir, train_regex_ir, encode_ir, and save_load_ir worse.
+> Try a smaller decode-only change next. Leave encode alone unless the local metric moves before guards.
+>
+> 2026-10-13, episode `0a065a3ab69f` (no candidate)
 
 > I read minbpe/basic.py, minbpe/base.py, minbpe/regex.py, and lineage_bench.py. I searched "where\[p\]\.append". I tried edits in minbpe/basic.py lines 158-167, 66-70, and 86-89, then reverted them. I tried edits in minbpe/regex.py lines 12-16, 101-111, 14-23, 83-87, 99-106, and 114-116.
 > evaluation 1 was rejected: train_basic_ir ratio 1.0038. evaluation 3 was rejected: train_basic_ir ratio 1.0003. evaluation 5 was rejected: train_basic_ir ratio 1.0005. evaluation 7 was rejected: train_regex_ir ratio 0.9959 vs required 0.9900. Builds were ok. Equivalence was identical outputs.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try a smaller change inside the hot encode loop. Leave get_stats and merge alone unless the target is not encode_ir.
 >
 > 2026-10-13, episode `740171ff8049` (no candidate)
-
-> Read minbpe/basic.py, minbpe/base.py, minbpe/regex.py, and lineage_bench.py. Searched ord(c), heap push/pop/replace, BYTE_VOCAB, and stats.update. Changed BasicTokenizer.train in minbpe/basic.py. Tried a vocabulary/heap-binding variant, then tie and neighbour update variants.
-> evaluation 1 was rejected: train_basic_ir parent 279100809, candidate 359851447, ratio 1.2893. evaluation 3 was rejected: ratio 0.9958. evaluation 5 was rejected: ratio 0.9960. evaluation 7 was rejected: ratio 1.0676. Builds were ok. Outputs were identical. No measured change reached the 1% threshold.
-> The viable BasicTokenizer.train vocabulary/heap-binding variant only improved train_basic_ir by about 0.4%. Other attempted train tie/neighbour updates regressed. The local edits in minbpe/basic.py did not clear the required bar.
-> Next, try a different BasicTokenizer.train path around pair-stat updates. Keep the equivalence checks. Do not submit the current patch.
->
-> 2026-10-13, episode `40078a4082b1` (no candidate)
 
 ## Licence
 
