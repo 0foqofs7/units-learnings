@@ -1,18 +1,18 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 102 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 103 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 19 (13 accepted, 5 no candidate, 1 rejected)
+- Attempts: 20 (13 accepted, 5 no candidate, 2 rejected)
 - Best accepted effect: 56.44% (ratio 0.4356), episode `71c36b66692b`
 - Accepted effects: 56.44%, 32.45%, 13.41%, 12.94%, 11.01%, 9.45%, 6.64%, 4.53%, 2.62%, 2.57%, 1.71%, 1.24%, 1.10%
-- Why candidates failed: no_improvement (1)
+- Why candidates failed: no_improvement (2)
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.4886 USD (over 19 attempts with a recorded cost)
+- Files changed by rejected candidates: `minbpe/basic.py`, `minbpe/regex.py`
+- Median model spend per attempt: 0.4698 USD (over 20 attempts with a recorded cost)
 
 ## Target perf:train_regex_ir
 
@@ -58,6 +58,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> I changed BasicTokenizer.decode and RegexTokenizer.decode cache-hit handling in minbpe/basic.py and minbpe/regex.py. List decode cache entries now keep the original vocab and special-token mapping objects beside copied snapshots.
+> evaluation 1 was accepted. guard: ok, 2 files, 16 lines. equivalence: identical outputs. decode_ir moved from parent 489857527 to candidate 484815370, ratio 0.9897. train_basic_ir ratio 1.0011. train_regex_ir ratio 1.0007. encode_ir ratio 1.0002. save_load_ir ratio 1.0004.
+> I believe the unchanged mapping case was paying repeated equality cost on decode cache hits. Object identity helped that target in my sandbox. It did not help the other measured metrics.
+> Next, wait for the independent replays. If they hold, inspect the same decode cache path for smaller guard cost without touching encode behavior.
+>
+> 2026-10-13, episode `d1922ef2b765` (rejected)
+
 > Changed minbpe/basic.py in BasicTokenizer.encode around lines 154-179, then changed BasicTokenizer.train around lines 116-154. Changed minbpe/regex.py pattern setup around lines 12-35 and RegexTokenizer.train around lines 88-111.
 > evaluation 1 rejected: train_basic_ir parent 263129870, candidate 283808636, ratio 1.0786. evaluation 3 rejected: ratio 1.0009. evaluation 5 rejected: train_regex_ir parent 371281607, candidate 370677925, ratio 0.9984, required 0.9900. evaluation 7 rejected: ratio 1.0006. Builds passed. Equivalence was identical outputs. Guards were ok.
 > BasicTokenizer.train rewrites did not help. The small RegexTokenizer.train change measured better at 0.9984, but not enough for 0.9900. Pattern setup churn did not help.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try a smaller change in the counting path. Recheck get_stats and merge in minbpe/basic.py before touching encode or decode again.
 >
 > 2026-10-13, episode `d2126e0bff5c` (no candidate)
-
-> I tried a byte-keyed load cache in minbpe/base.py around save/load. I changed lines 13-16, 262-267, 333-347, and 380-383, then backed those edits out. I tried direct _heapq/_count imports for regex training in minbpe/regex.py. I changed lines 12-16 and 101-112, then lines 12-20 and 89-91.
-> save_load_ir was rejected: worst ratio 1.0015 vs required 0.9900. Outputs were identical. train_regex_ir was rejected twice: worst ratio 0.9989 vs required 0.9900, then 0.9999 vs required 0.9900. Outputs were identical.
-> I now believe these paths are not paying enough on this bench. The load cache was slightly worse. The regex import change helped train_regex_ir once, but not enough, and touched encode_ir.
-> Try a change inside regex training work that reduces operations in the hot loop without adding overhead to encode_ir. Leave save/load alone unless a measured cost is found first.
->
-> 2026-10-13, episode `e9eb9178c5d5` (no candidate)
 
 ## Licence
 
