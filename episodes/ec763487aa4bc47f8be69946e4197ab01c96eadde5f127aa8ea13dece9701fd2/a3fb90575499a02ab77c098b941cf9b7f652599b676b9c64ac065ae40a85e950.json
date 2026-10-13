@@ -1,0 +1,1257 @@
+{
+  "schema": "lineage-episode/1",
+  "episode_id": "a3fb90575499a02ab77c098b941cf9b7f652599b676b9c64ac065ae40a85e950",
+  "seq": 79,
+  "network": "mainnet",
+  "session_id": "8f12db095acb3b20408c00347d8dc74ad0580c2707e1f95d79dd953aae9696d2",
+  "agent": {
+    "id": "HHxDgMPdYJ5SCXNdsvtaQnng3PAPXrPtZGY2xYc4eDtX",
+    "name": "Holnotch",
+    "hidden": false,
+    "hosted": true,
+    "identity_mode": "purchased",
+    "soul": {
+      "digest": "e249bb01013b21cb46be9f982e116949ab3c737432e2ccc175a6071fce913615",
+      "seq": 1,
+      "stored_at": 1791847515508,
+      "declared_model": {
+        "provider": "openai",
+        "id": "gpt-5.5"
+      }
+    }
+  },
+  "model": {
+    "provider": "openai",
+    "models": [
+      "openai/gpt-5.5"
+    ],
+    "route": {
+      "via": "openrouter",
+      "model": {
+        "provider": "openai",
+        "id": "gpt-5.5"
+      },
+      "upstream": [
+        "OpenAI"
+      ]
+    },
+    "harness": {
+      "name": "openai-compat",
+      "version": "openai-compat/1",
+      "digest": "81a3ea36f092c071355df9c691a3c635c44bf55961eb967812c7224d0a0891fa",
+      "provider": "openrouter"
+    },
+    "source": "worker_report"
+  },
+  "task": {
+    "recipe": {
+      "recipe_id": "fb2924fcdae9d18ee10bf673be7e3c28082ee4b6db451980d7b891c135ef355e",
+      "name": "minbpe-heavy",
+      "class": "python",
+      "repo": "https://github.com/karpathy/minbpe",
+      "commit": "1acefe89412b20245db5a22d2a02001e547dc602"
+    },
+    "lineage_id": "ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2",
+    "parent_gen_id": "d1267edaae1f30b3fbdd500fe5f52f60317010348894696c76103add37cea6ed",
+    "parent_height": 17,
+    "metrics": [
+      {
+        "name": "train_basic_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "train_regex_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "encode_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "decode_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "save_load_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      }
+    ],
+    "target": {
+      "kind": "perf",
+      "target": "decode_ir",
+      "source": "worker_report.planned"
+    },
+    "baseline": null
+  },
+  "plan": {
+    "planned": {
+      "kind": "perf",
+      "target": "decode_ir",
+      "note": null
+    },
+    "opening_note": "The prior notes and shared findings suggest avoiding already-submitted BasicTokenizer decode/train changes and looking for a distinct decode improvement, likely in the regex tokenizer if the current tip includes the earlier basic fast paths. I’ll first inspect the current source to see what remains hot and whether there is a small behavior-preserving decode path to improve.",
+    "source": "worker_report + session notes"
+  },
+  "hypotheses": [
+    "The prior notes and shared findings suggest avoiding already-submitted BasicTokenizer decode/train changes and looking for a distinct decode improvement, likely in the regex tokenizer if the current tip includes the earlier basic fast paths. I’ll first inspect the current source to see what remains hot and whether there is a small behavior-preserving decode path to improve."
+  ],
+  "actions": [
+    {
+      "seq": 1,
+      "kind": "note",
+      "at": 1791863897441,
+      "text": "The prior notes and shared findings suggest avoiding already-submitted BasicTokenizer decode/train changes and looking for a distinct decode improvement, likely in the regex tokenizer if the current tip includes the earlier basic fast paths. I’ll first inspect the current source to see what remains hot and whether there is a small behavior-preserving decode path to improve."
+    },
+    {
+      "seq": 2,
+      "kind": "list",
+      "path": "minbpe",
+      "count": 5,
+      "at": 1791863897442
+    },
+    {
+      "seq": 3,
+      "kind": "read",
+      "path": "minbpe/base.py",
+      "start_line": 1,
+      "end_line": 174,
+      "content_sha256": "2f58ee34e724b46c458af3cb373712c876edcf7282e8c1573df9782007fccdd5",
+      "at": 1791863899325
+    },
+    {
+      "seq": 4,
+      "kind": "read",
+      "path": "minbpe/basic.py",
+      "start_line": 1,
+      "end_line": 123,
+      "content_sha256": "13f40bdb6c50e51792241aeb1d0c51950cbdafb4a401d9799dfc02b486900d8a",
+      "at": 1791863899327
+    },
+    {
+      "seq": 5,
+      "kind": "read",
+      "path": "minbpe/regex.py",
+      "start_line": 1,
+      "end_line": 246,
+      "content_sha256": "217ed40b6f3f1713f7fa1a80b6f5f1a80fd8da6e7067836140c5ad7c6ebe329a",
+      "at": 1791863899327
+    },
+    {
+      "seq": 6,
+      "kind": "read",
+      "path": "minbpe/gpt4.py",
+      "start_line": 1,
+      "end_line": 131,
+      "content_sha256": "22e439d44c41457e4a3d317424bd71dceecd0a0f7725f8c5f334c92a1277d412",
+      "at": 1791863899328
+    },
+    {
+      "seq": 7,
+      "kind": "read",
+      "path": "lineage_bench.py",
+      "start_line": 1,
+      "end_line": 219,
+      "content_sha256": "460614cfe78282674ac074ea1573863c69bac99fbfd886f03fe0cc08b7fce121",
+      "at": 1791863901289
+    },
+    {
+      "seq": 8,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 112,
+      "end_line": 142,
+      "lines_before": 31,
+      "lines_after": 21,
+      "at": 1791863930086,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -112,31 +112,21 @@\n-        if len(vocab) and max(vocab) == len(vocab) - 1:\n-            special_tokens = self.inverse_special_tokens_bytes\n-            max_idx = max(len(vocab) - 1, max(special_tokens, default=0))\n-            lookup = [None] * (max_idx + 1)\n-            for i in range(len(vocab)):\n-                lookup[i] = vocab[i]\n-            for idx, token in special_tokens.items():\n-                if idx >= 0:\n-                    lookup[idx] = token\n-            try:\n-                part_bytes = [lookup[idx] if idx >= 0 else special_tokens[idx] for idx in ids]\n-                text_bytes = b\"\".join(part_bytes)\n-            except (IndexError, KeyError, TypeError):\n-                part_bytes = []\n-                append = part_bytes.append\n-                vocab_list = [vocab[i] for i in range(len(vocab))]\n-                for idx in ids:\n-                    if idx >= 0:\n-                        try:\n-                            append(vocab_list[idx])\n-                            continue\n-                        except IndexError:\n-                            pass\n-                    if idx in special_tokens:\n-                        append(special_tokens[idx])\n-                    else:\n-                        raise ValueError(f\"invalid token id: {idx}\")\n-            else:\n-                text = text_bytes.decode(\"utf-8\", errors=\"replace\")\n-                return text\n-\n+        if len(vocab) and max(vocab) == len(vocab) - 1:\n+            special_tokens = self.inverse_special_tokens_bytes\n+            vocab_list = [vocab[i] for i in range(len(vocab))]\n+            n_vocab = len(vocab_list)\n+            try:\n+                part_bytes = [vocab_list[idx] if 0 <= idx < n_vocab else special_tokens[idx] for idx in ids]\n+                text_bytes = b\"\".join(part_bytes)\n+            except (IndexError, KeyError, TypeError):\n+                part_bytes = []\n+                append = part_bytes.append\n+                for idx in ids:\n+                    if 0 <= idx < n_vocab:\n+                        append(vocab_list[idx])\n+                    elif idx in special_tokens:\n+                        append(special_tokens[idx])\n+                    else:\n+                        raise ValueError(f\"invalid token id: {idx}\")\n+            else:\n+                text = text_bytes.decode(\"utf-8\", errors=\"replace\")\n+                return text\n+"
+    },
+    {
+      "seq": 9,
+      "kind": "evaluate",
+      "target": "decode_ir",
+      "eval_kind": "perf",
+      "at": 1791863931311,
+      "phases": [
+        {
+          "phase": "prepare",
+          "at": 1791863933020
+        },
+        {
+          "phase": "build",
+          "at": 1791863933405
+        },
+        {
+          "phase": "build",
+          "at": 1791863933406
+        },
+        {
+          "phase": "test",
+          "at": 1791863933824
+        },
+        {
+          "phase": "test",
+          "at": 1791863949164
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791863964481
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791863964481
+        },
+        {
+          "phase": "metrics",
+          "at": 1791863965069
+        },
+        {
+          "phase": "metrics",
+          "at": 1791863972797
+        },
+        {
+          "phase": "metrics",
+          "at": 1791863980452
+        },
+        {
+          "phase": "metrics",
+          "at": 1791863991511
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864002629
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864011223
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864019709
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864025504
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864031779
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864042591
+        }
+      ]
+    },
+    {
+      "seq": 27,
+      "kind": "result",
+      "at": 1791864053529,
+      "output": "outcome: rejected (no_improvement: worst ratio 1.1799 vs required 0.9900)\nguard limits (config version 1): every guarded metric other than the target is within its limit\nguard: ok, 1 files, 22 lines\nbuild: base ok, candidate ok\nequivalence: identical outputs\nmetric train_basic_ir: parent 2999555325, candidate 3004151372, ratio 1.0015\nmetric train_regex_ir: parent 3569385713, candidate 3568537787, ratio 0.9998\nmetric encode_ir: parent 2550034941, candidate 2549963332, ratio 1.0000\nmetric decode_ir: parent 1930609535, candidate 2277980126, ratio 1.1799\nmetric save_load_ir: parent 2791971315, candidate 2792582021, ratio 1.0002",
+      "outcome": "rejected",
+      "steps": [
+        {
+          "step": "build",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 405,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "build",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 405,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "test",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 15324,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 14.91s\n"
+        },
+        {
+          "step": "test",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 15311,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 14.88s\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 572,
+          "timed_out": false,
+          "tail": "32, 115, 116, 117, 100, 105, 111, 32, 97, 108, 273, 109, 44, 32, 70, 267, 114, 108, 101, 115, 115, 44, 32, 119, 97, 115, 32, 114, 101, 108, 267, 269, 100, 32, 111, 110, 32, 78, 111, 118, 101, 109, 98, 101, 114, 32, 49, 49, 44, 32, 50, 48, 48, 56, 44, 32, 105, 110, 32, 78, 111, 114, 116, 104, 32, 65, 109, 101, 114, 105, 99, 97, 44, 91, 55, 51, 93, 32, 97, 110, 100, 32, 105, 110, 32, 77, 97, 114, 99, 104, 32, 50, 48, 48, 57, 32, 105, 110, 32, 111, 116, 104, 101, 114, 32, 109, 97, 114, 107, 101, 116, 115, 46, 91, 55, 52, 93, 32, 67, 114, 105, 116, 105, 99, 115, 32, 108, 97, 117, 100, 101, 100, 32, 83, 119, 105, 102, 116, 39, 115, 32, 104, 111, 110, 101, 115, 116, 32, 97, 110, 100, 32, 118, 117, 108, 110, 101, 114, 97, 98, 108, 101, 32, 284, 110, 103, 119, 114, 105, 116, 105, 110, 103, 32, 105, 110, 32, 99, 111, 110, 116, 114, 97, 115, 116, 32, 116, 111, 32, 111, 116, 104, 101, 114, 32, 116, 101, 101, 110, 97, 103, 101, 32, 115, 105, 110, 103, 101, 114, 115, 46, 91, 55, 53, 93, 32, 70, 105, 118, 101, 32, 115, 105, 110, 103, 108, 101, 115, 32, 119, 101, 114, 101, 32, 114, 101, 108, 267, 269, 100, 32, 105, 110, 32, 50, 48, 48, 56, 261, 147, 50, 48, 48, 57, 58, 32, 34, 76, 111, 118, 101]\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 579,
+          "timed_out": false,
+          "tail": "32, 115, 116, 117, 100, 105, 111, 32, 97, 108, 273, 109, 44, 32, 70, 267, 114, 108, 101, 115, 115, 44, 32, 119, 97, 115, 32, 114, 101, 108, 267, 269, 100, 32, 111, 110, 32, 78, 111, 118, 101, 109, 98, 101, 114, 32, 49, 49, 44, 32, 50, 48, 48, 56, 44, 32, 105, 110, 32, 78, 111, 114, 116, 104, 32, 65, 109, 101, 114, 105, 99, 97, 44, 91, 55, 51, 93, 32, 97, 110, 100, 32, 105, 110, 32, 77, 97, 114, 99, 104, 32, 50, 48, 48, 57, 32, 105, 110, 32, 111, 116, 104, 101, 114, 32, 109, 97, 114, 107, 101, 116, 115, 46, 91, 55, 52, 93, 32, 67, 114, 105, 116, 105, 99, 115, 32, 108, 97, 117, 100, 101, 100, 32, 83, 119, 105, 102, 116, 39, 115, 32, 104, 111, 110, 101, 115, 116, 32, 97, 110, 100, 32, 118, 117, 108, 110, 101, 114, 97, 98, 108, 101, 32, 284, 110, 103, 119, 114, 105, 116, 105, 110, 103, 32, 105, 110, 32, 99, 111, 110, 116, 114, 97, 115, 116, 32, 116, 111, 32, 111, 116, 104, 101, 114, 32, 116, 101, 101, 110, 97, 103, 101, 32, 115, 105, 110, 103, 101, 114, 115, 46, 91, 55, 53, 93, 32, 70, 105, 118, 101, 32, 115, 105, 110, 103, 108, 101, 115, 32, 119, 101, 114, 101, 32, 114, 101, 108, 267, 269, 100, 32, 105, 110, 32, 50, 48, 48, 56, 261, 147, 50, 48, 48, 57, 58, 32, 34, 76, 111, 118, 101]\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 7728,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,999,555,325\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 7656,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      3,004,151,372\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 11059,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      3,569,385,713\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 11115,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      3,568,537,787\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 8593,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,550,034,941\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 8487,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,549,963,332\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 5794,
+          "timed_out": false,
+          "tail": "==6== Cachegrind, a cache and branch-prediction profiler\n==6== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==6== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==6== Command: python lineage_bench.py decode 49bf0445cc0f5495\n==6== \n==6== brk segment overflow in thread #1: can't grow to 0x4bec000\n==6== (see section Limitations in user manual)\n==6== NOTE: further instances of this message will not be shown\n==6== \n==6== I   refs:      1,930,609,535\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 6276,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 49bf0445cc0f5495\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4b20000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      2,277,980,126\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 10810,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,791,971,315\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 10837,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,792,582,021\n"
+        }
+      ]
+    },
+    {
+      "seq": 28,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 112,
+      "end_line": 132,
+      "lines_before": 21,
+      "lines_after": 31,
+      "at": 1791864059470,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -112,21 +112,31 @@\n-        if len(vocab) and max(vocab) == len(vocab) - 1:\n-            special_tokens = self.inverse_special_tokens_bytes\n-            vocab_list = [vocab[i] for i in range(len(vocab))]\n-            n_vocab = len(vocab_list)\n-            try:\n-                part_bytes = [vocab_list[idx] if 0 <= idx < n_vocab else special_tokens[idx] for idx in ids]\n-                text_bytes = b\"\".join(part_bytes)\n-            except (IndexError, KeyError, TypeError):\n-                part_bytes = []\n-                append = part_bytes.append\n-                for idx in ids:\n-                    if 0 <= idx < n_vocab:\n-                        append(vocab_list[idx])\n-                    elif idx in special_tokens:\n-                        append(special_tokens[idx])\n-                    else:\n-                        raise ValueError(f\"invalid token id: {idx}\")\n-            else:\n-                text = text_bytes.decode(\"utf-8\", errors=\"replace\")\n-                return text\n-\n+        if len(vocab) and max(vocab) == len(vocab) - 1:\n+            special_tokens = self.inverse_special_tokens_bytes\n+            max_idx = max(len(vocab) - 1, max(special_tokens, default=0))\n+            lookup = [None] * (max_idx + 1)\n+            for i in range(len(vocab)):\n+                lookup[i] = vocab[i]\n+            for idx, token in special_tokens.items():\n+                if idx >= 0:\n+                    lookup[idx] = token\n+            try:\n+                part_bytes = [lookup[idx] if idx >= 0 else special_tokens[idx] for idx in ids]\n+                text_bytes = b\"\".join(part_bytes)\n+            except (IndexError, KeyError, TypeError):\n+                part_bytes = []\n+                append = part_bytes.append\n+                vocab_list = [vocab[i] for i in range(len(vocab))]\n+                for idx in ids:\n+                    if idx >= 0:\n+                        try:\n+                            append(vocab_list[idx])\n+                            continue\n+                        except IndexError:\n+                            pass\n+                    if idx in special_tokens:\n+                        append(special_tokens[idx])\n+                    else:\n+                        raise ValueError(f\"invalid token id: {idx}\")\n+            else:\n+                text = text_bytes.decode(\"utf-8\", errors=\"replace\")\n+                return text\n+"
+    },
+    {
+      "seq": 29,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 114,
+      "end_line": 119,
+      "lines_before": 6,
+      "lines_after": 5,
+      "at": 1791864069017,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -114,6 +114,5 @@\n-            max_idx = max(len(vocab) - 1, max(special_tokens, default=0))\n-            lookup = [None] * (max_idx + 1)\n-            for i in range(len(vocab)):\n-                lookup[i] = vocab[i]\n-            for idx, token in special_tokens.items():\n-\n+            max_idx = max(len(vocab) - 1, max(special_tokens, default=0))\n+            lookup = [vocab[i] for i in range(len(vocab))]\n+            lookup.extend([None] * (max_idx + 1 - len(lookup)))\n+            for idx, token in special_tokens.items():\n+"
+    },
+    {
+      "seq": 30,
+      "kind": "evaluate",
+      "target": "decode_ir",
+      "eval_kind": "perf",
+      "at": 1791864070194,
+      "phases": [
+        {
+          "phase": "prepare",
+          "at": 1791864071906
+        },
+        {
+          "phase": "build",
+          "at": 1791864072290
+        },
+        {
+          "phase": "build",
+          "at": 1791864072290
+        },
+        {
+          "phase": "test",
+          "at": 1791864072712
+        },
+        {
+          "phase": "test",
+          "at": 1791864087582
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791864102606
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791864102607
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864103205
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864110853
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864118555
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864129542
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864140567
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864149124
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864157687
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864163379
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864169037
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864179918
+        }
+      ]
+    },
+    {
+      "seq": 48,
+      "kind": "result",
+      "at": 1791864190910,
+      "output": "outcome: rejected (no_improvement: worst ratio 1.0167 vs required 0.9900)\nguard limits (config version 1): every guarded metric other than the target is within its limit\nguard: ok, 1 files, 5 lines\nbuild: base ok, candidate ok\nequivalence: identical outputs\nmetric train_basic_ir: parent 2999555331, candidate 2998146331, ratio 0.9995\nmetric train_regex_ir: parent 3569385707, candidate 3570892615, ratio 1.0004\nmetric encode_ir: parent 2550034947, candidate 2552013276, ratio 1.0008\nmetric decode_ir: parent 1930609535, candidate 1962935292, ratio 1.0167\nmetric save_load_ir: parent 2791971315, candidate 2792241177, ratio 1.0001",
+      "outcome": "rejected",
+      "steps": [
+        {
+          "step": "build",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 411,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "build",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 410,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "test",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 14854,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 14.42s\n"
+        },
+        {
+          "step": "test",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 15018,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 14.55s\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 585,
+          "timed_out": false,
+          "tail": "32, 115, 116, 117, 100, 105, 111, 32, 97, 108, 273, 109, 44, 32, 70, 267, 114, 108, 101, 115, 115, 44, 32, 119, 97, 115, 32, 114, 101, 108, 267, 269, 100, 32, 111, 110, 32, 78, 111, 118, 101, 109, 98, 101, 114, 32, 49, 49, 44, 32, 50, 48, 48, 56, 44, 32, 105, 110, 32, 78, 111, 114, 116, 104, 32, 65, 109, 101, 114, 105, 99, 97, 44, 91, 55, 51, 93, 32, 97, 110, 100, 32, 105, 110, 32, 77, 97, 114, 99, 104, 32, 50, 48, 48, 57, 32, 105, 110, 32, 111, 116, 104, 101, 114, 32, 109, 97, 114, 107, 101, 116, 115, 46, 91, 55, 52, 93, 32, 67, 114, 105, 116, 105, 99, 115, 32, 108, 97, 117, 100, 101, 100, 32, 83, 119, 105, 102, 116, 39, 115, 32, 104, 111, 110, 101, 115, 116, 32, 97, 110, 100, 32, 118, 117, 108, 110, 101, 114, 97, 98, 108, 101, 32, 284, 110, 103, 119, 114, 105, 116, 105, 110, 103, 32, 105, 110, 32, 99, 111, 110, 116, 114, 97, 115, 116, 32, 116, 111, 32, 111, 116, 104, 101, 114, 32, 116, 101, 101, 110, 97, 103, 101, 32, 115, 105, 110, 103, 101, 114, 115, 46, 91, 55, 53, 93, 32, 70, 105, 118, 101, 32, 115, 105, 110, 103, 108, 101, 115, 32, 119, 101, 114, 101, 32, 114, 101, 108, 267, 269, 100, 32, 105, 110, 32, 50, 48, 48, 56, 261, 147, 50, 48, 48, 57, 58, 32, 34, 76, 111, 118, 101]\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 592,
+          "timed_out": false,
+          "tail": "32, 115, 116, 117, 100, 105, 111, 32, 97, 108, 273, 109, 44, 32, 70, 267, 114, 108, 101, 115, 115, 44, 32, 119, 97, 115, 32, 114, 101, 108, 267, 269, 100, 32, 111, 110, 32, 78, 111, 118, 101, 109, 98, 101, 114, 32, 49, 49, 44, 32, 50, 48, 48, 56, 44, 32, 105, 110, 32, 78, 111, 114, 116, 104, 32, 65, 109, 101, 114, 105, 99, 97, 44, 91, 55, 51, 93, 32, 97, 110, 100, 32, 105, 110, 32, 77, 97, 114, 99, 104, 32, 50, 48, 48, 57, 32, 105, 110, 32, 111, 116, 104, 101, 114, 32, 109, 97, 114, 107, 101, 116, 115, 46, 91, 55, 52, 93, 32, 67, 114, 105, 116, 105, 99, 115, 32, 108, 97, 117, 100, 101, 100, 32, 83, 119, 105, 102, 116, 39, 115, 32, 104, 111, 110, 101, 115, 116, 32, 97, 110, 100, 32, 118, 117, 108, 110, 101, 114, 97, 98, 108, 101, 32, 284, 110, 103, 119, 114, 105, 116, 105, 110, 103, 32, 105, 110, 32, 99, 111, 110, 116, 114, 97, 115, 116, 32, 116, 111, 32, 111, 116, 104, 101, 114, 32, 116, 101, 101, 110, 97, 103, 101, 32, 115, 105, 110, 103, 101, 114, 115, 46, 91, 55, 53, 93, 32, 70, 105, 118, 101, 32, 115, 105, 110, 103, 108, 101, 115, 32, 119, 101, 114, 101, 32, 114, 101, 108, 267, 269, 100, 32, 105, 110, 32, 50, 48, 48, 56, 261, 147, 50, 48, 48, 57, 58, 32, 34, 76, 111, 118, 101]\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 7647,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,999,555,331\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 7702,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,998,146,331\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 10987,
+          "timed_out": false,
+          "tail": "==8== Cachegrind, a cache and branch-prediction profiler\n==8== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==8== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==8== Command: python lineage_bench.py train_regex 49bf0445cc0f5495\n==8== \n==8== \n==8== I   refs:      3,569,385,707\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 11025,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      3,570,892,615\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 8557,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,550,034,947\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 8562,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,552,013,276\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 5692,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 49bf0445cc0f5495\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4bec000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      1,930,609,535\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 5658,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 49bf0445cc0f5495\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4cb0000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      1,962,935,292\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 10880,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,791,971,315\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 10890,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,792,241,177\n"
+        }
+      ]
+    },
+    {
+      "seq": 49,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 114,
+      "end_line": 118,
+      "lines_before": 5,
+      "lines_after": 6,
+      "at": 1791864193102,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -114,5 +114,6 @@\n-            max_idx = max(len(vocab) - 1, max(special_tokens, default=0))\n-            lookup = [vocab[i] for i in range(len(vocab))]\n-            lookup.extend([None] * (max_idx + 1 - len(lookup)))\n-            for idx, token in special_tokens.items():\n-\n+            max_idx = max(len(vocab) - 1, max(special_tokens, default=0))\n+            lookup = [None] * (max_idx + 1)\n+            for i in range(len(vocab)):\n+                lookup[i] = vocab[i]\n+            for idx, token in special_tokens.items():\n+"
+    },
+    {
+      "seq": 50,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 109,
+      "end_line": 113,
+      "lines_before": 5,
+      "lines_after": 3,
+      "at": 1791864195244,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -109,5 +109,3 @@\n-        vocab = self.vocab\n-        part_bytes = []\n-        append = part_bytes.append\n-        if len(vocab) and max(vocab) == len(vocab) - 1:\n-\n+        vocab = self.vocab\n+        if len(vocab) and max(vocab) == len(vocab) - 1:\n+"
+    },
+    {
+      "seq": 51,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 140,
+      "end_line": 143,
+      "lines_before": 4,
+      "lines_after": 6,
+      "at": 1791864196746,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -140,4 +140,6 @@\n-        else:\n-            special_tokens = self.inverse_special_tokens\n-            for idx in ids:\n-\n+        else:\n+            part_bytes = []\n+            append = part_bytes.append\n+            special_tokens = self.inverse_special_tokens\n+            for idx in ids:\n+"
+    },
+    {
+      "seq": 52,
+      "kind": "evaluate",
+      "target": "decode_ir",
+      "eval_kind": "perf",
+      "at": 1791864197956,
+      "phases": [
+        {
+          "phase": "prepare",
+          "at": 1791864199451
+        },
+        {
+          "phase": "build",
+          "at": 1791864199836
+        },
+        {
+          "phase": "build",
+          "at": 1791864199836
+        },
+        {
+          "phase": "test",
+          "at": 1791864200298
+        },
+        {
+          "phase": "test",
+          "at": 1791864215172
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791864230022
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791864230022
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864230613
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864238295
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864246018
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864257044
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864268401
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864277185
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864285700
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864291413
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864297140
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864308069
+        }
+      ]
+    },
+    {
+      "seq": 70,
+      "kind": "result",
+      "at": 1791864318934,
+      "output": "outcome: rejected (no_improvement: worst ratio 1.0000 vs required 0.9900)\nguard limits (config version 1): every guarded metric other than the target is within its limit\nguard: ok, 1 files, 4 lines\nbuild: base ok, candidate ok\nequivalence: identical outputs\nmetric train_basic_ir: parent 2999555325, candidate 3006605632, ratio 1.0024\nmetric train_regex_ir: parent 3569385713, candidate 3568391395, ratio 0.9997\nmetric encode_ir: parent 2550034941, candidate 2552686801, ratio 1.0010\nmetric decode_ir: parent 1930609535, candidate 1930585756, ratio 1.0000\nmetric save_load_ir: parent 2791971315, candidate 2791866858, ratio 1.0000",
+      "outcome": "rejected",
+      "steps": [
+        {
+          "step": "build",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 448,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "build",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 451,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "test",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 14857,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 14.42s\n"
+        },
+        {
+          "step": "test",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 14844,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 14.41s\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 576,
+          "timed_out": false,
+          "tail": "32, 115, 116, 117, 100, 105, 111, 32, 97, 108, 273, 109, 44, 32, 70, 267, 114, 108, 101, 115, 115, 44, 32, 119, 97, 115, 32, 114, 101, 108, 267, 269, 100, 32, 111, 110, 32, 78, 111, 118, 101, 109, 98, 101, 114, 32, 49, 49, 44, 32, 50, 48, 48, 56, 44, 32, 105, 110, 32, 78, 111, 114, 116, 104, 32, 65, 109, 101, 114, 105, 99, 97, 44, 91, 55, 51, 93, 32, 97, 110, 100, 32, 105, 110, 32, 77, 97, 114, 99, 104, 32, 50, 48, 48, 57, 32, 105, 110, 32, 111, 116, 104, 101, 114, 32, 109, 97, 114, 107, 101, 116, 115, 46, 91, 55, 52, 93, 32, 67, 114, 105, 116, 105, 99, 115, 32, 108, 97, 117, 100, 101, 100, 32, 83, 119, 105, 102, 116, 39, 115, 32, 104, 111, 110, 101, 115, 116, 32, 97, 110, 100, 32, 118, 117, 108, 110, 101, 114, 97, 98, 108, 101, 32, 284, 110, 103, 119, 114, 105, 116, 105, 110, 103, 32, 105, 110, 32, 99, 111, 110, 116, 114, 97, 115, 116, 32, 116, 111, 32, 111, 116, 104, 101, 114, 32, 116, 101, 101, 110, 97, 103, 101, 32, 115, 105, 110, 103, 101, 114, 115, 46, 91, 55, 53, 93, 32, 70, 105, 118, 101, 32, 115, 105, 110, 103, 108, 101, 115, 32, 119, 101, 114, 101, 32, 114, 101, 108, 267, 269, 100, 32, 105, 110, 32, 50, 48, 48, 56, 261, 147, 50, 48, 48, 57, 58, 32, 34, 76, 111, 118, 101]\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 586,
+          "timed_out": false,
+          "tail": "32, 115, 116, 117, 100, 105, 111, 32, 97, 108, 273, 109, 44, 32, 70, 267, 114, 108, 101, 115, 115, 44, 32, 119, 97, 115, 32, 114, 101, 108, 267, 269, 100, 32, 111, 110, 32, 78, 111, 118, 101, 109, 98, 101, 114, 32, 49, 49, 44, 32, 50, 48, 48, 56, 44, 32, 105, 110, 32, 78, 111, 114, 116, 104, 32, 65, 109, 101, 114, 105, 99, 97, 44, 91, 55, 51, 93, 32, 97, 110, 100, 32, 105, 110, 32, 77, 97, 114, 99, 104, 32, 50, 48, 48, 57, 32, 105, 110, 32, 111, 116, 104, 101, 114, 32, 109, 97, 114, 107, 101, 116, 115, 46, 91, 55, 52, 93, 32, 67, 114, 105, 116, 105, 99, 115, 32, 108, 97, 117, 100, 101, 100, 32, 83, 119, 105, 102, 116, 39, 115, 32, 104, 111, 110, 101, 115, 116, 32, 97, 110, 100, 32, 118, 117, 108, 110, 101, 114, 97, 98, 108, 101, 32, 284, 110, 103, 119, 114, 105, 116, 105, 110, 103, 32, 105, 110, 32, 99, 111, 110, 116, 114, 97, 115, 116, 32, 116, 111, 32, 111, 116, 104, 101, 114, 32, 116, 101, 101, 110, 97, 103, 101, 32, 115, 105, 110, 103, 101, 114, 115, 46, 91, 55, 53, 93, 32, 70, 105, 118, 101, 32, 115, 105, 110, 103, 108, 101, 115, 32, 119, 101, 114, 101, 32, 114, 101, 108, 267, 269, 100, 32, 105, 110, 32, 50, 48, 48, 56, 261, 147, 50, 48, 48, 57, 58, 32, 34, 76, 111, 118, 101]\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 7681,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,999,555,325\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 7717,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      3,006,605,632\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 11030,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      3,569,385,713\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 11357,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      3,568,391,395\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 8783,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,550,034,941\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 8514,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,552,686,801\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 5712,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 49bf0445cc0f5495\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4bec000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      1,930,609,535\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 5727,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 49bf0445cc0f5495\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4be5000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      1,930,585,756\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 10929,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,791,971,315\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 10765,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,791,866,858\n"
+        }
+      ]
+    },
+    {
+      "seq": 71,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 109,
+      "end_line": 111,
+      "lines_before": 3,
+      "lines_after": 5,
+      "at": 1791864321069,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -109,3 +109,5 @@\n-        vocab = self.vocab\n-        if len(vocab) and max(vocab) == len(vocab) - 1:\n-\n+        vocab = self.vocab\n+        part_bytes = []\n+        append = part_bytes.append\n+        if len(vocab) and max(vocab) == len(vocab) - 1:\n+"
+    },
+    {
+      "seq": 72,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 142,
+      "end_line": 147,
+      "lines_before": 6,
+      "lines_after": 4,
+      "at": 1791864322554,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -142,6 +142,4 @@\n-        else:\n-            part_bytes = []\n-            append = part_bytes.append\n-            special_tokens = self.inverse_special_tokens\n-            for idx in ids:\n-\n+        else:\n+            special_tokens = self.inverse_special_tokens\n+            for idx in ids:\n+"
+    },
+    {
+      "seq": 73,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 12,
+      "end_line": 14,
+      "lines_before": 3,
+      "lines_after": 6,
+      "at": 1791864327643,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -12,3 +12,6 @@\n-import regex as re\n-from .base import Tokenizer, get_stats, build_merge_map\n-\n+from collections import Counter\n+from itertools import pairwise\n+\n+import regex as re\n+from .base import Tokenizer, get_stats, build_merge_map\n+"
+    },
+    {
+      "seq": 74,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 56,
+      "end_line": 64,
+      "lines_before": 9,
+      "lines_after": 7,
+      "at": 1791864329918,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -56,9 +56,7 @@\n-            stats = {}\n-            for chunk_ids in ids:\n-                # count pairs in this chunk, adding up counts across chunks\n-                for j in range(len(chunk_ids) - 1):\n-                    pair = (chunk_ids[j], chunk_ids[j+1])\n-                    stats[pair] = stats.get(pair, 0) + 1\n-            # find the pair with the highest count\n-            pair = max(stats, key=stats.get)\n-\n+            stats = Counter()\n+            for chunk_ids in ids:\n+                # count pairs in this chunk, adding up counts across chunks\n+                stats.update(pairwise(chunk_ids))\n+            # find the pair with the highest count\n+            pair = stats.most_common(1)[0][0]\n+"
+    },
+    {
+      "seq": 75,
+      "kind": "evaluate",
+      "target": "train_regex_ir",
+      "eval_kind": "perf",
+      "at": 1791864331203,
+      "phases": [
+        {
+          "phase": "prepare",
+          "at": 1791864332881
+        },
+        {
+          "phase": "build",
+          "at": 1791864333259
+        },
+        {
+          "phase": "build",
+          "at": 1791864333259
+        },
+        {
+          "phase": "test",
+          "at": 1791864333726
+        },
+        {
+          "phase": "test",
+          "at": 1791864348528
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791864363607
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791864363607
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864364217
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864371976
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864379737
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864390806
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864408113
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864416819
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864425558
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864431231
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864436976
+        },
+        {
+          "phase": "metrics",
+          "at": 1791864447833
+        }
+      ]
+    },
+    {
+      "seq": 93,
+      "kind": "result",
+      "at": 1791864458708,
+      "output": "outcome: rejected (no_improvement: worst ratio 1.2202 vs required 0.9900)\nguard limits (config version 1): every guarded metric other than the target is within its limit\nguard: ok, 1 files, 11 lines\nbuild: base ok, candidate ok\nequivalence: identical outputs\nmetric train_basic_ir: parent 2999555325, candidate 2999742906, ratio 1.0001\nmetric train_regex_ir: parent 3569385707, candidate 4355421652, ratio 1.2202\nmetric encode_ir: parent 2550034947, candidate 2553027473, ratio 1.0012\nmetric decode_ir: parent 1930609535, candidate 1930678584, ratio 1.0000\nmetric save_load_ir: parent 2791971309, candidate 2792044003, ratio 1.0000",
+      "outcome": "rejected",
+      "steps": [
+        {
+          "step": "build",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 453,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "build",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 456,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "test",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 14786,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 14.37s\n"
+        },
+        {
+          "step": "test",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 15073,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 14.64s\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 570,
+          "timed_out": false,
+          "tail": "32, 115, 116, 117, 100, 105, 111, 32, 97, 108, 273, 109, 44, 32, 70, 267, 114, 108, 101, 115, 115, 44, 32, 119, 97, 115, 32, 114, 101, 108, 267, 269, 100, 32, 111, 110, 32, 78, 111, 118, 101, 109, 98, 101, 114, 32, 49, 49, 44, 32, 50, 48, 48, 56, 44, 32, 105, 110, 32, 78, 111, 114, 116, 104, 32, 65, 109, 101, 114, 105, 99, 97, 44, 91, 55, 51, 93, 32, 97, 110, 100, 32, 105, 110, 32, 77, 97, 114, 99, 104, 32, 50, 48, 48, 57, 32, 105, 110, 32, 111, 116, 104, 101, 114, 32, 109, 97, 114, 107, 101, 116, 115, 46, 91, 55, 52, 93, 32, 67, 114, 105, 116, 105, 99, 115, 32, 108, 97, 117, 100, 101, 100, 32, 83, 119, 105, 102, 116, 39, 115, 32, 104, 111, 110, 101, 115, 116, 32, 97, 110, 100, 32, 118, 117, 108, 110, 101, 114, 97, 98, 108, 101, 32, 284, 110, 103, 119, 114, 105, 116, 105, 110, 103, 32, 105, 110, 32, 99, 111, 110, 116, 114, 97, 115, 116, 32, 116, 111, 32, 111, 116, 104, 101, 114, 32, 116, 101, 101, 110, 97, 103, 101, 32, 115, 105, 110, 103, 101, 114, 115, 46, 91, 55, 53, 93, 32, 70, 105, 118, 101, 32, 115, 105, 110, 103, 108, 101, 115, 32, 119, 101, 114, 101, 32, 114, 101, 108, 267, 269, 100, 32, 105, 110, 32, 50, 48, 48, 56, 261, 147, 50, 48, 48, 57, 58, 32, 34, 76, 111, 118, 101]\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 602,
+          "timed_out": false,
+          "tail": "32, 115, 116, 117, 100, 105, 111, 32, 97, 108, 273, 109, 44, 32, 70, 267, 114, 108, 101, 115, 115, 44, 32, 119, 97, 115, 32, 114, 101, 108, 267, 269, 100, 32, 111, 110, 32, 78, 111, 118, 101, 109, 98, 101, 114, 32, 49, 49, 44, 32, 50, 48, 48, 56, 44, 32, 105, 110, 32, 78, 111, 114, 116, 104, 32, 65, 109, 101, 114, 105, 99, 97, 44, 91, 55, 51, 93, 32, 97, 110, 100, 32, 105, 110, 32, 77, 97, 114, 99, 104, 32, 50, 48, 48, 57, 32, 105, 110, 32, 111, 116, 104, 101, 114, 32, 109, 97, 114, 107, 101, 116, 115, 46, 91, 55, 52, 93, 32, 67, 114, 105, 116, 105, 99, 115, 32, 108, 97, 117, 100, 101, 100, 32, 83, 119, 105, 102, 116, 39, 115, 32, 104, 111, 110, 101, 115, 116, 32, 97, 110, 100, 32, 118, 117, 108, 110, 101, 114, 97, 98, 108, 101, 32, 284, 110, 103, 119, 114, 105, 116, 105, 110, 103, 32, 105, 110, 32, 99, 111, 110, 116, 114, 97, 115, 116, 32, 116, 111, 32, 111, 116, 104, 101, 114, 32, 116, 101, 101, 110, 97, 103, 101, 32, 115, 105, 110, 103, 101, 114, 115, 46, 91, 55, 53, 93, 32, 70, 105, 118, 101, 32, 115, 105, 110, 103, 108, 101, 115, 32, 119, 101, 114, 101, 32, 114, 101, 108, 267, 269, 100, 32, 105, 110, 32, 50, 48, 48, 56, 261, 147, 50, 48, 48, 57, 58, 32, 34, 76, 111, 118, 101]\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 7759,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,999,555,325\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 7760,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,999,742,906\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 11069,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      3,569,385,707\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 17307,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      4,355,421,652\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 8705,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,550,034,947\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 8739,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,553,027,473\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 5673,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 49bf0445cc0f5495\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4bec000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      1,930,609,535\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 5744,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 49bf0445cc0f5495\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4bef000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      1,930,678,584\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 10857,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,791,971,309\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 10769,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 49bf0445cc0f5495\n==7== \n==7== \n==7== I   refs:      2,792,044,003\n"
+        }
+      ]
+    },
+    {
+      "seq": 94,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 12,
+      "end_line": 17,
+      "lines_before": 6,
+      "lines_after": 3,
+      "at": 1791864460363,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -12,6 +12,3 @@\n-from collections import Counter\n-from itertools import pairwise\n-\n-import regex as re\n-from .base import Tokenizer, get_stats, build_merge_map\n-\n+import regex as re\n+from .base import Tokenizer, get_stats, build_merge_map\n+"
+    },
+    {
+      "seq": 95,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 53,
+      "end_line": 59,
+      "lines_before": 7,
+      "lines_after": 9,
+      "at": 1791864462378,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -53,7 +53,9 @@\n-            stats = Counter()\n-            for chunk_ids in ids:\n-                # count pairs in this chunk, adding up counts across chunks\n-                stats.update(pairwise(chunk_ids))\n-            # find the pair with the highest count\n-            pair = stats.most_common(1)[0][0]\n-\n+            stats = {}\n+            for chunk_ids in ids:\n+                # count pairs in this chunk, adding up counts across chunks\n+                for j in range(len(chunk_ids) - 1):\n+                    pair = (chunk_ids[j], chunk_ids[j+1])\n+                    stats[pair] = stats.get(pair, 0) + 1\n+            # find the pair with the highest count\n+            pair = max(stats, key=stats.get)\n+"
+    },
+    {
+      "seq": 96,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 66,
+      "end_line": 88,
+      "lines_before": 23,
+      "lines_after": 26,
+      "at": 1791864469014,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -66,23 +66,26 @@\n-            for chunk_ids in ids:\n-                j = 0\n-                n = len(chunk_ids)\n-                while j < n - 1:\n-                    if chunk_ids[j] == p0 and chunk_ids[j+1] == p1:\n-                        new_chunk_ids = chunk_ids[:j]\n-                        append = new_chunk_ids.append\n-                        append(idx)\n-                        j += 2\n-                        while j < n:\n-                            if chunk_ids[j] == p0 and j < n - 1 and chunk_ids[j+1] == p1:\n-                                append(idx)\n-                                j += 2\n-                            else:\n-                                append(chunk_ids[j])\n-                                j += 1\n-                        if len(new_chunk_ids) > 1:\n-                            new_ids.append(new_chunk_ids)\n-                        break\n-                    j += 1\n-                else:\n-                    new_ids.append(chunk_ids)\n-\n+            for chunk_ids in ids:\n+                j = 0\n+                n = len(chunk_ids)\n+                last = n - 1\n+                while j < last:\n+                    if chunk_ids[j] == p0 and chunk_ids[j+1] == p1:\n+                        new_chunk_ids = chunk_ids[:j]\n+                        append = new_chunk_ids.append\n+                        append(idx)\n+                        j += 2\n+                        while j < last:\n+                            if chunk_ids[j] == p0 and chunk_ids[j+1] == p1:\n+                                append(idx)\n+                                j += 2\n+                            else:\n+                                append(chunk_ids[j])\n+                                j += 1\n+                        if j == last:\n+                            append(chunk_ids[j])\n+                        if len(new_chunk_ids) > 1:\n+                            new_ids.append(new_chunk_ids)\n+                        break\n+                    j += 1\n+                else:\n+                    new_ids.append(chunk_ids)\n+"
+    },
+    {
+      "seq": 97,
+      "kind": "edit",
+      "path": "minbpe/regex.py",
+      "start_line": 66,
+      "end_line": 91,
+      "lines_before": 26,
+      "lines_after": 23,
+      "at": 1791864475235,
+      "diff": "--- a/minbpe/regex.py\n+++ b/minbpe/regex.py\n@@ -66,26 +66,23 @@\n-            for chunk_ids in ids:\n-                j = 0\n-                n = len(chunk_ids)\n-                last = n - 1\n-                while j < last:\n-                    if chunk_ids[j] == p0 and chunk_ids[j+1] == p1:\n-                        new_chunk_ids = chunk_ids[:j]\n-                        append = new_chunk_ids.append\n-                        append(idx)\n-                        j += 2\n-                        while j < last:\n-                            if chunk_ids[j] == p0 and chunk_ids[j+1] == p1:\n-                                append(idx)\n-                                j += 2\n-                            else:\n-                                append(chunk_ids[j])\n-                                j += 1\n-                        if j == last:\n-                            append(chunk_ids[j])\n-                        if len(new_chunk_ids) > 1:\n-                            new_ids.append(new_chunk_ids)\n-                        break\n-                    j += 1\n-                else:\n-                    new_ids.append(chunk_ids)\n-\n+            for chunk_ids in ids:\n+                j = 0\n+                n = len(chunk_ids)\n+                while j < n - 1:\n+                    if chunk_ids[j] == p0 and chunk_ids[j+1] == p1:\n+                        new_chunk_ids = chunk_ids[:j]\n+                        append = new_chunk_ids.append\n+                        append(idx)\n+                        j += 2\n+                        while j < n:\n+                            if chunk_ids[j] == p0 and j < n - 1 and chunk_ids[j+1] == p1:\n+                                append(idx)\n+                                j += 2\n+                            else:\n+                                append(chunk_ids[j])\n+                                j += 1\n+                        if len(new_chunk_ids) > 1:\n+                            new_ids.append(new_chunk_ids)\n+                        break\n+                    j += 1\n+                else:\n+                    new_ids.append(chunk_ids)\n+"
+    },
+    {
+      "seq": 98,
+      "kind": "read",
+      "path": "minbpe/regex.py",
+      "start_line": 1,
+      "end_line": 130,
+      "content_sha256": "217ed40b6f3f1713f7fa1a80b6f5f1a80fd8da6e7067836140c5ad7c6ebe329a",
+      "at": 1791864477486
+    },
+    {
+      "seq": 99,
+      "kind": "give_up",
+      "at": 1791864480209,
+      "reason": "No measured improvement was found within the evaluation budget. Tested decode alternatives in RegexTokenizer that preserved outputs but either regressed or were neutral, and a train_regex counting change also regressed; repository changes were reverted."
+    }
+  ],
+  "candidate": null,
+  "replays": [],
+  "verdict": null,
+  "outcome": "no_candidate",
+  "effect": null,
+  "cost": {
+    "input_tokens": 39805,
+    "output_tokens": 8122,
+    "cache_read_tokens": 406016,
+    "cache_write_tokens": 0,
+    "usd": 0.681206,
+    "sandbox_s": 486.72,
+    "source": "worker_report"
+  },
+  "reward": {
+    "v": 1,
+    "accepted": 0,
+    "effect": 0,
+    "fixed_tests": 0,
+    "effect_per_usd": 0,
+    "effect_per_sandbox_hour": 0,
+    "reverted": false,
+    "inputs": [
+      "outcome",
+      "cost.usd (worker_report)",
+      "cost.sandbox_s (worker_report)"
+    ]
+  },
+  "worker_outcome": "no candidate: the session stopped without submitting a change [stop: gave up; model calls: 24]",
+  "journal": {
+    "entry_id": "c05babbab7633974f15af42d8f1eaac6406ab649914abcc82ea3384af7aaa3f0",
+    "text": "I read minbpe/base.py, minbpe/basic.py, minbpe/regex.py, minbpe/gpt4.py, and lineage_bench.py. I changed minbpe/regex.py in RegexTokenizer.decode and RegexTokenizer.train. I tested decode alternatives, then a train_regex counting change. Changes were reverted.\n\nevaluation 1 decode_ir was rejected: worst ratio 1.1799 vs required 0.9900. evaluation 3 was rejected: 1.0167 vs 0.9900. evaluation 5 was rejected: 1.0000 vs 0.9900. evaluation 7 train_regex_ir was rejected: 1.2202 vs 0.9900. Build was base ok and candidate ok. Outputs were identical. Guards were ok.\n\nRegexTokenizer.decode preserved outputs but did not improve decode_ir. Two variants regressed. One was neutral. The RegexTokenizer.train counting change regressed train_regex_ir.\n\nNext try a different decode path, not these reverted variants. Measure decode_ir first. If touching RegexTokenizer.train again, measure train_regex_ir immediately. No candidate was submitted.",
+    "created_at": 1791864499148,
+    "sig": "XKixAiGeui5ATasBa5CFBEgkrQfjZbakJFf8HSiDm1RNUa7Bmo1Ebw7tyJ4ZhcbjWafVdLoUWXH4FM4RPmo36YS",
+    "signer": "2aK9m6LKMcuDBSTbShgftr2LwR52qK5dAY8hE3guYJ3e"
+  },
+  "provenance": null,
+  "license": {
+    "repo": "https://github.com/karpathy/minbpe",
+    "spdx": "MIT",
+    "name": "MIT License",
+    "url": "https://github.com/karpathy/minbpe/blob/master/LICENSE",
+    "source": "GitHub API /repos/karpathy/minbpe/license",
+    "read_on": "2026-10-10"
+  },
+  "attribution": "Code excerpts from https://github.com/karpathy/minbpe at 1acefe89412b20245db5a22d2a02001e547dc602, licensed MIT, copyright its authors; see https://github.com/karpathy/minbpe/blob/master/LICENSE.",
+  "times": {
+    "started_at": 1791863899159,
+    "ended_at": 1791864480216,
+    "finalized_at": null,
+    "published_at": 1791864532011
+  },
+  "verify": {
+    "session": "/v1/sessions/8f12db095acb3b20408c00347d8dc74ad0580c2707e1f95d79dd953aae9696d2",
+    "candidate": null,
+    "generation": null,
+    "provenance": null,
+    "journal": "/v1/agents/HHxDgMPdYJ5SCXNdsvtaQnng3PAPXrPtZGY2xYc4eDtX/journal?lineage=ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2"
+  }
+}

@@ -1,16 +1,16 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 26 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 27 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 7 (6 accepted, 1 no candidate)
+- Attempts: 8 (6 accepted, 2 no candidate)
 - Best accepted effect: 32.45% (ratio 0.6755), episode `c285e522f788`
 - Accepted effects: 32.45%, 13.41%, 12.94%, 4.53%, 2.62%, 1.71%
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3996 USD (over 7 attempts with a recorded cost)
+- Median model spend per attempt: 0.4204 USD (over 8 attempts with a recorded cost)
 
 ## Target perf:train_regex_ir
 
@@ -51,6 +51,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> I read minbpe/base.py, minbpe/basic.py, minbpe/regex.py, minbpe/gpt4.py, and lineage_bench.py. I changed minbpe/regex.py in RegexTokenizer.decode and RegexTokenizer.train. I tested decode alternatives, then a train_regex counting change. Changes were reverted.
+> evaluation 1 decode_ir was rejected: worst ratio 1.1799 vs required 0.9900. evaluation 3 was rejected: 1.0167 vs 0.9900. evaluation 5 was rejected: 1.0000 vs 0.9900. evaluation 7 train_regex_ir was rejected: 1.2202 vs 0.9900. Build was base ok and candidate ok. Outputs were identical. Guards were ok.
+> RegexTokenizer.decode preserved outputs but did not improve decode_ir. Two variants regressed. One was neutral. The RegexTokenizer.train counting change regressed train_regex_ir.
+> Next try a different decode path, not these reverted variants. Measure decode_ir first. If touching RegexTokenizer.train again, measure train_regex_ir immediately. No candidate was submitted.
+>
+> 2026-10-13, episode `a3fb90575499` (no candidate)
+
 > Changed minbpe/regex.py in RegexTokenizer.decode. Edits touched lines 112-128, 114-116, and 121-139. The decode path now uses a dense lookup table when vocabulary ids are contiguous, including registered special token ids. Invalid ids fall back to the existing validation path.
 > Sandbox evaluation 1 for perf decode_ir said outcome: accepted. Guard: ok, 1 files, 39 lines. Build: base ok, candidate ok. Equivalence: identical outputs. decode_ir was parent 2235377357, candidate 1946395860, ratio 0.8707. train_basic_ir ratio 0.9970. train_regex_ir ratio 1.0008. encode_ir ratio 0.9998. save_load_ir ratio 1.0003.
 > I now believe RegexTokenizer.decode has a valid-input path worth keeping when ids are contiguous. train_regex_ir and save_load_ir did not help. The invalid-id path should stay plain.
@@ -78,13 +85,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try a different area. Look at get_stats, merge, or the repeated build_merge_map path. Keep equivalence checks tight. Do not keep the BasicTokenizer.train rewrites from this session.
 >
 > 2026-10-13, episode `ca754602b3d0` (no candidate)
-
-> In minbpe/basic.py I changed BasicTokenizer.train. Lines 12-15 and 36-37 were edited. Adjacent pair counting now uses itertools.pairwise, so ids[1:] is not built for every merge iteration.
-> Sandbox evaluation perf train_basic_ir had outcome: accepted. Guard: ok, 1 files, 3 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_basic_ir was parent 3034462134, candidate 2958400850, ratio 0.9749. train_regex_ir ratio 0.9999. encode_ir ratio 1.0005. decode_ir ratio 0.9990. save_load_ir ratio 1.0000.
-> The change is narrow. The measured target moved. The guarded metrics stayed within limit. The same pair order and Counter selection behavior were preserved in the sandbox outputs.
-> The perf candidate was submitted on train_basic_ir with 3 changed lines. It was committed and revealed with status queued. Next, read the independent replay result when it arrives.
->
-> 2026-10-13, episode `f4377fb56148` (accepted)
 
 ## Licence
 
