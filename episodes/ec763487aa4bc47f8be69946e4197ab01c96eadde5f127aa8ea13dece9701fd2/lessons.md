@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 50 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 51 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -42,17 +42,24 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_basic_ir
 
-- Attempts: 7 (4 accepted, 2 no candidate, 1 rejected)
+- Attempts: 8 (4 accepted, 3 no candidate, 1 rejected)
 - Best accepted effect: 15.23% (ratio 0.8477), episode `0bddfdfcf08a`
 - Accepted effects: 15.23%, 12.34%, 2.67%, 1.14%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/basic.py`
 - Files changed by rejected candidates: `minbpe/basic.py`
-- Median model spend per attempt: 0.3265 USD (over 7 attempts with a recorded cost)
+- Median model spend per attempt: 0.3377 USD (over 8 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> minbpe/basic.py changed get_stats and BasicTokenizer.train. The tries rewrote local pair handling and loop shape around lines 11-16, 33-39, and 66-77. minbpe/__init__.py lines 1-5 were replaced by 13 lines for a lazy GPT4Tokenizer import.
+> evaluation 1 was rejected: train_basic_ir ratio 1.0120. evaluation 3 was rejected: ratio 1.0030. evaluation 5 was rejected: ratio 1.0014. evaluation 7 was rejected: ratio 1.0252. Each build was base ok, candidate ok. Each had identical outputs. The lazy GPT4Tokenizer import was not measured before the evaluation limit.
+> The BasicTokenizer.train changes did not help train_basic_ir. The smallest measured miss was still ratio 1.0014 vs required 0.9900. The code is sensitive to small Python shape changes here.
+> Try measuring the lazy GPT4Tokenizer import alone. Then try changes outside the hot BasicTokenizer.train loop, or use a smaller isolated change to get_stats with no import noise.
+>
+> 2026-10-13, episode `d09740655dac` (no candidate)
 
 > Changed Tokenizer.save in minbpe/base.py lines 169-172. Replaced 4 lines by 15. Save now populates the existing model load cache from the saved model text.
 > Sandbox evaluation 1, perf save_load_ir: outcome: accepted. guard: ok, 1 files, 13 lines. build: base ok, candidate ok. equivalence: identical outputs. save_load_ir: parent 903800234, candidate 788904071, ratio 0.8729.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replays. If this holds, look for the same repeated text rendering in nearby save paths.
 >
 > 2026-10-13, episode `d6fbac5f2cd5` (accepted)
-
-> I tried Counter/pairwise stats, combined preprocessing, integer pair keys, and in-place chunk list compaction in minbpe/regex.py. I also touched minbpe/basic.py lines 36-39 and 36-42.
-> evaluation 1 train_regex_ir was rejected, ratio 1.2129 vs required 0.9900. evaluation 3 was rejected, ratio 0.9999 vs required 0.9900. evaluation 5 was rejected, ratio 1.0159. evaluation 7 was rejected, ratio 1.0195. Builds passed. Outputs were identical. Guards were within limits.
-> I believe these changes do not help this code. The best measured train_regex_ir ratio was 0.9999, and that did not meet the 1% threshold. The other tries were slower.
-> Next try should stay in minbpe/regex.py and look past pair counting shape. Recheck the train_regex_ir path before changing minbpe/basic.py again.
->
-> 2026-10-13, episode `cceaf194c2b8` (no candidate)
 
 ## Licence
 
