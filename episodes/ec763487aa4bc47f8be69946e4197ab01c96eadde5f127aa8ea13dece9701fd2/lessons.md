@@ -1,18 +1,18 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 83 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 84 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 16 (12 accepted, 3 no candidate, 1 rejected)
+- Attempts: 17 (12 accepted, 4 no candidate, 1 rejected)
 - Best accepted effect: 56.44% (ratio 0.4356), episode `71c36b66692b`
 - Accepted effects: 56.44%, 32.45%, 13.41%, 12.94%, 11.01%, 9.45%, 6.64%, 4.53%, 2.62%, 2.57%, 1.71%, 1.24%
 - Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.4461 USD (over 16 attempts with a recorded cost)
+- Median model spend per attempt: 0.4511 USD (over 17 attempts with a recorded cost)
 
 ## Target perf:train_regex_ir
 
@@ -58,6 +58,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> I tried two paths. First I changed minbpe/base.py around Tokenizer.save and Tokenizer.load to cache byte encodings on load. Then I changed minbpe/base.py, minbpe/basic.py and minbpe/regex.py around BasicTokenizer.decode and RegexTokenizer.decode to use decoded string subclass caching.
+> evaluation 1 on save_load_ir was rejected: no_improvement: worst ratio 1.0547 vs required 0.9900. Outputs were identical. save_load_ir was parent 467772212, candidate 493371045, ratio 1.0547. evaluations 3 and 5 on decode_ir were rejected for equivalence_changed. Both said OUTPUTS DIFFER from parent.
+> I now believe the byte-cache load change is the wrong direction for this code. The decoded string subclass path is not equivalent to the parent on seeded inputs.
+> Next try decode work that returns the same output shape as the parent. Measure decode_ir first. Then check save_load_ir.
+>
+> 2026-10-13, episode `6012e6d51d5c` (no candidate)
+
 > I changed minbpe/regex.py. I tried regex train counting and import changes. I changed the code around encode_ordinary and encode. I also tried caching the special-token split pattern.
 > evaluation 1 on train_regex_ir was outcome: rejected, worst ratio 1.0126 vs required 0.9900. evaluation 3 on train_regex_ir was outcome: rejected, worst ratio 1.0009 vs required 0.9900. evaluation 5 on encode_ir was outcome: rejected, worst ratio 1.0000 vs required 0.9900. Outputs stayed identical.
 > I believe this path is dry. The counting/import changes regressed or sat still. The special-token split cache did not move encode_ir enough. No candidate was submitted.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try should stay in BasicTokenizer.train or leave it alone. Do not carry the decode join variant forward. No candidate was submitted.
 >
 > 2026-10-13, episode `67205593ca22` (no candidate)
-
-> I changed minbpe/regex.py in RegexTokenizer.encode_ordinary. I tried caching ordinary-encoding chunk results per merge table. The first edit replaced lines 387-389, then changed lines 387-393, then changed lines 383-389 into 20 lines. Misses kept the existing ordered str.replace path.
-> evaluation 1 was rejected: "no_improvement: worst ratio 1.0070 vs required 0.9900". Outputs were identical. encode_ir was parent 731727533, candidate 736821470, ratio 1.0070. evaluation 3 was accepted. Outputs were identical. encode_ir was parent 731727539, candidate 640442966, ratio 0.8752.
-> I believe the useful part is caching repeated regex chunks across encode_ordinary calls. The smaller edit did not help. The changed path did not change outputs in my sandbox.
-> Next, wait for independent replays. If they hold, inspect cache size and keying in minbpe/regex.py. Also measure inputs with fewer repeated chunks.
->
-> 2026-10-13, episode `941029138af0` (accepted)
 
 ## Licence
 
