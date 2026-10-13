@@ -1,18 +1,18 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 39 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 40 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 9 (6 accepted, 2 no candidate, 1 rejected)
+- Attempts: 10 (7 accepted, 2 no candidate, 1 rejected)
 - Best accepted effect: 32.45% (ratio 0.6755), episode `c285e522f788`
-- Accepted effects: 32.45%, 13.41%, 12.94%, 4.53%, 2.62%, 1.71%
+- Accepted effects: 32.45%, 13.41%, 12.94%, 4.53%, 2.62%, 1.71%, 1.24%
 - Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.4412 USD (over 9 attempts with a recorded cost)
+- Median model spend per attempt: 0.4316 USD (over 10 attempts with a recorded cost)
 
 ## Target perf:train_regex_ir
 
@@ -54,6 +54,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> I tried a save_load_ir change in minbpe/base.py, then backed it out. I changed BasicTokenizer.decode in minbpe/basic.py and RegexTokenizer.decode in minbpe/regex.py to cache dense decode lookup structures when vocabulary and special-token item tuples are unchanged.
+> The save_load_ir run was rejected: worst ratio 1.0242 vs required 0.9900. It had identical outputs. The decode_ir run was accepted in sandbox with identical outputs. decode_ir moved from 1863912617 to 1842788660, ratio 0.9887. save_load_ir moved from 1018691873 to 1019159066, ratio 1.0005.
+> I believe rebuilding the dense decode lookup on every decode call is real waste here. The base.py save_load_ir attempt did not help.
+> Next, wait for independent replay. If it holds, look for the same repeated-structure rebuild in encode paths without touching save_load_ir.
+>
+> 2026-10-13, episode `7aa873ea219f` (accepted)
+
 > Read minbpe/base.py, minbpe/basic.py, minbpe/regex.py, and lineage_bench.py. Tried minbpe/base.py Tokenizer.save and Tokenizer.load changes for save_load_ir. Those changes did not hold. Then changed minbpe/regex.py RegexTokenizer.decode to cache the dense decode lookup table by the current vocab and special-token byte mappings.
 > save_load_ir runs were rejected. evaluation 1: worst ratio 1.0262 vs required 0.9900. evaluation 3: worst ratio 0.9981 vs required 0.9900. evaluation 5: worst ratio 1.0023 vs required 0.9900. evaluation 7 on decode_ir was accepted in sandbox: parent 1921555607, candidate 1890224655, ratio 0.9837. Equivalence was identical outputs. Guard was ok, 1 files, 21 lines.
 > Tokenizer.save and Tokenizer.load are not the place yet. RegexTokenizer.decode was rebuilding work that can be reused when the tokenizer dictionaries have not changed.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try a different encode path. Do not spend more time reshaping the same merge loop without a new measurement target. No candidate was submitted.
 >
 > 2026-10-13, episode `b5a9b92e411d` (no candidate)
-
-> Changed minbpe/base.py in Tokenizer.load. Replaced lines 175-198, then lines 175-195. Changed lines 13-14 and lines 177-203 to cache parsed model contents by tokenizer type and file text, then restore copies.
-> evaluation 1 on perf save_load_ir was rejected: worst ratio 1.0033 vs required 0.9900. save_load_ir was parent 1644420757, candidate 1649815121, ratio 1.0033. It did not help. evaluation 3 was accepted in sandbox: save_load_ir parent 1644420757, candidate 1380927170, ratio 0.8398. Equivalence was identical outputs.
-> I now believe the useful change is in Tokenizer.load, not around it. Repeated loads of the same model text were paying parse and rebuild cost. The cache keeps independent mutable tokenizer state by restoring copies.
-> Next try measuring the copy path inside Tokenizer.load. Keep the key as tokenizer type and file text. Watch encode_ir ratio 1.0011 and train_regex_ir ratio 1.0002. The submitted perf candidate has status queued.
->
-> 2026-10-13, episode `424dca7e96a1` (accepted)
 
 ## Licence
 
