@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 106 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 107 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -36,13 +36,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 31 (3 rejected, 17 accepted, 11 no candidate)
+- Attempts: 32 (3 rejected, 17 accepted, 12 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
 - Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 12.89%, 10.30%, 10.08%, 7.37%, 6.30%, 4.72%, 3.80%, 3.11%, 3.08%, 2.81%, 2.48%, 1.41%, 1.11%
 - Why candidates failed: stale (2), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/__init__.py`, `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.3959 USD (over 31 attempts with a recorded cost)
+- Median model spend per attempt: 0.4027 USD (over 32 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -57,6 +57,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried one save/load cache change in minbpe/base.py. I touched the def save and def load path and the _LOAD_CACHE, _MODEL_BYTES_PREFIX_CACHE, and _VOCAB_BYTES_PREFIX_CACHE area.
+> evaluation 1: perf save_load_ir returned outcome: rejected (no_improvement: worst ratio 1.0013 vs required 0.9900). Outputs were identical. save_load_ir was parent 437674408, candidate 438231692, ratio 1.0013. train_basic_ir ratio 1.0025, train_regex_ir ratio 1.0018, encode_ir ratio 1.0003, decode_ir ratio 1.0018.
+> I now believe this cache edit did not help. It made the target worse and did not break equivalence.
+> Next try a different source of save/load work, not this cache shape. Re-read minbpe/base.py lines 260-380 before editing.
+>
+> 2026-10-13, episode `7838832bc3fb` (no candidate)
 
 > I worked in minbpe/regex.py. I changed RegexTokenizer.train and the encode path. I also read minbpe/base.py, lineage_bench.py, minbpe/basic.py, and minbpe/__init__.py.
 > evaluation 1 was rejected, with train_regex_ir ratio 0.9998. evaluation 3 was rejected, with ratio 1.0003. evaluation 5 was rejected, with ratio 1.0066. Outputs stayed identical. Guards were ok. The best train_regex_ir attempt was only a 0.02% reduction.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for the independent replays. If they hold, inspect the same decode cache path for smaller guard cost without touching encode behavior.
 >
 > 2026-10-13, episode `d1922ef2b765` (rejected)
-
-> Changed minbpe/basic.py in BasicTokenizer.encode around lines 154-179, then changed BasicTokenizer.train around lines 116-154. Changed minbpe/regex.py pattern setup around lines 12-35 and RegexTokenizer.train around lines 88-111.
-> evaluation 1 rejected: train_basic_ir parent 263129870, candidate 283808636, ratio 1.0786. evaluation 3 rejected: ratio 1.0009. evaluation 5 rejected: train_regex_ir parent 371281607, candidate 370677925, ratio 0.9984, required 0.9900. evaluation 7 rejected: ratio 1.0006. Builds passed. Equivalence was identical outputs. Guards were ok.
-> BasicTokenizer.train rewrites did not help. The small RegexTokenizer.train change measured better at 0.9984, but not enough for 0.9900. Pattern setup churn did not help.
-> Try narrower work in RegexTokenizer.train. Reduce merge allocation without changing outputs. Leave BasicTokenizer.encode alone unless encode_ir is the target. Session ended with no candidate and no submitted change.
->
-> 2026-10-13, episode `9f71cbbf86f4` (no candidate)
 
 ## Licence
 
