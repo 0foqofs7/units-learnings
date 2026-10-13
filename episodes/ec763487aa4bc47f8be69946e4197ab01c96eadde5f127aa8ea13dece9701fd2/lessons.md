@@ -1,18 +1,18 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 44 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 45 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 12 (9 accepted, 2 no candidate, 1 rejected)
+- Attempts: 13 (10 accepted, 2 no candidate, 1 rejected)
 - Best accepted effect: 56.44% (ratio 0.4356), episode `71c36b66692b`
-- Accepted effects: 56.44%, 32.45%, 13.41%, 12.94%, 11.01%, 4.53%, 2.62%, 1.71%, 1.24%
+- Accepted effects: 56.44%, 32.45%, 13.41%, 12.94%, 11.01%, 9.45%, 4.53%, 2.62%, 1.71%, 1.24%
 - Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.4316 USD (over 12 attempts with a recorded cost)
+- Median model spend per attempt: 0.4412 USD (over 13 attempts with a recorded cost)
 
 ## Target perf:train_regex_ir
 
@@ -54,6 +54,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> Changed minbpe/basic.py and minbpe/regex.py. The changed functions were BasicTokenizer.decode and RegexTokenizer.decode. Added a small recent-list decode cache on RegexTokenizer. Changed BasicTokenizer and RegexTokenizer list decode validation to use dictionary snapshots instead of rebuilt item tuples.
+> evaluation 1: outcome: rejected (no_improvement: worst ratio 0.9930 vs required 0.9900). decode_ir ratio 0.9930. That change did not help enough. evaluation 3: outcome: accepted, decode_ir ratio 0.9809. evaluation 5: outcome: accepted, decode_ir ratio 0.9009. equivalence: identical outputs. guard: ok, 2 files, 30 lines.
+> I now believe repeated list decodes were paying for dense lookup setup and tuple construction. The cache and snapshot check removed more work from decode_ir than the guarded metrics gained.
+> Next try a smaller cache shape in RegexTokenizer.decode, and check if BasicTokenizer.decode needs the same recent-list path. The submitted perf candidate is queued. Its verdict comes later from independent replays.
+>
+> 2026-10-13, episode `e0b1eb262663` (accepted)
+
 > Changed minbpe/base.py lines 18-20, 87-96, and 181-208. The changed save path is Tokenizer.save. It caches rendered .vocab lines by token id, token bytes, and child token bytes.
 > Own perf save_load_ir run: outcome accepted. Guard ok, 1 files, 34 lines. Build base ok and candidate ok. Equivalence identical outputs. save_load_ir parent 1001179229, candidate 954074973, ratio 0.9530. train_basic_ir ratio 1.0000, train_regex_ir ratio 1.0003, encode_ir ratio 0.9984, decode_ir ratio 1.0004.
 > The save/load path repeats enough .vocab rendering for a line cache to matter. The run did not help train_regex_ir. It did not help decode_ir. encode_ir moved the other way in this run.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try smaller invalidation state. Check memory growth from cached id sequences. The submitted perf candidate is queued, and the replay verdict comes later.
 >
 > 2026-10-13, episode `71c36b66692b` (accepted)
-
-> I tried a save_load_ir change in minbpe/base.py, then backed it out. I changed BasicTokenizer.decode in minbpe/basic.py and RegexTokenizer.decode in minbpe/regex.py to cache dense decode lookup structures when vocabulary and special-token item tuples are unchanged.
-> The save_load_ir run was rejected: worst ratio 1.0242 vs required 0.9900. It had identical outputs. The decode_ir run was accepted in sandbox with identical outputs. decode_ir moved from 1863912617 to 1842788660, ratio 0.9887. save_load_ir moved from 1018691873 to 1019159066, ratio 1.0005.
-> I believe rebuilding the dense decode lookup on every decode call is real waste here. The base.py save_load_ir attempt did not help.
-> Next, wait for independent replay. If it holds, look for the same repeated-structure rebuild in encode paths without touching save_load_ir.
->
-> 2026-10-13, episode `7aa873ea219f` (accepted)
 
 ## Licence
 
