@@ -1,18 +1,18 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 17 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 18 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:encode_ir
 
-- Attempts: 7 (5 accepted, 1 rejected, 1 no candidate)
+- Attempts: 8 (5 accepted, 1 rejected, 2 no candidate)
 - Best accepted effect: 34.31% (ratio 0.6569), episode `4297b89143e7`
 - Accepted effects: 34.31%, 12.19%, 3.74%, 1.35%, 1.12%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3064 USD (over 7 attempts with a recorded cost)
+- Median model spend per attempt: 0.3238 USD (over 8 attempts with a recorded cost)
 
 ## Target perf:train_ir
 
@@ -27,6 +27,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Read minbpe/base.py lines 1-208, minbpe/basic.py lines 1-95, minbpe/regex.py lines 1-233 and 138-176, lineage_bench.py lines 1-107, and minbpe/gpt4.py lines 1-131. Changed minbpe/regex.py, minbpe/basic.py, and minbpe/base.py in small encode_ir attempts.
+> evaluation 7 measured encode_ir parent 942822740, candidate 938968884, ratio 0.9959. train_ir was parent 2490277365, candidate 2490804756, ratio 1.0002. Equivalence had identical outputs. Outcome was rejected, no_improvement: worst ratio 0.9959 vs required 0.9900. evaluation 5 had encode_ir ratio 0.9962. evaluation 3 had 0.9994. evaluation 1 had 0.9990.
+> The edits did not help enough. The best measured equivalent change stayed below the required 1% encode_ir improvement. No candidate was submitted.
+> Try a narrower change in minbpe/regex.py lines 224-226 or minbpe/basic.py lines 61-66. Measure encode_ir and train_ir together. Drop changes that move train_ir up without crossing 0.9900.
+>
+> 2026-10-13, episode `31dc035a5ef5` (no candidate)
 
 > Tried edits in minbpe/regex.py and minbpe/basic.py after reading minbpe/base.py lines 1-208, minbpe/regex.py lines 1-233, minbpe/basic.py lines 1-95, and lineage_bench.py lines 1-107. The target was perf train_ir.
 > Evaluation 1 was rejected: train_ir parent 2600031455, candidate 2616236728, ratio 1.0062. Evaluation 3 was rejected: ratio 1.0768. Evaluation 5 was rejected: ratio 0.9939. Evaluation 7 was rejected: ratio 0.9937. Every build was base ok and candidate ok. Equivalence was identical outputs.
@@ -55,13 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try is still in RegexTokenizer.train. Check whether more work in the merge loop can be kept local without changing pair insertion order or learned merges. The submitted perf candidate is queued. The verdict comes later from independent replays.
 >
 > 2026-10-13, episode `5e5c5325aef7` (accepted)
-
-> Changed minbpe/base.py to add a cached nested merge lookup on Tokenizer. Changed BasicTokenizer.encode in minbpe/basic.py. Changed RegexTokenizer.encode_chunk and RegexTokenizer.encode_ordinary in minbpe/regex.py.
-> Sandbox evaluation 1 for perf encode_ir returned outcome: accepted. Guard: ok, 3 files, 24 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_ir parent 2894356096, candidate 2896110474, ratio 1.0006. encode_ir parent 1038805572, candidate 1025301620, ratio 0.9870.
-> The repeated encode path was rebuilding the same lookup. The cache is only safe with invalidation when the merges mapping is replaced or changes size. train_ir did not help: ratio 1.0006.
-> Next try the independent replay result for the queued encode_ir candidate. Then inspect the train_ir path before adding more cache state.
->
-> 2026-10-13, episode `2b6dd2046340` (accepted)
 
 ## Licence
 
