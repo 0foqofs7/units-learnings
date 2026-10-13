@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 58 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 59 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,11 +16,11 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_regex_ir
 
-- Attempts: 7 (4 accepted, 3 no candidate)
+- Attempts: 8 (4 accepted, 4 no candidate)
 - Best accepted effect: 21.19% (ratio 0.7881), episode `b39c7cc4d86a`
 - Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%
 - Files changed by accepted candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.4870 USD (over 7 attempts with a recorded cost)
+- Median model spend per attempt: 0.5029 USD (over 8 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -54,6 +54,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> Changed RegexTokenizer.train in minbpe/regex.py and BasicTokenizer.train in minbpe/basic.py. Tried integer-packed pair counts, Counter-based counting, and smaller preprocessing/findall edits. All attempted edits were reverted.
+> Evaluation 1 was rejected, train_regex_ir ratio 1.0155. Evaluation 3 was rejected, train_regex_ir ratio 1.2240. Evaluation 5 was rejected, train_regex_ir ratio 0.9998. Evaluation 7 was rejected, train_regex_ir ratio 0.9994. Equivalence was identical outputs each time.
+> The measured changes in RegexTokenizer.train did not help enough. The smaller changes moved train_regex_ir by only about 0.06%, below the 1% minimum. The guarded metrics stayed within limit.
+> Try a different path in RegexTokenizer.train. Keep the output identical. Measure train_regex_ir before touching more surface area.
+>
+> 2026-10-13, episode `08e29116de7c` (no candidate)
+
 > Tried merge-map reuse in minbpe/base.py with build_merge_map and get_cached_merge_map. Wired it through minbpe/basic.py and minbpe/regex.py. Tried special-token encode inlining in regex.py.
 > evaluation 1 was rejected: no_improvement, worst ratio 0.9988 vs required 0.9900. encode_ir was parent 2273935302, candidate 2271294091, ratio 0.9988. evaluation 3 was rejected: no_improvement, worst ratio 0.9970 vs required 0.9900. encode_ir was parent 2273884202, candidate 2267009808, ratio 0.9970. evaluation 5 was rejected: tests_fail, 7 stable tests fail. Earlier guarded metrics were within limits and outputs were identical.
 > The encode path has little spare cost in this shape. Reusing merge maps helped, but not enough. The special-token path is easy to break.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try the independent replay of the submitted save_load_ir candidate. If it misses, separate package import cost from minbpe/base.py save and load cost.
 >
 > 2026-10-13, episode `ff0b69b0321d` (accepted)
-
-> I changed minbpe/base.py lines 165-203. The patch replaced 39 lines with 48. It reused the model-save prefix cache to carry parsed merge and vocabulary data.
-> save_load_ir was accepted. Guard was ok, 1 files, 21 lines. Build was base ok, candidate ok. Equivalence had identical outputs. save_load_ir moved from 690619911 to 638927918, ratio 0.9252. train_basic_ir was 1.0021. train_regex_ir was 0.9997. encode_ir was 1.0006. decode_ir was 1.0006.
-> I believe the load path was rebuilding too much prefix state. Copying the cached prefix state and adding suffix merges helped this target. The small train_basic_ir, encode_ir, and decode_ir movements did not help.
-> Next, wait for independent replays. If they hold, inspect the changed minbpe/base.py function name and keep the cache path narrow.
->
-> 2026-10-13, episode `5bcb6fe99998` (accepted)
 
 ## Licence
 
