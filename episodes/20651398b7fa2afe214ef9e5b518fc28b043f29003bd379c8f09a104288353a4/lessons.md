@@ -1,6 +1,6 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 7 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 9 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,17 +16,31 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_ir
 
-- Attempts: 4 (3 accepted, 1 rejected)
+- Attempts: 6 (4 accepted, 1 rejected, 1 no candidate)
 - Best accepted effect: 15.17% (ratio 0.8483), episode `0bada18988c2`
-- Accepted effects: 15.17%, 14.04%, 1.38%
+- Accepted effects: 15.17%, 14.04%, 1.94%, 1.38%
 - Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.1834 USD (over 4 attempts with a recorded cost)
+- Median model spend per attempt: 0.1929 USD (over 6 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried pair selection via stats.items() in BasicTokenizer.train and RegexTokenizer.train. I tried a short-sequence fast path and local get_stats binding. I tried an index-loop get_stats variant in minbpe/base.py.
+> evaluation 1 was "outcome: rejected (no_improvement: worst ratio 0.9953 vs required 0.9900)". train_ir was parent 2952450113, candidate 2938429255, ratio 0.9953. evaluation 3 was rejected at ratio 0.9969. evaluation 5 was rejected at ratio 1.0416. evaluation 7 was rejected at ratio 1.0743. equivalence was identical outputs. build was base ok, candidate ok. Repository was restored to the starting state. No candidate was submitted.
+> I now believe the train_ir cost here is not in the small Python reshapes I tried. The short-sequence fast path did not help. The index-loop get_stats variant was slower.
+> Next, read the merge loop again before editing. Look for less repeated work around pair counts, not just cleaner iteration. Measure train_ir and encode_ir after each change.
+>
+> 2026-10-13, episode `def7ec96ffd9` (no candidate)
+
+> I changed minbpe/base.py merge and minbpe/regex.py merge. I moved unmatched trailing-token handling out of the scan loop. I read minbpe/base.py, minbpe/basic.py, minbpe/regex.py, minbpe/gpt4.py, and lineage_bench.py.
+> Evaluation 1 was rejected. train_ir was parent 2859591337, candidate 2857360562, ratio 0.9992. encode_ir was parent 1124152912, candidate 1116894643, ratio 0.9935. Evaluation 3 was accepted in sandbox. train_ir was parent 2859591337, candidate 2819054839, ratio 0.9858. encode_ir was parent 1124152906, candidate 1116648972, ratio 0.9933. Outputs were identical.
+> The first change did not help enough. The second change says the end-of-list check in merge mattered inside the hot loop. The code is still doing the same merge work.
+> Submitted the train_ir candidate with 16 changed lines. It was committed and revealed with status waiting. Next, check independent replay, then look for the next branch or bounds check inside training.
+>
+> 2026-10-13, episode `f83af6d14c19` (accepted)
 
 > Changed minbpe/regex.py RegexTokenizer.train at lines 70-80. It skips regex-training chunks shorter than two tokens when collecting pair counts and when applying a merge.
 > Own sandbox evaluation perf train_ir had outcome: accepted. guard: ok, 1 files, 5 lines. build: base ok, candidate ok. equivalence: identical outputs. train_ir: parent 3093707638, candidate 3001903254, ratio 0.9703. encode_ir: parent 1122634032, candidate 1122743414, ratio 1.0001.
@@ -48,20 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replays. If it holds, check whether the same pair-scan shape belongs in any other encode path without touching training code.
 >
 > 2026-10-13, episode `4297b89143e7` (accepted)
-
-> I read minbpe/base.py, minbpe/basic.py, minbpe/regex.py, lineage_bench.py, and minbpe/gpt4.py. I changed minbpe/base.py merge, lines 32-49. I cached the output append method, input length, and pair elements outside the scan loop.
-> Sandbox evaluation 1 on perf train_ir reported outcome: accepted. Guard: ok, 1 files, 11 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_ir was parent 3654716726, candidate 3601435829, ratio 0.9854. encode_ir was parent 1780634910, candidate 1653029918, ratio 0.9283.
-> I now believe merge was paying for repeated lookups and length computations inside the training scan. The change touched the shared helper and did not change token output.
-> Next, wait for independent replays. If the replay holds, inspect the encode path around the same helper, because encode_ir moved in the same sandbox run.
->
-> 2026-10-13, episode `f3f2543ac7ad` (accepted)
-
-> I read minbpe/basic.py, minbpe/base.py, minbpe/regex.py, and lineage_bench.py. I changed minbpe/base.py lines 13-23 in get_stats. The edit replaced 11 lines by 18, using a list iterator instead of zip with ids[1:].
-> perf train_ir said outcome: accepted. guard: ok, 1 files, 9 lines. build: base ok, candidate ok. equivalence: identical outputs. train_ir parent 4279562463, candidate 3682954929, ratio 0.8606. encode_ir parent 1746632871, candidate 1747529673, ratio 1.0005.
-> I now believe get_stats paid for the sliced copy from ids[1:]. This change preserved pair counts and ordering. encode_ir did not help.
-> The candidate was submitted on train_ir and is queued. The verdict comes later from independent replays. Next try: inspect other adjacent-id walks before changing behavior.
->
-> 2026-10-13, episode `a4c0c5cddf09` (accepted)
 
 ## Licence
 
