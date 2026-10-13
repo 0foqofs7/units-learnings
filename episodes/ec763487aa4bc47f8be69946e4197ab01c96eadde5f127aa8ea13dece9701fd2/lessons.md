@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 68 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 69 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -26,13 +26,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 10 (6 accepted, 3 no candidate, 1 rejected)
+- Attempts: 11 (7 accepted, 3 no candidate, 1 rejected)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
-- Accepted effects: 24.45%, 20.23%, 10.64%, 9.58%, 6.55%, 1.15%
+- Accepted effects: 24.45%, 20.23%, 10.64%, 9.58%, 6.55%, 1.72%, 1.15%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.3230 USD (over 10 attempts with a recorded cost)
+- Median model spend per attempt: 0.3084 USD (over 11 attempts with a recorded cost)
 
 ## Target perf:save_load_ir
 
@@ -57,6 +57,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I changed the str-based encode paths in minbpe/basic.py lines 161-166 and minbpe/regex.py lines 340-343. I removed the membership test before ordered merge replacement and let str.replace return the unchanged string.
+> Sandbox eval perf encode_ir was accepted. Guard ok, 2 files, 6 lines. Build base ok, candidate ok. Equivalence identical outputs. encode_ir parent 751875480, candidate 737516903, ratio 0.9809. train_basic_ir ratio 0.9999. train_regex_ir ratio 0.9998. decode_ir ratio 0.9990. save_load_ir ratio 0.9998.
+> I believe the extra scan in the encode path was wasted work. The change did not alter produced token ids in this eval.
+> Next, wait for independent replay. If it holds, look for the same membership-before-replace shape in nearby encode code.
+>
+> 2026-10-13, episode `5940393779a8` (accepted)
 
 > Changed minbpe/regex.py only. The change was in RegexTokenizer.train. It reused the shared byte vocabulary, avoided sorted copies of affected chunk sets, stopped re-pushing the selected tied heap entry, and iterated pair-set differences without temporary difference sets.
 > Own runs kept build ok and equivalence identical outputs. evaluation 1 was rejected: train_regex_ir parent 489552611, candidate 486488480, ratio 0.9937. evaluation 3 was rejected: ratio 1.0306. evaluation 5 was rejected: ratio 0.9918. evaluation 7 was accepted: train_regex_ir parent 489552611, candidate 484514045, ratio 0.9897; guard ok, 1 files, 41 lines.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > The candidate was submitted and revealed with status queued. Its verdict comes later from independent replays. Next, check the replay result for save_load_ir and the guarded metrics before changing this path again.
 >
 > 2026-10-13, episode `7f363b3a905c` (accepted)
-
-> minbpe/regex.py was read with minbpe/basic.py and minbpe/base.py. RegexTokenizer.train changed at lines 99-117 and 130-139. The tries were tie resolution during the stats scan, then affected chunk index reuse from the old/new pair update passes.
-> Own sandbox rejected the first pass: train_regex_ir parent 593842327, candidate 593262410, ratio 0.9990. Another pass gave ratio 0.9947 and was rejected. The 9 line pass made train_regex_ir ratio 1.2140 and was rejected. The 31 line pass had identical outputs and outcome: accepted. train_regex_ir parent 593842333, candidate 562460252, ratio 0.9472. Guards were ok.
-> The useful part is not changing pair counts. The useful part is removing redundant full pair scans and avoiding sorting affected chunk indices. The 9 line version did not help.
-> Next, wait for independent replays. If they hold, look at RegexTokenizer.encode in minbpe/regex.py, not train_basic_ir.
->
-> 2026-10-13, episode `d617fc601c22` (rejected)
 
 ## Licence
 
