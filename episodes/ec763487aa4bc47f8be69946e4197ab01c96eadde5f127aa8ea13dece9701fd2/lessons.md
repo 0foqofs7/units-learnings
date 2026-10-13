@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 13 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 14 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -29,12 +29,12 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 3 (2 rejected, 1 accepted)
+- Attempts: 4 (2 rejected, 1 accepted, 1 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
 - Why candidates failed: stale (1), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.2114 USD (over 3 attempts with a recorded cost)
+- Median model spend per attempt: 0.2301 USD (over 4 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -46,6 +46,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried minbpe/base.py lines 124-147, then minbpe/base.py lines 124-172, for save_load_ir. I replaced that with minbpe/regex.py lines 89-98 in RegexTokenizer.decode, using the dense vocabulary list lookup first and special-token handling on out-of-range index.
+> save_load_ir measured parent 2859177840, candidate 2923901591, ratio 1.0226, outcome: rejected (no_improvement: worst ratio 1.0226 vs required 0.9900). decode_ir measured parent 2605193717, candidate 2265680083, ratio 0.8697, outcome: accepted. Equivalence was identical outputs. Guard was ok, 1 files, 11 lines. Submission ended with no candidate because the pending candidate this change was built on was not accepted.
+> I believe RegexTokenizer.decode was carrying an avoidable explicit upper-bound comparison on the valid-token path. The base.py save/load edit did not help.
+> Try the same dense lookup shape only where vocab ids are dense. Keep invalid and special-token handling behind the failed list index path.
+>
+> 2026-10-13, episode `4c423c477fd8` (no candidate)
 
 > Changed minbpe/basic.py in BasicTokenizer.decode. Tried a dense vocabulary list fast path for contiguous ids when ids is a list or tuple, with fallback for negative, out-of-range, or non-index ids.
 > First decode_ir run was rejected: worst ratio 0.9941 vs required 0.9900. It did not help enough. Later sandbox runs had identical outputs and guard ok. evaluation 3 decode_ir ratio was 0.8692. evaluation 5 ratio was 0.9563. evaluation 7 ratio was 0.9548.
@@ -74,13 +81,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > I believe Tokenizer.save was paying for the same token decoding and control-character escaping more than once. Next, wait for independent replays. If they hold, look for the same repeated rendering pattern in nearby save and load paths.
 >
 > 2026-10-13, episode `fb1a4124d661` (accepted)
-
-> I tried a first-token lookup table for merge lookup during encoding. I touched get_stats in minbpe/base.py, BasicTokenizer.train and BasicTokenizer.encode in minbpe/basic.py, RegexTokenizer.__init__, RegexTokenizer.train, RegexTokenizer._encode_chunk, and RegexTokenizer.encode in minbpe/regex.py, and GPT4Tokenizer.__init__ in minbpe/gpt4.py.
-> Evaluation 1 said outcome: rejected (no_improvement: worst ratio 0.9997 vs required 0.9900). Evaluation 3 said outcome: rejected (tests_fail: 7 stable tests fail). Evaluation 5 said outcome: accepted. It had guard: ok, 4 files, 41 lines, equivalence: identical outputs. encode_ir parent 2650671334, candidate 2492317199, ratio 0.9403.
-> I now believe tuple allocation and hashing in adjacent pair lookup is the encode_ir cost that moved. The first lookup edit did not help. The broken GPT4 path showed that merge construction is easy to change by accident.
-> Next try isolating the encode path again. Keep the same lowest-ranked merge rule. Recheck GPT4Tokenizer tests before timing encode_ir. The submitted perf candidate is queued, and the verdict comes later from independent replays.
->
-> 2026-10-13, episode `5119d6e92e9d` (accepted)
 
 ## Licence
 
