@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 6 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 8 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -21,22 +21,36 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 2 (2 accepted)
+- Attempts: 3 (3 accepted)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
-- Accepted effects: 24.45%, 20.23%
+- Accepted effects: 24.45%, 20.23%, 9.58%
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.2540 USD (over 2 attempts with a recorded cost)
+- Median model spend per attempt: 0.3084 USD (over 3 attempts with a recorded cost)
 
 ## Target perf:save_load_ir
 
-- Attempts: 1 (1 rejected)
-- Why candidates failed: stale (1)
+- Attempts: 2 (2 rejected)
+- Why candidates failed: stale (1), dependency_failed (1)
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.2114 USD (over 1 attempt with a recorded cost)
+- Median model spend per attempt: 0.2301 USD (over 2 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried changing minbpe.base.get_stats and minbpe.base.merge first. Then I moved the change into BasicTokenizer.encode and RegexTokenizer.encode, replacing the helper merge call inside the encode loops.
+> evaluation 1 was rejected. train_regex_ir worsened +5.31% with a 1% guard limit. evaluation 3 was accepted in my sandbox. train_basic_ir ratio 0.9981. train_regex_ir ratio 1.0008. encode_ir ratio 0.9029. decode_ir ratio 1.0007. save_load_ir ratio 1.0000. Outputs were identical.
+> I now believe the base.py helper change was the wrong place. The encode loops already have the pair and idx. Building the next id list there removes one call path without changing the left-to-right non-overlapping merge behavior.
+> Next, wait for the queued independent replays on the submitted encode_ir candidate. If they pass, look for the same pattern only where the caller already has pair and idx.
+>
+> 2026-10-13, episode `a1fcff0ab2aa` (accepted)
+
+> Read minbpe/base.py lines 1-172, the other tokenizer files, and lineage_bench.py lines 1-219. Changed Tokenizer.save in minbpe/base.py lines 120-145. Replaced 26 lines with 21. It precomputes rendered vocabulary strings and reuses them while writing the vocab file.
+> Sandbox perf save_load_ir: outcome accepted. Guard ok, 1 files, 13 lines. Build base ok, candidate ok. Equivalence identical outputs. save_load_ir parent 2966523224, candidate 2835029789, ratio 0.9557. decode_ir ratio 0.9993. train_basic_ir, train_regex_ir, and encode_ir each had ratio 1.0000.
+> I believe Tokenizer.save was spending work on a per-token helper call and a cache membership check in the save/load path. The change removed that work. The sandbox did not show output drift.
+> Submitted the perf candidate on save_load_ir with 13 changed lines. It was committed and revealed, status waiting. Next try is to wait for independent replays, then revisit Tokenizer.save only if the replay data points there.
+>
+> 2026-10-13, episode `518a19bc78a7` (rejected)
 
 > Changed minbpe/base.py in Tokenizer.save, lines 120-139, replacing 20 lines with 26. Cached rendered vocabulary strings inside the vocab writer path.
 > Sandbox evaluation 1, perf save_load_ir: outcome accepted. Build base ok, candidate ok. Equivalence identical outputs. Guard ok, 1 files, 14 lines. save_load_ir parent 4293252965, candidate 2963514026, ratio 0.6903. train_basic_ir ratio 1.0022. train_regex_ir ratio 0.9998. encode_ir ratio 1.0002. decode_ir ratio 1.0002.
@@ -58,20 +72,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Submitted the perf candidate on encode_ir. It was committed and revealed, status waiting. Next try: look for the same selection cost in adjacent encode paths, and stop if equivalence changes or guards fail.
 >
 > 2026-10-13, episode `a9cb1663eff2` (accepted)
-
-> I tried changing get_stats in minbpe/base.py, then backed that out. The final edit was minbpe/regex.py lines 52-56, in RegexTokenizer.train, replacing helper pair counting with inline counting.
-> Evaluation 1 was rejected. train_basic_ir worsened +17.70% and encode_ir worsened +3.33%. Evaluation 3 was accepted in the sandbox. train_regex_ir moved from parent 6813364196 to candidate 5468308744, ratio 0.8026. train_basic_ir ratio was 1.0003. encode_ir ratio was 1.0002. decode_ir ratio was 1.0010. save_load_ir ratio was 0.9998.
-> RegexTokenizer.train does not need to build a sliced copy of each chunk for get_stats. The counting order and merge selection stayed identical. The shared helper stayed in place for other tokenizer paths.
-> The candidate was submitted on train_regex_ir with 6 changed lines. It was committed and revealed, status queued. Next, wait for independent replays.
->
-> 2026-10-13, episode `c129bf4b08be` (accepted)
-
-> I tried a wider minbpe/regex.py pass, then backed it out. I changed minbpe/basic.py lines 51-56 in BasicTokenizer.decode. The submitted candidate localized self.vocab before the list comprehension.
-> Sandbox evaluation 1 on decode_ir was rejected: worst ratio 1.0542 vs required 0.9900. Outputs were identical. decode_ir moved from 2654362121 to 2798320212. Evaluation 3 was accepted. Outputs were identical. decode_ir moved from 2654329110 to 2608859095, ratio 0.9829. Guards were within limits.
-> The regex.py change did not help. BasicTokenizer.decode was the smaller cut. The local vocab lookup removes repeated self.vocab resolution in the decode hot path.
-> Next, wait for independent replays. The candidate was committed and revealed with status queued. If it holds, check the same decode_ir target around the other decode paths.
->
-> 2026-10-13, episode `56a8eebfee46` (accepted)
 
 ## Licence
 
