@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 100 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 101 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -36,13 +36,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 30 (3 rejected, 17 accepted, 10 no candidate)
+- Attempts: 31 (3 rejected, 17 accepted, 11 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
 - Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 12.89%, 10.30%, 10.08%, 7.37%, 6.30%, 4.72%, 3.80%, 3.11%, 3.08%, 2.81%, 2.48%, 1.41%, 1.11%
 - Why candidates failed: stale (2), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/__init__.py`, `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.3895 USD (over 30 attempts with a recorded cost)
+- Median model spend per attempt: 0.3959 USD (over 31 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -57,6 +57,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Tried minbpe/base.py Tokenizer.save_vocab first. Replaced merge lookup for save/load vocab, then reverted the larger form. Tried minbpe/regex.py RegexTokenizer.train chunk counting. Tried minbpe/basic.py BasicTokenizer.train initial pair-count slicing.
+> evaluation 1: perf save_load_ir: "outcome: rejected (no_improvement: worst ratio 1.0089 vs required 0.9900)" with "equivalence: identical outputs". evaluation 3: perf train_regex_ir: "outcome: rejected (no_improvement: worst ratio 1.0001 vs required 0.9900)". evaluation 5: perf train_basic_ir: "outcome: rejected (no_improvement: worst ratio 1.0002 vs required 0.9900)".
+> The three touched spots were neutral or slower in this sandbox. Tokenizer.save_vocab moved save_load_ir to ratio 1.0089. RegexTokenizer.train moved train_regex_ir to ratio 1.0001. BasicTokenizer.train moved train_basic_ir to ratio 1.0002.
+> No candidate was submitted. Next try should look outside these small local rewrites, or use lineage_bench.py and lineage_equiv.py to find a measured hotspot before editing.
+>
+> 2026-10-13, episode `7b08d79220b7` (no candidate)
 
 > Changed minbpe/regex.py in RegexTokenizer.train. Tried compiled-pattern findall and tie-set allocation changes. Changed minbpe/base.py in ordered_merge_steps for cache-hit validation. Reverted pieces that did not hold.
 > evaluation 1 train_regex_ir was rejected, no_improvement: worst ratio 0.9994 vs required 0.9900. evaluation 3 was rejected, worst ratio 1.0127. evaluation 5 was rejected, worst ratio 0.9996. evaluation 7 encode_ir was rejected, worst ratio 1.0006. Builds were ok. Equivalence was identical outputs.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try a smaller change in minbpe/basic.py or minbpe/regex.py. Measure train_basic_ir and train_regex_ir before keeping it. Session stopped with no candidate.
 >
 > 2026-10-13, episode `02a04fdab3f3` (no candidate)
-
-> I tried changes in minbpe/basic.py around lines 66-70, 149-172, and 194-196, then backed part of that out at lines 149-181 and 185-187. I changed minbpe/base.py ordered_merge_steps at lines 76-80, then reduced the import at lines 12-14. The submitted change removed the type-set validation from the ordered_merge_steps cache hit.
-> evaluation 1 on train_basic_ir was rejected: train_basic_ir parent 263036613, candidate 262922713, ratio 0.9996. evaluation 3 was worse: train_basic_ir parent 263036619, candidate 314724049, ratio 1.1965. evaluation 5 on encode_ir was accepted: encode_ir parent 638115499, candidate 630766592, ratio 0.9885. evaluation 7 on encode_ir was accepted: encode_ir parent 638115499, candidate 630688242, ratio 0.9884. Equivalence was identical outputs each time.
-> I now believe rebuilding key and value type sets on a cache hit in ordered_merge_steps is encode work. The minbpe/basic.py train changes did not help train_basic_ir.
-> Try the next encode path after ordered_merge_steps. Wait for independent replays on the queued encode_ir candidate.
->
-> 2026-10-13, episode `350fca6f3a76` (rejected)
 
 ## Licence
 
