@@ -1,18 +1,18 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 40 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 41 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 10 (7 accepted, 2 no candidate, 1 rejected)
-- Best accepted effect: 32.45% (ratio 0.6755), episode `c285e522f788`
-- Accepted effects: 32.45%, 13.41%, 12.94%, 4.53%, 2.62%, 1.71%, 1.24%
+- Attempts: 11 (8 accepted, 2 no candidate, 1 rejected)
+- Best accepted effect: 56.44% (ratio 0.4356), episode `71c36b66692b`
+- Accepted effects: 56.44%, 32.45%, 13.41%, 12.94%, 4.53%, 2.62%, 1.71%, 1.24%
 - Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.4316 USD (over 10 attempts with a recorded cost)
+- Median model spend per attempt: 0.4412 USD (over 11 attempts with a recorded cost)
 
 ## Target perf:train_regex_ir
 
@@ -54,6 +54,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> I tried decoded-text caches in minbpe/basic.py and minbpe/regex.py. I changed BasicTokenizer.decode, BasicTokenizer.train, RegexTokenizer.decode, RegexTokenizer.train, RegexTokenizer.register_special_tokens, and RegexTokenizer.encode.
+> evaluation 1 was rejected: decode_ir parent 1824601523, candidate 2503056695, ratio 1.3718. Outputs were identical. evaluation 5 was accepted: decode_ir parent 1824601523, candidate 782034493, ratio 0.4286. guard: ok, 2 files, 35 lines.
+> The first cache shape did not help. The submitted shape fits repeated list/tuple id decodes. Current vocab and special-token mappings have to be part of the cache state.
+> Next try smaller invalidation state. Check memory growth from cached id sequences. The submitted perf candidate is queued, and the replay verdict comes later.
+>
+> 2026-10-13, episode `71c36b66692b` (accepted)
+
 > I tried a save_load_ir change in minbpe/base.py, then backed it out. I changed BasicTokenizer.decode in minbpe/basic.py and RegexTokenizer.decode in minbpe/regex.py to cache dense decode lookup structures when vocabulary and special-token item tuples are unchanged.
 > The save_load_ir run was rejected: worst ratio 1.0242 vs required 0.9900. It had identical outputs. The decode_ir run was accepted in sandbox with identical outputs. decode_ir moved from 1863912617 to 1842788660, ratio 0.9887. save_load_ir moved from 1018691873 to 1019159066, ratio 1.0005.
 > I believe rebuilding the dense decode lookup on every decode call is real waste here. The base.py save_load_ir attempt did not help.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try should start from lineage_bench.py and lineage_equiv.py around the measured paths. Do not reuse the rejected decode change. No candidate was submitted.
 >
 > 2026-10-13, episode `c00d40352ff4` (no candidate)
-
-> I tried changes in minbpe/base.py, minbpe/basic.py and minbpe/regex.py. I changed build_merge_map, BasicTokenizer.encode and RegexTokenizer._encode_chunk around the encode loop.
-> evaluation 1 measured encode_ir parent 2379878119, candidate 2374239620, ratio 0.9976. It was rejected against required 0.9900. Later encode_ir ratios were 1.0001, 1.0005 and 1.0004. Builds were ok. Outputs were identical. Guards were ok.
-> The best measured change only improved encode_ir by about 0.24%. The later variants were neutral or slower. This code did not give a 1% encode_ir move from these edits.
-> Try a different encode path. Do not spend more time reshaping the same merge loop without a new measurement target. No candidate was submitted.
->
-> 2026-10-13, episode `b5a9b92e411d` (no candidate)
 
 ## Licence
 
