@@ -1,16 +1,18 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 38 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 39 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 8 (6 accepted, 2 no candidate)
+- Attempts: 9 (6 accepted, 2 no candidate, 1 rejected)
 - Best accepted effect: 32.45% (ratio 0.6755), episode `c285e522f788`
 - Accepted effects: 32.45%, 13.41%, 12.94%, 4.53%, 2.62%, 1.71%
+- Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.4204 USD (over 8 attempts with a recorded cost)
+- Files changed by rejected candidates: `minbpe/regex.py`
+- Median model spend per attempt: 0.4412 USD (over 9 attempts with a recorded cost)
 
 ## Target perf:train_regex_ir
 
@@ -52,6 +54,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> Read minbpe/base.py, minbpe/basic.py, minbpe/regex.py, and lineage_bench.py. Tried minbpe/base.py Tokenizer.save and Tokenizer.load changes for save_load_ir. Those changes did not hold. Then changed minbpe/regex.py RegexTokenizer.decode to cache the dense decode lookup table by the current vocab and special-token byte mappings.
+> save_load_ir runs were rejected. evaluation 1: worst ratio 1.0262 vs required 0.9900. evaluation 3: worst ratio 0.9981 vs required 0.9900. evaluation 5: worst ratio 1.0023 vs required 0.9900. evaluation 7 on decode_ir was accepted in sandbox: parent 1921555607, candidate 1890224655, ratio 0.9837. Equivalence was identical outputs. Guard was ok, 1 files, 21 lines.
+> Tokenizer.save and Tokenizer.load are not the place yet. RegexTokenizer.decode was rebuilding work that can be reused when the tokenizer dictionaries have not changed.
+> Next, wait for independent replay on the submitted decode_ir candidate. If it fails, inspect the cache key and mutation path in RegexTokenizer.decode before adding more changes.
+>
+> 2026-10-13, episode `cea9559a2d89` (rejected)
+
 > I changed minbpe/base.py. I changed render_token. I added a bounded module-level cache for token bytes. I also changed the save path to reuse cached rendered tokens.
 > perf save_load_ir returned outcome: accepted. Guard: ok, 1 files, 8 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_basic_ir ratio 1.0008. train_regex_ir ratio 1.0004. encode_ir ratio 0.9998. decode_ir ratio 1.0012. save_load_ir parent 1367474013, candidate 1026081136, ratio 0.7503.
 > I think save_load_ir was paying to decode and scan the same byte tokens across overlapping vocabularies. The cache helped that target. The guarded metrics stayed within limits in this sandbox run.
@@ -79,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try measuring the copy path inside Tokenizer.load. Keep the key as tokenizer type and file text. Watch encode_ir ratio 1.0011 and train_regex_ir ratio 1.0002. The submitted perf candidate has status queued.
 >
 > 2026-10-13, episode `424dca7e96a1` (accepted)
-
-> Changed minbpe/regex.py in RegexTokenizer.train. Tried Counter/pairwise counting, combined preprocessing, and a local stats.get binding.
-> evaluation 5: train_regex_ir parent 3389510551, candidate 3372944958, ratio 0.9951, outcome: rejected (no_improvement: worst ratio 0.9951 vs required 0.9900). evaluation 1 was 1.2058. evaluation 3 was 1.0003. evaluation 7 was 1.1221. equivalence: identical outputs. guard: ok.
-> The local stats.get binding was the only useful move. It improved train_regex_ir by about 0.5%, below the required 1.0%. Counter/pairwise counting and combined preprocessing were neutral or slower.
-> Try another part of RegexTokenizer.train. Look at the merge loop and stats update shape before touching preprocessing again.
->
-> 2026-10-13, episode `332a1256f3fa` (no candidate)
 
 ## Licence
 
