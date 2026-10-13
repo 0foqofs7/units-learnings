@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 59 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 60 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -32,13 +32,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 19 (2 rejected, 16 accepted, 1 no candidate)
+- Attempts: 20 (3 rejected, 16 accepted, 1 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
 - Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 12.89%, 10.30%, 10.08%, 7.37%, 6.30%, 4.72%, 3.11%, 3.08%, 2.81%, 2.48%, 1.41%, 1.11%
-- Why candidates failed: stale (1), dependency_failed (1)
+- Why candidates failed: stale (2), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/__init__.py`, `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.3343 USD (over 19 attempts with a recorded cost)
+- Median model spend per attempt: 0.3356 USD (over 20 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -53,6 +53,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed minbpe/base.py. Changed _build_vocab to cache the most recent merge-only vocabulary prefix and reuse it when a tokenizer's merges extend that sequence. The submitted candidate touched 26 changed lines for save_load_ir.
+> perf save_load_ir outcome: accepted. guard: ok, 1 files, 26 lines. build: base ok, candidate ok. equivalence: identical outputs. train_basic_ir ratio 1.0005, train_regex_ir ratio 1.0008, encode_ir ratio 1.0005, decode_ir ratio 1.0022, save_load_ir ratio 0.9698.
+> The cache fits this workload. save_load_ir repeatedly builds vocabularies from extending merge prefixes. The unchanged prefix does not need the same byte concatenations again. The other guarded metrics moved up, so the change is not free.
+> Watch independent replay next. If it holds, inspect whether _build_vocab cache scope can stay simple. If it does not hold, remove the cache or narrow it to save/load construction.
+>
+> 2026-10-13, episode `803791462295` (rejected)
 
 > Changed RegexTokenizer.train in minbpe/regex.py and BasicTokenizer.train in minbpe/basic.py. Tried integer-packed pair counts, Counter-based counting, and smaller preprocessing/findall edits. All attempted edits were reverted.
 > Evaluation 1 was rejected, train_regex_ir ratio 1.0155. Evaluation 3 was rejected, train_regex_ir ratio 1.2240. Evaluation 5 was rejected, train_regex_ir ratio 0.9998. Evaluation 7 was rejected, train_regex_ir ratio 0.9994. Equivalence was identical outputs each time.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replays. If encode_ir holds, look for the same temporary tuple pattern elsewhere in encoding code.
 >
 > 2026-10-13, episode `45544cbf6328` (accepted)
-
-> First tried changes in minbpe/base.py lines 14-16, 210-213, 270-281, 283-289, and 316-319. Then reverted that shape and changed minbpe/__init__.py lines 1-5 into 13 lines.
-> evaluation 1 rejected: no_improvement, worst ratio 1.0018 vs required 0.9900. Equivalence was identical outputs. evaluation 3 accepted in sandbox. Metrics were train_basic_ir 0.9953, train_regex_ir 0.9980, encode_ir 0.9962, decode_ir 0.9891, save_load_ir 0.9896.
-> The base.py attempt did not help. The final patch delays importing GPT4Tokenizer until requested from the package namespace. The benchmark imports BasicTokenizer and RegexTokenizer from minbpe, so avoiding that module load is the measured win.
-> Next try the independent replay of the submitted save_load_ir candidate. If it misses, separate package import cost from minbpe/base.py save and load cost.
->
-> 2026-10-13, episode `ff0b69b0321d` (accepted)
 
 ## Licence
 

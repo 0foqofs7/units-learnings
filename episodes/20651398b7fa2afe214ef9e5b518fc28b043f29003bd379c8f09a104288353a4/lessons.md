@@ -1,32 +1,46 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 19 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 21 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:encode_ir
 
-- Attempts: 9 (5 accepted, 2 rejected, 2 no candidate)
+- Attempts: 10 (5 accepted, 2 rejected, 3 no candidate)
 - Best accepted effect: 34.31% (ratio 0.6569), episode `4297b89143e7`
 - Accepted effects: 34.31%, 12.19%, 3.74%, 1.35%, 1.12%
 - Why candidates failed: stale_conflict (2)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3411 USD (over 9 attempts with a recorded cost)
+- Median model spend per attempt: 0.4015 USD (over 10 attempts with a recorded cost)
 
 ## Target perf:train_ir
 
-- Attempts: 10 (7 accepted, 1 rejected, 2 no candidate)
+- Attempts: 11 (7 accepted, 2 rejected, 2 no candidate)
 - Best accepted effect: 15.17% (ratio 0.8483), episode `0bada18988c2`
 - Accepted effects: 15.17%, 14.04%, 6.05%, 4.39%, 3.36%, 1.94%, 1.38%
-- Why candidates failed: no_improvement (1)
+- Why candidates failed: no_improvement (1), stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/regex.py`
-- Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.2393 USD (over 10 attempts with a recorded cost)
+- Files changed by rejected candidates: `minbpe/basic.py`, `minbpe/regex.py`
+- Median model spend per attempt: 0.2781 USD (over 11 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried ordered merge lookup and chunk cache edits on encode_ir. Edits touched minbpe/regex.py, minbpe/basic.py, and minbpe/base.py. The encode functions touched were RegexTokenizer.encode and BasicTokenizer.encode.
+> evaluation 1 was rejected, ratio 0.9980. evaluation 3 was rejected, ratio 0.9981. evaluation 5 was rejected, ratio 5.8208. evaluation 7 was rejected, ratio 0.9964. All had identical outputs. The best measured encode_ir change was below the 1% requirement.
+> I now believe these local encode edits do not move this code enough. The broad variant made encode_ir much worse. The session ended with no candidate.
+> Next try should stay out of the broad base/basic path and measure smaller RegexTokenizer.encode changes against lineage_bench.py and lineage_equiv.py.
+>
+> 2026-10-13, episode `25b0b5eb1a43` (no candidate)
+
+> I changed BasicTokenizer.train in minbpe/basic.py. I tried packed integer pair keys, then a string vocabulary path using str.replace for ids that fit in Unicode code points. I also tried edits in minbpe/regex.py.
+> evaluation 1 was rejected: train_ir parent 1085386408, candidate 1081581765, ratio 0.9965. evaluation 3 was rejected: train_ir parent 1085386414, candidate 1088955134, ratio 1.0033. evaluation 5 was accepted: train_ir parent 1085386408, candidate 1001852302, ratio 0.9230. Outputs were identical. encode_ir moved to 483133186, ratio 1.0032.
+> I now believe BasicTokenizer.train is where this change belongs. The regex edit did not help in this session. The string path reduced measured train_ir. It did not reduce measured encode_ir.
+> Next, wait for independent replays. If it holds, look at the encode path and the fallback integer-list path. Keep the same ordering and non-overlapping merge behavior.
+>
+> 2026-10-13, episode `d6f96f22458a` (rejected)
 
 > I tried cached merge lookup in minbpe/base.py, minbpe/basic.py, and minbpe/regex.py. I changed build_merge_lookup, BasicTokenizer.encode, and RegexTokenizer._encode_chunk to use a list indexed by the first token during encoding.
 > Evaluation 1 was rejected: encode_ir ratio 0.9997. Evaluation 3 was rejected: encode_ir ratio 0.9990. Evaluation 5 was rejected: encode_ir ratio 0.9993. Those changes did not help enough. Evaluation 7 was accepted in sandbox: train_ir ratio 1.0006, encode_ir ratio 0.9492, equivalence identical outputs, guard ok, 3 files, 65 lines.
@@ -48,20 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try a change outside these edited lines, still measured by perf train_ir. If it misses required 0.9900, stop earlier.
 >
 > 2026-10-13, episode `64e0edb30661` (no candidate)
-
-> Changed minbpe/regex.py RegexTokenizer.encode_ordinary and minbpe/basic.py BasicTokenizer.encode. Inlined the encode-time merge step after the lowest-rank adjacent pair is selected. Kept the selected pair as scalar values.
-> Own sandbox evaluation 1 on perf encode_ir: outcome: accepted. Guard: ok, 2 files, 46 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_ir parent 2570885327, candidate 2570714396, ratio 0.9999. encode_ir parent 1000196880, candidate 989394437, ratio 0.9892.
-> The helper call and pair tuple construction were work inside every encode merge step. Removing them did not change scan order or merge results in this run.
-> Submitted the perf candidate on encode_ir. Status is queued. Independent replays come next.
->
-> 2026-10-13, episode `9d030a543daf` (accepted)
-
-> Tried inlining the merge application loop inside RegexTokenizer.train in minbpe/regex.py. Also tried the same loop shape in BasicTokenizer.train in minbpe/basic.py, then reverted it. Read minbpe/regex.py lines 1-197, minbpe/base.py lines 1-208, minbpe/basic.py lines 1-80, lineage_bench.py lines 1-107.
-> Sandbox evaluation 1 was rejected: train_ir parent 2678982934, candidate 2717114266, ratio 1.0142 vs required 0.9900. encode_ir ratio 1.0012. Sandbox evaluation 3 was accepted: train_ir parent 2678982928, candidate 2588512713, ratio 0.9662. encode_ir ratio 1.0014. Both had identical outputs and guard ok.
-> The helper call per chunk in RegexTokenizer.train was the cost worth removing here. The BasicTokenizer.train change did not help enough to keep.
-> Next try a narrower pass over RegexTokenizer.train that keeps the lazy-copy behavior for chunks without the selected pair. The submitted candidate has 23 changed lines and is queued for independent replays.
->
-> 2026-10-13, episode `cfd755e70325` (accepted)
 
 ## Licence
 

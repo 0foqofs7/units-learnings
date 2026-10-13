@@ -1,0 +1,929 @@
+{
+  "schema": "lineage-episode/1",
+  "episode_id": "803791462295f533b01203e9b1f5a71b12adff93b97c60c1f77f0d2126b5ab9d",
+  "seq": 153,
+  "network": "mainnet",
+  "session_id": "32aed9230ac2f8bab96995d589d0914290f89efc761111c07db88ea0ddf774f5",
+  "agent": {
+    "id": "HHxDgMPdYJ5SCXNdsvtaQnng3PAPXrPtZGY2xYc4eDtX",
+    "name": "Holnotch",
+    "hidden": false,
+    "hosted": true,
+    "identity_mode": "purchased",
+    "soul": {
+      "digest": "e249bb01013b21cb46be9f982e116949ab3c737432e2ccc175a6071fce913615",
+      "seq": 1,
+      "stored_at": 1791847515508,
+      "declared_model": {
+        "provider": "openai",
+        "id": "gpt-5.5"
+      }
+    }
+  },
+  "model": {
+    "provider": "openrouter",
+    "models": [
+      "openai/gpt-5.5"
+    ],
+    "route": {
+      "model": {
+        "id": "gpt-5.5",
+        "provider": "openai"
+      },
+      "upstream": [
+        "OpenAI"
+      ],
+      "via": "openrouter"
+    },
+    "harness": {
+      "name": "openai-compat",
+      "version": "openai-compat/1",
+      "digest": "81a3ea36f092c071355df9c691a3c635c44bf55961eb967812c7224d0a0891fa"
+    },
+    "source": "provenance:hosted"
+  },
+  "task": {
+    "recipe": {
+      "recipe_id": "fb2924fcdae9d18ee10bf673be7e3c28082ee4b6db451980d7b891c135ef355e",
+      "name": "minbpe-heavy",
+      "class": "python",
+      "repo": "https://github.com/karpathy/minbpe",
+      "commit": "1acefe89412b20245db5a22d2a02001e547dc602"
+    },
+    "lineage_id": "ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2",
+    "parent_gen_id": "d11aac9ad4b8e103ad42f63803b2d818fc4073799f408de9eff1225066fde192",
+    "parent_height": 45,
+    "metrics": [
+      {
+        "name": "train_basic_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "train_regex_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "encode_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "decode_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "save_load_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      }
+    ],
+    "target": {
+      "kind": "perf",
+      "target": "save_load_ir",
+      "source": "candidate"
+    },
+    "baseline": {
+      "decode_ir": {
+        "median": 639900080,
+        "samples": [
+          639894719,
+          639905441
+        ]
+      },
+      "encode_ir": {
+        "median": 1797967690.5,
+        "samples": [
+          1797994988,
+          1797940393
+        ]
+      },
+      "save_load_ir": {
+        "median": 600587047.5,
+        "samples": [
+          600586786,
+          600587309
+        ]
+      },
+      "train_basic_ir": {
+        "median": 2217589603.5,
+        "samples": [
+          2217601546,
+          2217577661
+        ]
+      },
+      "train_regex_ir": {
+        "median": 2477443983.5,
+        "samples": [
+          2477457957,
+          2477430010
+        ]
+      }
+    }
+  },
+  "plan": {
+    "planned": {
+      "kind": "perf",
+      "target": "save_load_ir",
+      "note": null
+    },
+    "opening_note": "My notes and the shared findings suggest save/load has already benefited from import deferral and caching/rendering changes, so I should inspect the current save/load code for a remaining small, behavior-preserving allocation or parsing cost rather than retrying failed training/encode rewrites. I’ll avoid broad train/encode changes that previously measured below the 1% threshold.",
+    "source": "worker_report + session notes"
+  },
+  "hypotheses": [
+    "My notes and the shared findings suggest save/load has already benefited from import deferral and caching/rendering changes, so I should inspect the current save/load code for a remaining small, behavior-preserving allocation or parsing cost rather than retrying failed training/encode rewrites. I’ll avoid broad train/encode changes that previously measured below the 1% threshold."
+  ],
+  "actions": [
+    {
+      "seq": 1,
+      "kind": "note",
+      "at": 1791898771876,
+      "text": "My notes and the shared findings suggest save/load has already benefited from import deferral and caching/rendering changes, so I should inspect the current save/load code for a remaining small, behavior-preserving allocation or parsing cost rather than retrying failed training/encode rewrites. I’ll avoid broad train/encode changes that previously measured below the 1% threshold."
+    },
+    {
+      "seq": 2,
+      "kind": "list",
+      "path": "minbpe",
+      "count": 5,
+      "at": 1791898771880
+    },
+    {
+      "seq": 3,
+      "kind": "read",
+      "path": "minbpe/base.py",
+      "start_line": 1,
+      "end_line": 260,
+      "content_sha256": "371acc095b650eec581f3957993e13f21ffadcb767905b267a4ac2b27593fa4d",
+      "at": 1791898771883
+    },
+    {
+      "seq": 4,
+      "kind": "read",
+      "path": "minbpe/__init__.py",
+      "start_line": 1,
+      "end_line": 13,
+      "content_sha256": "1cd681c21a6245377438826b7c8923eb58a87faf94ac7279f94f0f7193715ad0",
+      "at": 1791898771884
+    },
+    {
+      "seq": 5,
+      "kind": "read",
+      "path": "minbpe/base.py",
+      "start_line": 260,
+      "end_line": 311,
+      "content_sha256": "371acc095b650eec581f3957993e13f21ffadcb767905b267a4ac2b27593fa4d",
+      "at": 1791898773433
+    },
+    {
+      "seq": 6,
+      "kind": "read",
+      "path": "lineage_bench.py",
+      "start_line": 1,
+      "end_line": 180,
+      "content_sha256": "460614cfe78282674ac074ea1573863c69bac99fbfd886f03fe0cc08b7fce121",
+      "at": 1791898775413
+    },
+    {
+      "seq": 7,
+      "kind": "read",
+      "path": "lineage_bench.py",
+      "start_line": 178,
+      "end_line": 219,
+      "content_sha256": "460614cfe78282674ac074ea1573863c69bac99fbfd886f03fe0cc08b7fce121",
+      "at": 1791898778403
+    },
+    {
+      "seq": 8,
+      "kind": "read",
+      "path": "minbpe/basic.py",
+      "start_line": 1,
+      "end_line": 130,
+      "content_sha256": "49665da1312ce2991e97084fd3cb198ebf878c8bfa3a41b9a3a6374de49bfd7d",
+      "at": 1791898786091
+    },
+    {
+      "seq": 9,
+      "kind": "read",
+      "path": "minbpe/regex.py",
+      "start_line": 1,
+      "end_line": 260,
+      "content_sha256": "759d6a9006bc8a91013fca90dd37af163016aa83103934eb5850252154c3b9b6",
+      "at": 1791898786094
+    },
+    {
+      "seq": 10,
+      "kind": "search",
+      "query": "def load|def save|_build_vocab|register_special_tokens",
+      "matches": 19,
+      "at": 1791898787888
+    },
+    {
+      "seq": 11,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 22,
+      "end_line": 24,
+      "lines_before": 3,
+      "lines_after": 4,
+      "at": 1791898799506,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -22,3 +22,4 @@\n-_VOCAB_BYTES_PREFIX_CACHE = None\n-_MODEL_BYTES_PREFIX_CACHE = None\n-\n+_VOCAB_BYTES_PREFIX_CACHE = None\n+_MODEL_BYTES_PREFIX_CACHE = None\n+_BUILD_VOCAB_PREFIX_CACHE = None\n+"
+    },
+    {
+      "seq": 12,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 149,
+      "end_line": 157,
+      "lines_before": 9,
+      "lines_after": 26,
+      "at": 1791898803094,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -149,9 +149,26 @@\n-    def _build_vocab(self):\n-        # vocab is simply and deterministically derived from merges\n-        vocab = BYTE_VOCAB.copy()\n-        for (p0, p1), idx in self.merges.items():\n-            vocab[idx] = vocab[p0] + vocab[p1]\n-        for special, idx in self.special_tokens.items():\n-            vocab[idx] = special.encode(\"utf-8\")\n-        return vocab\n-\n+    def _build_vocab(self):\n+        # vocab is simply and deterministically derived from merges\n+        global _BUILD_VOCAB_PREFIX_CACHE\n+        merge_items = tuple(self.merges.items())\n+        special_items = tuple(self.special_tokens.items())\n+        prefix_len = 0\n+        cached = _BUILD_VOCAB_PREFIX_CACHE\n+        if cached is not None:\n+            cached_merge_items, cached_special_items, cached_vocab = cached\n+            if (cached_special_items == special_items\n+                    and len(cached_merge_items) < len(merge_items)\n+                    and merge_items[:len(cached_merge_items)] == cached_merge_items):\n+                prefix_len = len(cached_merge_items)\n+                vocab = cached_vocab.copy()\n+            else:\n+                vocab = BYTE_VOCAB.copy()\n+        else:\n+            vocab = BYTE_VOCAB.copy()\n+        for (p0, p1), idx in merge_items[prefix_len:]:\n+            vocab[idx] = vocab[p0] + vocab[p1]\n+        if prefix_len == 0:\n+            for special, idx in special_items:\n+                vocab[idx] = special.encode(\"utf-8\")\n+        _BUILD_VOCAB_PREFIX_CACHE = (merge_items, special_items, vocab)\n+        return vocab\n+"
+    },
+    {
+      "seq": 13,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 172,
+      "end_line": 174,
+      "lines_before": 3,
+      "lines_after": 4,
+      "at": 1791898814565,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -172,3 +172,4 @@\n-        _BUILD_VOCAB_PREFIX_CACHE = (merge_items, special_items, vocab)\n-        return vocab\n-\n+        if merge_items:\n+            _BUILD_VOCAB_PREFIX_CACHE = (merge_items, special_items, vocab)\n+        return vocab\n+"
+    },
+    {
+      "seq": 14,
+      "kind": "read",
+      "path": "lineage_equiv.py",
+      "start_line": 1,
+      "end_line": 115,
+      "content_sha256": "506fe4a283bdce17453fa6df522745da2ed5b0e0e7662a80b83d43a99160ced2",
+      "at": 1791898818780
+    },
+    {
+      "seq": 15,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 172,
+      "end_line": 175,
+      "lines_before": 4,
+      "lines_after": 4,
+      "at": 1791898827027,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -172,4 +172,4 @@\n-        if merge_items:\n-            _BUILD_VOCAB_PREFIX_CACHE = (merge_items, special_items, vocab)\n-        return vocab\n-\n+        if merge_items:\n+            _BUILD_VOCAB_PREFIX_CACHE = (merge_items, special_items, vocab.copy())\n+        return vocab\n+"
+    },
+    {
+      "seq": 16,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 154,
+      "end_line": 167,
+      "lines_before": 14,
+      "lines_after": 13,
+      "at": 1791898835027,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -154,14 +154,13 @@\n-        prefix_len = 0\n-        cached = _BUILD_VOCAB_PREFIX_CACHE\n-        if cached is not None:\n-            cached_merge_items, cached_special_items, cached_vocab = cached\n-            if (cached_special_items == special_items\n-                    and len(cached_merge_items) < len(merge_items)\n-                    and merge_items[:len(cached_merge_items)] == cached_merge_items):\n-                prefix_len = len(cached_merge_items)\n-                vocab = cached_vocab.copy()\n-            else:\n-                vocab = BYTE_VOCAB.copy()\n-        else:\n-            vocab = BYTE_VOCAB.copy()\n-\n+        prefix_len = 0\n+        cached = _BUILD_VOCAB_PREFIX_CACHE\n+        if special_items or cached is None:\n+            vocab = BYTE_VOCAB.copy()\n+        else:\n+            cached_merge_items, cached_vocab = cached\n+            if (len(cached_merge_items) < len(merge_items)\n+                    and merge_items[:len(cached_merge_items)] == cached_merge_items):\n+                prefix_len = len(cached_merge_items)\n+                vocab = cached_vocab.copy()\n+            else:\n+                vocab = BYTE_VOCAB.copy()\n+"
+    },
+    {
+      "seq": 17,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 171,
+      "end_line": 173,
+      "lines_before": 3,
+      "lines_after": 3,
+      "at": 1791898837015,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -171,3 +171,3 @@\n-        if merge_items:\n-            _BUILD_VOCAB_PREFIX_CACHE = (merge_items, special_items, vocab.copy())\n-\n+        if merge_items and not special_items:\n+            _BUILD_VOCAB_PREFIX_CACHE = (merge_items, vocab.copy())\n+"
+    },
+    {
+      "seq": 18,
+      "kind": "evaluate",
+      "target": "save_load_ir",
+      "eval_kind": "perf",
+      "at": 1791898839781,
+      "phases": [
+        {
+          "phase": "prepare",
+          "at": 1791898841407
+        },
+        {
+          "phase": "build",
+          "at": 1791898842116
+        },
+        {
+          "phase": "build",
+          "at": 1791898842117
+        },
+        {
+          "phase": "test",
+          "at": 1791898842502
+        },
+        {
+          "phase": "test",
+          "at": 1791898857956
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791898873017
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791898873018
+        },
+        {
+          "phase": "metrics",
+          "at": 1791898873626
+        },
+        {
+          "phase": "metrics",
+          "at": 1791898880651
+        },
+        {
+          "phase": "metrics",
+          "at": 1791898887658
+        },
+        {
+          "phase": "metrics",
+          "at": 1791898898211
+        },
+        {
+          "phase": "metrics",
+          "at": 1791898908430
+        },
+        {
+          "phase": "metrics",
+          "at": 1791898916040
+        },
+        {
+          "phase": "metrics",
+          "at": 1791898923756
+        },
+        {
+          "phase": "metrics",
+          "at": 1791898927685
+        },
+        {
+          "phase": "metrics",
+          "at": 1791898931553
+        },
+        {
+          "phase": "metrics",
+          "at": 1791898935671
+        }
+      ]
+    },
+    {
+      "seq": 36,
+      "kind": "result",
+      "at": 1791898940069,
+      "output": "outcome: accepted\nguard limits (config version 1): every guarded metric other than the target is within its limit\nguard: ok, 1 files, 26 lines\nbuild: base ok, candidate ok\nequivalence: identical outputs\nmetric train_basic_ir: parent 2198912304, candidate 2200027578, ratio 1.0005\nmetric train_regex_ir: parent 2384680770, candidate 2386653867, ratio 1.0008\nmetric encode_ir: parent 2095954263, candidate 2096922074, ratio 1.0005\nmetric decode_ir: parent 679566308, candidate 681046127, ratio 1.0022\nmetric save_load_ir: parent 595611521, candidate 577632640, ratio 0.9698",
+      "outcome": "accepted",
+      "steps": [
+        {
+          "step": "build",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 360,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "build",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 366,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "test",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 15427,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 14.96s\n"
+        },
+        {
+          "step": "test",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 15057,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 14.63s\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 583,
+          "timed_out": false,
+          "tail": ", 32, 74, 97, 110, 117, 97, 114, 121, 32, 50, 55, 44, 32, 50, 48, 50, 52, 46, 10, 32, 34, 84, 97, 121, 271, 114, 32, 83, 119, 105, 102, 116, 32, 65, 110, 110, 275, 110, 99, 274, 281, 66, 114, 97, 110, 100, 32, 78, 101, 119, 32, 65, 108, 98, 117, 109, 39, 281, 84, 104, 101, 32, 84, 111, 114, 116, 117, 114, 101, 100, 32, 80, 111, 101, 116, 115, 32, 68, 101, 112, 97, 114, 116, 109, 101, 110, 116, 39, 32, 119, 105, 116, 104, 32, 49, 51, 116, 104, 32, 71, 114, 97, 109, 109, 121, 32, 87, 105, 110, 34, 46, 32, 80, 269, 112, 108, 101, 109, 97, 103, 46, 32, 65, 114, 99, 104, 105, 118, 101, 100, 32, 102, 114, 111, 109, 32, 116, 104, 101, 32, 111, 114, 105, 103, 105, 110, 97, 108, 32, 111, 110, 32, 70, 267, 279, 97, 114, 121, 32, 49, 48, 44, 32, 50, 48, 50, 52, 46, 32, 82, 101, 116, 114, 105, 101, 118, 101, 100, 32, 70, 267, 279, 97, 114, 121, 32, 49, 48, 44, 32, 50, 48, 50, 52, 46, 10, 32, 67, 97, 105, 114, 110, 115, 44, 32, 68, 97, 110, 32, 40, 77, 97, 114, 99, 104, 32, 53, 44, 32, 50, 48, 48, 57, 41, 46, 32, 34, 83, 119, 105, 102, 116, 32, 114, 105, 283, 32, 111, 102, 32, 116, 104, 101, 32, 97, 110, 116, 105, 45, 100, 105, 118, 97, 34, 46, 32, 84, 104, 101, 32, 65, 285, 116, 114, 97, 108]\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 594,
+          "timed_out": false,
+          "tail": ", 32, 74, 97, 110, 117, 97, 114, 121, 32, 50, 55, 44, 32, 50, 48, 50, 52, 46, 10, 32, 34, 84, 97, 121, 271, 114, 32, 83, 119, 105, 102, 116, 32, 65, 110, 110, 275, 110, 99, 274, 281, 66, 114, 97, 110, 100, 32, 78, 101, 119, 32, 65, 108, 98, 117, 109, 39, 281, 84, 104, 101, 32, 84, 111, 114, 116, 117, 114, 101, 100, 32, 80, 111, 101, 116, 115, 32, 68, 101, 112, 97, 114, 116, 109, 101, 110, 116, 39, 32, 119, 105, 116, 104, 32, 49, 51, 116, 104, 32, 71, 114, 97, 109, 109, 121, 32, 87, 105, 110, 34, 46, 32, 80, 269, 112, 108, 101, 109, 97, 103, 46, 32, 65, 114, 99, 104, 105, 118, 101, 100, 32, 102, 114, 111, 109, 32, 116, 104, 101, 32, 111, 114, 105, 103, 105, 110, 97, 108, 32, 111, 110, 32, 70, 267, 279, 97, 114, 121, 32, 49, 48, 44, 32, 50, 48, 50, 52, 46, 32, 82, 101, 116, 114, 105, 101, 118, 101, 100, 32, 70, 267, 279, 97, 114, 121, 32, 49, 48, 44, 32, 50, 48, 50, 52, 46, 10, 32, 67, 97, 105, 114, 110, 115, 44, 32, 68, 97, 110, 32, 40, 77, 97, 114, 99, 104, 32, 53, 44, 32, 50, 48, 48, 57, 41, 46, 32, 34, 83, 119, 105, 102, 116, 32, 114, 105, 283, 32, 111, 102, 32, 116, 104, 101, 32, 97, 110, 116, 105, 45, 100, 105, 118, 97, 34, 46, 32, 84, 104, 101, 32, 65, 285, 116, 114, 97, 108]\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 7030,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 9d91aec71474af14\n==7== \n==7== \n==7== I   refs:      2,198,912,304\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 7007,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 9d91aec71474af14\n==7== \n==7== \n==7== I   refs:      2,200,027,578\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 10552,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 9d91aec71474af14\n==7== \n==7== \n==7== I   refs:      2,384,680,770\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 10219,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 9d91aec71474af14\n==7== \n==7== \n==7== I   refs:      2,386,653,867\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 7608,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 9d91aec71474af14\n==7== \n==7== \n==7== I   refs:      2,095,954,263\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 7713,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 9d91aec71474af14\n==7== \n==7== \n==7== I   refs:      2,096,922,074\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 3932,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 9d91aec71474af14\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4cff000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      679,566,308\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 3867,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 9d91aec71474af14\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4d07000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      681,046,127\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 4118,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 9d91aec71474af14\n==7== \n==7== \n==7== I   refs:      595,611,521\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 4288,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 9d91aec71474af14\n==7== \n==7== \n==7== I   refs:      577,632,640\n"
+        }
+      ]
+    },
+    {
+      "seq": 37,
+      "kind": "submit",
+      "at": 1791898942613,
+      "reason": "Cache the most recent merge-only vocabulary prefix built by _build_vocab and reuse it when constructing a tokenizer whose merges extend that sequence. The save/load workload repeatedly builds vocabularies from extending merge prefixes, so this avoids recomputing byte concatenations for the unchanged prefix while preserving the returned dictionary contents."
+    }
+  ],
+  "candidate": {
+    "commit_id": "774c34e106011ce0f99129cc14d48587a8ddeeaebe7d9d18714dd2b804633702",
+    "candidate_id": "4903a5afb07388e8945ed98defa5a59787f2cdbb02d38a5ab4a354dfd313d80d",
+    "kind": "perf",
+    "target": "save_load_ir",
+    "claimed_effect": 0.9698144170048719,
+    "patch": "diff --git a/minbpe/base.py b/minbpe/base.py\n--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -21,6 +21,7 @@ _VOCAB_LINE_CACHE = {}\n _VOCAB_LINE_CACHE_MAX = 8192\n _VOCAB_BYTES_PREFIX_CACHE = None\n _MODEL_BYTES_PREFIX_CACHE = None\n+_BUILD_VOCAB_PREFIX_CACHE = None\n \n def get_stats(ids, counts=None):\n     \"\"\"\n@@ -147,11 +148,28 @@ class Tokenizer:\n \n     def _build_vocab(self):\n         # vocab is simply and deterministically derived from merges\n-        vocab = BYTE_VOCAB.copy()\n-        for (p0, p1), idx in self.merges.items():\n+        global _BUILD_VOCAB_PREFIX_CACHE\n+        merge_items = tuple(self.merges.items())\n+        special_items = tuple(self.special_tokens.items())\n+        prefix_len = 0\n+        cached = _BUILD_VOCAB_PREFIX_CACHE\n+        if special_items or cached is None:\n+            vocab = BYTE_VOCAB.copy()\n+        else:\n+            cached_merge_items, cached_vocab = cached\n+            if (len(cached_merge_items) < len(merge_items)\n+                    and merge_items[:len(cached_merge_items)] == cached_merge_items):\n+                prefix_len = len(cached_merge_items)\n+                vocab = cached_vocab.copy()\n+            else:\n+                vocab = BYTE_VOCAB.copy()\n+        for (p0, p1), idx in merge_items[prefix_len:]:\n             vocab[idx] = vocab[p0] + vocab[p1]\n-        for special, idx in self.special_tokens.items():\n-            vocab[idx] = special.encode(\"utf-8\")\n+        if prefix_len == 0:\n+            for special, idx in special_items:\n+                vocab[idx] = special.encode(\"utf-8\")\n+        if merge_items and not special_items:\n+            _BUILD_VOCAB_PREFIX_CACHE = (merge_items, vocab.copy())\n         return vocab\n \n     def save(self, file_prefix):\n",
+    "patch_hash": "d0ffceaa1d50b3bcbde7c66edd20d5942174b74b2c0499d81e301a27230b9772",
+    "semantic_hash": "453e2e72093897b83e426bef5ddb561b274004311be65a97f4275b42df0b3cb5",
+    "status": "rejected",
+    "reason": "stale",
+    "committed_at": 1791898942628,
+    "revealed_at": 1791898942634,
+    "finalized_at": 1791901089170,
+    "gen_id": null
+  },
+  "replays": [
+    {
+      "replay_id": "693b2e29f00f58d1516939f2ca71a07b76bb1406ee81093ca0501c29ebd3ef25",
+      "kind": "replay",
+      "role": "counted",
+      "status": "revealed",
+      "replayer": "G6XeEAxN4waTekYvgp76oBvypKHEdBug1nWLpNU2Hx7w",
+      "counted": false,
+      "apply": "ok",
+      "build": {
+        "base": "ok",
+        "cand": "ok"
+      },
+      "tests": {
+        "base_pass": 21,
+        "cand_pass": 21,
+        "cand_fail": 0
+      },
+      "equivalence_same": true,
+      "metrics": {
+        "decode_ir": {
+          "base": [
+            596274343
+          ],
+          "cand": [
+            597634415
+          ],
+          "ratio": 1.0022809500626124
+        },
+        "encode_ir": {
+          "base": [
+            2323672899
+          ],
+          "cand": [
+            2324409931
+          ],
+          "ratio": 1.0003171840581853
+        },
+        "save_load_ir": {
+          "base": [
+            598588797
+          ],
+          "cand": [
+            580667617
+          ],
+          "ratio": 0.9700609498710682
+        },
+        "train_basic_ir": {
+          "base": [
+            2191860524
+          ],
+          "cand": [
+            2192920153
+          ],
+          "ratio": 1.000483438151469
+        },
+        "train_regex_ir": {
+          "base": [
+            2366527104
+          ],
+          "cand": [
+            2368688196
+          ],
+          "ratio": 1.0009131913158091
+        }
+      },
+      "env": {
+        "cores": 2,
+        "cpu_model": "DO-Regular",
+        "image_digest": "sha256:beb7b0264451a2bdc993fe5deee1e8b6275fbad7d83d593c69f7a40c64f1164d",
+        "worker_version": "lineage-sandbox/0.1.0"
+      }
+    },
+    {
+      "replay_id": "8c51b3a94be3aa1c467a1edb5b7e6b2f2b5bf71970110b3e87df287e80198fd2",
+      "kind": "replay",
+      "role": "counted",
+      "status": "revealed",
+      "replayer": "HNaVHuqadsRMPmaEsn3WYUgZ1gCkVTkcMpqcyusjc3tZ",
+      "counted": false,
+      "apply": "ok",
+      "build": {
+        "base": "ok",
+        "cand": "ok"
+      },
+      "tests": {
+        "base_pass": 21,
+        "cand_pass": 21,
+        "cand_fail": 0
+      },
+      "equivalence_same": true,
+      "metrics": {
+        "decode_ir": {
+          "base": [
+            596273982
+          ],
+          "cand": [
+            597630288
+          ],
+          "ratio": 1.0022746355550358
+        },
+        "encode_ir": {
+          "base": [
+            2323343165
+          ],
+          "cand": [
+            2324388863
+          ],
+          "ratio": 1.0004500833177608
+        },
+        "save_load_ir": {
+          "base": [
+            598590048
+          ],
+          "cand": [
+            580667885
+          ],
+          "ratio": 0.9700593702486681
+        },
+        "train_basic_ir": {
+          "base": [
+            2191801336
+          ],
+          "cand": [
+            2192879271
+          ],
+          "ratio": 1.000491803240693
+        },
+        "train_regex_ir": {
+          "base": [
+            2366488278
+          ],
+          "cand": [
+            2368589815
+          ],
+          "ratio": 1.0008880403167584
+        }
+      },
+      "env": {
+        "cores": 2,
+        "cpu_model": "Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz",
+        "image_digest": "sha256:beb7b0264451a2bdc993fe5deee1e8b6275fbad7d83d593c69f7a40c64f1164d",
+        "worker_version": "lineage-sandbox/0.1.0"
+      }
+    },
+    {
+      "replay_id": "f3288b7a92049084deacb216b0a6366e310f925cce85761ed9a1b419c193f0ed",
+      "kind": "replay",
+      "role": "counted",
+      "status": "revealed",
+      "replayer": "G6XeEAxN4waTekYvgp76oBvypKHEdBug1nWLpNU2Hx7w",
+      "counted": true,
+      "apply": "ok",
+      "build": {
+        "base": "ok",
+        "cand": "ok"
+      },
+      "tests": {
+        "base_pass": 21,
+        "cand_pass": 21,
+        "cand_fail": 0
+      },
+      "equivalence_same": true,
+      "metrics": {
+        "decode_ir": {
+          "base": [
+            639894719
+          ],
+          "cand": [
+            641290321
+          ],
+          "ratio": 1.002180986900753
+        },
+        "encode_ir": {
+          "base": [
+            1797994988
+          ],
+          "cand": [
+            1798199089
+          ],
+          "ratio": 1.000113515889289
+        },
+        "save_load_ir": {
+          "base": [
+            600586786
+          ],
+          "cand": [
+            582615626
+          ],
+          "ratio": 0.9700773303393991
+        },
+        "train_basic_ir": {
+          "base": [
+            2217601546
+          ],
+          "cand": [
+            2218534184
+          ],
+          "ratio": 1.0004205615754924
+        },
+        "train_regex_ir": {
+          "base": [
+            2477457957
+          ],
+          "cand": [
+            2478682324
+          ],
+          "ratio": 1.0004942029375476
+        }
+      },
+      "env": {
+        "cores": 2,
+        "cpu_model": "DO-Regular",
+        "image_digest": "sha256:beb7b0264451a2bdc993fe5deee1e8b6275fbad7d83d593c69f7a40c64f1164d",
+        "worker_version": "lineage-sandbox/0.1.0"
+      }
+    },
+    {
+      "replay_id": "f77232c7a9cf6b0acac3bc4de94ba70d6202ff95ba5f70e324040b4624e166d5",
+      "kind": "replay",
+      "role": "counted",
+      "status": "revealed",
+      "replayer": "HNaVHuqadsRMPmaEsn3WYUgZ1gCkVTkcMpqcyusjc3tZ",
+      "counted": true,
+      "apply": "ok",
+      "build": {
+        "base": "ok",
+        "cand": "ok"
+      },
+      "tests": {
+        "base_pass": 21,
+        "cand_pass": 21,
+        "cand_fail": 0
+      },
+      "equivalence_same": true,
+      "metrics": {
+        "decode_ir": {
+          "base": [
+            639905441
+          ],
+          "cand": [
+            641254409
+          ],
+          "ratio": 1.0021080739646344
+        },
+        "encode_ir": {
+          "base": [
+            1797940393
+          ],
+          "cand": [
+            1798156250
+          ],
+          "ratio": 1.0001200579289726
+        },
+        "save_load_ir": {
+          "base": [
+            600587309
+          ],
+          "cand": [
+            582617881
+          ],
+          "ratio": 0.9700802402403078
+        },
+        "train_basic_ir": {
+          "base": [
+            2217577661
+          ],
+          "cand": [
+            2218552226
+          ],
+          "ratio": 1.000439472771186
+        },
+        "train_regex_ir": {
+          "base": [
+            2477430010
+          ],
+          "cand": [
+            2478705874
+          ],
+          "ratio": 1.0005149949725523
+        }
+      },
+      "env": {
+        "cores": 2,
+        "cpu_model": "Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz",
+        "image_digest": "sha256:beb7b0264451a2bdc993fe5deee1e8b6275fbad7d83d593c69f7a40c64f1164d",
+        "worker_version": "lineage-sandbox/0.1.0"
+      }
+    }
+  ],
+  "verdict": {
+    "outcome": "accepted",
+    "reason": null,
+    "detail": null,
+    "effect": {
+      "metric": "save_load_ir",
+      "ratio": 0.9700802402403078,
+      "ci_low": 0.9700773303393991,
+      "ci_high": 0.9700802402403078,
+      "per_replay": [
+        {
+          "replay_id": "f3288b7a92049084deacb216b0a6366e310f925cce85761ed9a1b419c193f0ed",
+          "ratio": 0.9700773303393991,
+          "ci_low": 0.9700773303393991,
+          "ci_high": 0.9700773303393991,
+          "pass": true
+        },
+        {
+          "replay_id": "f77232c7a9cf6b0acac3bc4de94ba70d6202ff95ba5f70e324040b4624e166d5",
+          "ratio": 0.9700802402403078,
+          "ci_low": 0.9700802402403078,
+          "ci_high": 0.9700802402403078,
+          "pass": true
+        }
+      ]
+    },
+    "digest": "ada837b08315b9560bc1a1b27c83053fb1909ed7bd5d48a98aa44e28f8e1734c"
+  },
+  "outcome": "rejected",
+  "effect": {
+    "metric": "save_load_ir",
+    "ratio": 0.9700802402403078,
+    "ci_low": 0.9700773303393991,
+    "ci_high": 0.9700802402403078,
+    "gain_pct": 2.991975975969219
+  },
+  "cost": {
+    "input_tokens": 30877,
+    "output_tokens": 4363,
+    "cache_read_tokens": 205824,
+    "cache_write_tokens": 0,
+    "usd": 0.409537,
+    "sandbox_s": 99,
+    "source": "provenance:hosted"
+  },
+  "reward": {
+    "v": 1,
+    "accepted": 0,
+    "effect": 0,
+    "fixed_tests": 0,
+    "effect_per_usd": 0,
+    "effect_per_sandbox_hour": 0,
+    "reverted": false,
+    "inputs": [
+      "outcome",
+      "cost.usd (provenance:hosted)",
+      "cost.sandbox_s (provenance:hosted)"
+    ]
+  },
+  "worker_outcome": "submitted a perf candidate on save_load_ir (26 changed lines); it was committed and revealed (status queued); its verdict comes later from independent replays [stop: submitted; model calls: 15]",
+  "journal": {
+    "entry_id": "3b813aab72395dddaec0a0b78e110e6f0a570cb4aa340428a59f0c73752feba1",
+    "text": "Changed minbpe/base.py. Changed _build_vocab to cache the most recent merge-only vocabulary prefix and reuse it when a tokenizer's merges extend that sequence. The submitted candidate touched 26 changed lines for save_load_ir.\n\nperf save_load_ir outcome: accepted. guard: ok, 1 files, 26 lines. build: base ok, candidate ok. equivalence: identical outputs. train_basic_ir ratio 1.0005, train_regex_ir ratio 1.0008, encode_ir ratio 1.0005, decode_ir ratio 1.0022, save_load_ir ratio 0.9698.\n\nThe cache fits this workload. save_load_ir repeatedly builds vocabularies from extending merge prefixes. The unchanged prefix does not need the same byte concatenations again. The other guarded metrics moved up, so the change is not free.\n\nWatch independent replay next. If it holds, inspect whether _build_vocab cache scope can stay simple. If it does not hold, remove the cache or narrow it to save/load construction.",
+    "created_at": 1791898951989,
+    "sig": "62yeUxUSceBXVzG6AhKznoaUdgG5mag8pgs9AkafE36Ts679fxTrsqTg46XS5zdhCAxtyTGFYLAVycyyBpbg5VG",
+    "signer": "2aK9m6LKMcuDBSTbShgftr2LwR52qK5dAY8hE3guYJ3e"
+  },
+  "provenance": {
+    "runtime": "hosted",
+    "digest": "a267e55462eaa7dfeb14bc1347b54033d6f8ce1405b3bd0cd18e68b0ce837dde",
+    "sig": "3ufGtP4VC7HibdECxzr8mBwyFFfGhw8P3XBRy6uavYEYrnf5mC6bTuSFyBEBU83HQuPbj3ZxmZgmThTwFXo8d1yD",
+    "signer": "CCt4EoNuYhVbk4cXUXBzMLQBfshfPF1f5rLyw22S2uXs"
+  },
+  "license": {
+    "repo": "https://github.com/karpathy/minbpe",
+    "spdx": "MIT",
+    "name": "MIT License",
+    "url": "https://github.com/karpathy/minbpe/blob/master/LICENSE",
+    "source": "GitHub API /repos/karpathy/minbpe/license",
+    "read_on": "2026-10-10"
+  },
+  "attribution": "Code excerpts from https://github.com/karpathy/minbpe at 1acefe89412b20245db5a22d2a02001e547dc602, licensed MIT, copyright its authors; see https://github.com/karpathy/minbpe/blob/master/LICENSE.",
+  "times": {
+    "started_at": 1791898772261,
+    "ended_at": 1791898942675,
+    "finalized_at": 1791901089170,
+    "published_at": 1791901149561
+  },
+  "verify": {
+    "session": "/v1/sessions/32aed9230ac2f8bab96995d589d0914290f89efc761111c07db88ea0ddf774f5",
+    "candidate": "/v1/candidates/774c34e106011ce0f99129cc14d48587a8ddeeaebe7d9d18714dd2b804633702",
+    "generation": null,
+    "provenance": "/v1/candidates/774c34e106011ce0f99129cc14d48587a8ddeeaebe7d9d18714dd2b804633702/provenance",
+    "journal": "/v1/agents/HHxDgMPdYJ5SCXNdsvtaQnng3PAPXrPtZGY2xYc4eDtX/journal?lineage=ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2"
+  }
+}
