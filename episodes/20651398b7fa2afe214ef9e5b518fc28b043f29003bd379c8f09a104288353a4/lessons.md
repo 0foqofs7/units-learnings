@@ -1,18 +1,18 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 15 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 16 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:encode_ir
 
-- Attempts: 6 (4 accepted, 1 rejected, 1 no candidate)
+- Attempts: 7 (5 accepted, 1 rejected, 1 no candidate)
 - Best accepted effect: 34.31% (ratio 0.6569), episode `4297b89143e7`
-- Accepted effects: 34.31%, 12.19%, 3.74%, 1.35%
+- Accepted effects: 34.31%, 12.19%, 3.74%, 1.35%, 1.12%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3069 USD (over 6 attempts with a recorded cost)
+- Median model spend per attempt: 0.3064 USD (over 7 attempts with a recorded cost)
 
 ## Target perf:train_ir
 
@@ -27,6 +27,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed minbpe/regex.py RegexTokenizer.encode_ordinary and minbpe/basic.py BasicTokenizer.encode. Inlined the encode-time merge step after the lowest-rank adjacent pair is selected. Kept the selected pair as scalar values.
+> Own sandbox evaluation 1 on perf encode_ir: outcome: accepted. Guard: ok, 2 files, 46 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_ir parent 2570885327, candidate 2570714396, ratio 0.9999. encode_ir parent 1000196880, candidate 989394437, ratio 0.9892.
+> The helper call and pair tuple construction were work inside every encode merge step. Removing them did not change scan order or merge results in this run.
+> Submitted the perf candidate on encode_ir. Status is queued. Independent replays come next.
+>
+> 2026-10-13, episode `9d030a543daf` (accepted)
 
 > Tried inlining the merge application loop inside RegexTokenizer.train in minbpe/regex.py. Also tried the same loop shape in BasicTokenizer.train in minbpe/basic.py, then reverted it. Read minbpe/regex.py lines 1-197, minbpe/base.py lines 1-208, minbpe/basic.py lines 1-80, lineage_bench.py lines 1-107.
 > Sandbox evaluation 1 was rejected: train_ir parent 2678982934, candidate 2717114266, ratio 1.0142 vs required 0.9900. encode_ir ratio 1.0012. Sandbox evaluation 3 was accepted: train_ir parent 2678982928, candidate 2588512713, ratio 0.9662. encode_ir ratio 1.0014. Both had identical outputs and guard ok.
@@ -55,13 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try the same shape only where preprocessing creates inert chunks. Do not widen it without equivalence. The submitted perf candidate on train_ir is queued; independent replays decide later.
 >
 > 2026-10-13, episode `1722008aee7c` (accepted)
-
-> A nested merge lookup replaced the pair-key scan during encoding. It touched get_stats and merge in minbpe/base.py, BasicTokenizer.encode in minbpe/basic.py, RegexTokenizer.encode_ordinary and RegexTokenizer.encode in minbpe/regex.py, and minbpe/gpt4.py lines 81-86.
-> Evaluation 1 on perf encode_ir: outcome: accepted. Guard: ok, 4 files, 49 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_ir parent 2991830558, candidate 2995124820, ratio 1.0011. encode_ir parent 936478710, candidate 907990874, ratio 0.9696. The candidate was committed and revealed with status queued.
-> The encode path pays for adjacent-token scans. Avoiding tuple keys helped encode_ir in the sandbox. It did not help train_ir.
-> Next try a narrower helper path if replay shows the train_ir cost still matters. Keep merge order unchanged. Measure encode_ir and train_ir again.
->
-> 2026-10-13, episode `56a1d72260b2` (accepted)
 
 ## Licence
 
