@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 15 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 16 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -14,10 +14,11 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_regex_ir
 
-- Attempts: 1 (1 accepted)
+- Attempts: 2 (2 accepted)
 - Best accepted effect: 18.19% (ratio 0.8181), episode `c129bf4b08be`
+- Accepted effects: 18.19%, 14.36%
 - Files changed by accepted candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.1959 USD (over 1 attempt with a recorded cost)
+- Median model spend per attempt: 0.2292 USD (over 2 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -47,6 +48,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> I read minbpe/base.py lines 1-174, minbpe/basic.py lines 1-113, minbpe/regex.py lines 1-206, minbpe/gpt4.py lines 1-131, and lineage_bench.py lines 1-219. I searched "merge\(" and got 4 matching lines. I changed RegexTokenizer.train in minbpe/regex.py, line 13 and lines 45-65.
+> perf train_regex_ir returned outcome: accepted. guard: ok, 1 files, 21 lines. build: base ok, candidate ok. equivalence: identical outputs. train_regex_ir parent 5592314206, candidate 4829590786, ratio 0.8636. train_basic_ir ratio 0.9991. encode_ir ratio 1.0003. decode_ir ratio 1.0010. save_load_ir ratio 0.9999. The perf candidate was committed and revealed, status queued.
+> Those numbers put the movement in RegexTokenizer.train. The shared merge helper call did not need to sit in that loop. Keeping only chunks that can still contribute pairs kept outputs identical in this sandbox.
+> Next try separating minbpe/regex.py line 13 from lines 45-65 and rerun perf train_regex_ir, encode_ir, and decode_ir.
+>
+> 2026-10-13, episode `365a360ca9ed` (accepted)
+
 > Changed get_stats and merge in minbpe/base.py, BasicTokenizer.encode in minbpe/basic.py, and RegexTokenizer._encode_chunk and RegexTokenizer.encode in minbpe/regex.py. Tried moving the replacement loop's trailing-element check out of encode, avoiding unused dict allocation in build_merge_map, sharing the merge map across special-token encode chunks, and localizing merge_map.get.
 > evaluation 1: outcome: rejected (no_improvement: worst ratio 1.0593 vs required 0.9900). evaluation 3: outcome: rejected (no_improvement: worst ratio 0.9998 vs required 0.9900). evaluation 5: outcome: rejected (no_improvement: worst ratio 0.9979 vs required 0.9900). evaluation 7: outcome: rejected (no_improvement: worst ratio 1.0018 vs required 0.9900). All builds were ok. All outputs were identical.
 > The encode_ir path did not move enough. Some variants were slower. The safe edits were still noise against the required 0.9900.
@@ -74,13 +82,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try is to inspect decode paths in minbpe/basic.py and minbpe/base.py for the same pattern after independent replays.
 >
 > 2026-10-13, episode `22e0b8b3a2d4` (accepted)
-
-> I tried helper changes in minbpe/base.py lines 13-23, 13-30, 25-42, and 25-45. I then changed minbpe/basic.py in BasicTokenizer.train lines 38-41, replacing 4 lines by 16, and inlined the pair replacement step.
-> Evaluation 1 was rejected: no_improvement, worst ratio 1.0055 vs required 0.9900. Evaluation 3 cut train_basic_ir to ratio 0.8749, but was rejected because train_regex_ir worsened +2.86% with a 1% limit. Evaluation 5 was accepted in sandbox: train_basic_ir ratio 0.8768, train_regex_ir ratio 1.0001, encode_ir ratio 0.9993, decode_ir ratio 0.9998, save_load_ir ratio 1.0001. Outputs were identical. The candidate was submitted and is queued.
-> The base.py helper changes did not help. The useful change was inside BasicTokenizer.train. The shared merge helper cost shows up in the basic training loop, while regex training needs to stay on the old path.
-> Next try a smaller BasicTokenizer.train specialization, if replay keeps the same shape. Measure train_regex_ir before submit.
->
-> 2026-10-13, episode `0f2bb1bd86d7` (accepted)
 
 ## Licence
 
