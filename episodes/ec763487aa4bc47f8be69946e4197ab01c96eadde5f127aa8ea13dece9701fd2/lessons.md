@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 71 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 72 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -46,17 +46,24 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_basic_ir
 
-- Attempts: 9 (4 accepted, 4 no candidate, 1 rejected)
+- Attempts: 10 (5 accepted, 4 no candidate, 1 rejected)
 - Best accepted effect: 15.23% (ratio 0.8477), episode `0bddfdfcf08a`
-- Accepted effects: 15.23%, 12.34%, 2.67%, 1.14%
+- Accepted effects: 15.23%, 12.34%, 2.67%, 1.33%, 1.14%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/basic.py`
 - Files changed by rejected candidates: `minbpe/basic.py`
-- Median model spend per attempt: 0.3489 USD (over 9 attempts with a recorded cost)
+- Median model spend per attempt: 0.3377 USD (over 10 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Read minbpe/basic.py 1-207, minbpe/base.py 1-260, lineage_bench.py 1-219, and minbpe/regex.py 1-220. Searched "BYTE_VOCAB|BasicTokenizer": 36 matching lines. Changed BasicTokenizer.train in minbpe/basic.py 73-82, replacing 10 lines by 27.
+> Sandbox evaluation 1, perf train_basic_ir: outcome accepted. Guard ok, 1 files, 33 lines. Build base ok, candidate ok. Equivalence: identical outputs. train_basic_ir parent 329898824, candidate 325663410, ratio 0.9872. train_regex_ir ratio 1.0001. encode_ir ratio 0.9997. decode_ir ratio 1.0000. save_load_ir ratio 0.9999.
+> BasicTokenizer.train can update pair-count deltas directly in small dictionaries instead of building intermediate left/right lists and Counter objects for each merge. In this sandbox that kept the same outputs.
+> Submitted the perf candidate on train_basic_ir. It was committed and revealed, status queued. Next is independent replay. After that, compare the guarded metrics again before changing more code.
+>
+> 2026-10-13, episode `daea1c52c9be` (accepted)
 
 > Changed minbpe/basic.py lines 112-115 and 150-151. Changed minbpe/regex.py lines 220-227, 286-288, and 306-308. The change adds a same-object fast path to the existing decode list caches.
 > Sandbox perf decode_ir was outcome: accepted. Equivalence had identical outputs. decode_ir moved from 598411188 to 558360739, ratio 0.9331. train_basic_ir ratio was 1.0031. train_regex_ir ratio was 1.0027. encode_ir ratio was 0.9988. save_load_ir ratio was 1.0020.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Submitted the perf candidate on train_regex_ir with 41 changed lines. It was committed and revealed, status queued. Next try after independent replays: inspect remaining allocations in RegexTokenizer.train and keep identical outputs.
 >
 > 2026-10-13, episode `2eab3dab4624` (accepted)
-
-> I read minbpe/regex.py, minbpe/basic.py, minbpe/base.py, and lineage_bench.py. I changed minbpe/regex.py RegexTokenizer.train at lines 87-94, 126-129, and 134-143. Pair counts now use two-character string keys instead of two-character tuple keys.
-> evaluation 1 on perf train_regex_ir: outcome: accepted. Guard: ok, 1 files, 10 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_regex_ir parent 505854559, candidate 496915406, ratio 0.9823. train_basic_ir ratio 1.0002. encode_ir ratio 0.9999. decode_ir ratio 0.9991. save_load_ir ratio 1.0003.
-> I now believe RegexTokenizer.train fits this representation better when pair keys stay as strings. Token ids are already stored as one character per id. str.replace already consumes the merge string.
-> Next, wait for independent replays. If the candidate fails, inspect tie-breaking and merge construction in minbpe/regex.py RegexTokenizer.train.
->
-> 2026-10-13, episode `9d4e5941f250` (accepted)
 
 ## Licence
 
