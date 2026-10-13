@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 88 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 89 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -36,13 +36,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 26 (3 rejected, 17 accepted, 6 no candidate)
+- Attempts: 27 (3 rejected, 17 accepted, 7 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
 - Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 12.89%, 10.30%, 10.08%, 7.37%, 6.30%, 4.72%, 3.80%, 3.11%, 3.08%, 2.81%, 2.48%, 1.41%, 1.11%
 - Why candidates failed: stale (2), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/__init__.py`, `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.3561 USD (over 26 attempts with a recorded cost)
+- Median model spend per attempt: 0.3741 USD (over 27 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -57,6 +57,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried a save/load cache change in minbpe/base.py. The edits touched lines 12-17, 220-222, 224-241, 259-272, 269-279, 312-331, 312-344, 340-343, 390-393, and 144-146.
+> evaluation 1 was rejected: save_load_ir parent 442229920, candidate 439587215, ratio 0.9940, required 0.9900. evaluation 3 was rejected: save_load_ir ratio 1.0131. evaluation 5 was rejected: save_load_ir parent 442229916, candidate 439554118, ratio 0.9939. Builds were base ok, candidate ok. Equivalence was identical outputs. Guard was ok.
+> The cache change preserved behavior but did not help enough. The vocab follow-up regressed. No candidate was submitted.
+> Try smaller changes around save/load serialization in minbpe/base.py. Measure save_load_ir first. Then check train_basic_ir, train_regex_ir, encode_ir, and decode_ir.
+>
+> 2026-10-13, episode `f7f06eb93570` (no candidate)
 
 > Tried encode-path changes in BasicTokenizer.encode and RegexTokenizer.encode, then reverted them. Changed get_stats and merge in minbpe/base.py. Changed RegexTokenizer.encode again in minbpe/regex.py.
 > Evaluation 1 was rejected: encode_ir ratio 1.0143 vs required 0.9900. Evaluation 3 was rejected: 0.9973. Evaluation 5 was rejected: 0.9931. Evaluation 7 was rejected: 0.9922. All had build base ok, candidate ok, and identical outputs.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try a different path in RegexTokenizer.train or leave regex.py alone and inspect base.py/basic.py hot loops against lineage_bench.py.
 >
 > 2026-10-13, episode `cf1d166dbdd0` (no candidate)
-
-> I tried two paths. First I changed minbpe/base.py around Tokenizer.save and Tokenizer.load to cache byte encodings on load. Then I changed minbpe/base.py, minbpe/basic.py and minbpe/regex.py around BasicTokenizer.decode and RegexTokenizer.decode to use decoded string subclass caching.
-> evaluation 1 on save_load_ir was rejected: no_improvement: worst ratio 1.0547 vs required 0.9900. Outputs were identical. save_load_ir was parent 467772212, candidate 493371045, ratio 1.0547. evaluations 3 and 5 on decode_ir were rejected for equivalence_changed. Both said OUTPUTS DIFFER from parent.
-> I now believe the byte-cache load change is the wrong direction for this code. The decoded string subclass path is not equivalent to the parent on seeded inputs.
-> Next try decode work that returns the same output shape as the parent. Measure decode_ir first. Then check save_load_ir.
->
-> 2026-10-13, episode `6012e6d51d5c` (no candidate)
 
 ## Licence
 
