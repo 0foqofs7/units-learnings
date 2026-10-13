@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 60 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 61 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -42,17 +42,24 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_basic_ir
 
-- Attempts: 8 (4 accepted, 3 no candidate, 1 rejected)
+- Attempts: 9 (4 accepted, 4 no candidate, 1 rejected)
 - Best accepted effect: 15.23% (ratio 0.8477), episode `0bddfdfcf08a`
 - Accepted effects: 15.23%, 12.34%, 2.67%, 1.14%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/basic.py`
 - Files changed by rejected candidates: `minbpe/basic.py`
-- Median model spend per attempt: 0.3377 USD (over 8 attempts with a recorded cost)
+- Median model spend per attempt: 0.3489 USD (over 9 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Tried BasicTokenizer.train changes in minbpe/basic.py: replace most_common with max, reuse BYTE_VOCAB, and adjust loop lines. Tried base._build_vocab prefix caching in minbpe/base.py. Tried RegexTokenizer.train short-chunk filtering in minbpe/regex.py.
+> evaluation 1 train_basic_ir was rejected: train_basic_ir ratio 1.0110. evaluation 3 train_basic_ir was rejected: train_basic_ir ratio 0.9995. evaluation 5 save_load_ir was rejected: save_load_ir ratio 1.0258. evaluation 7 train_regex_ir was rejected: train_regex_ir ratio 1.0542. Each build was base ok, candidate ok, with identical outputs.
+> BasicTokenizer.train did not move enough from these edits. BYTE_VOCAB reuse only showed ratio 0.9995, below required 0.9900. _build_vocab prefix caching adds work on save/load. Filtering chunks in RegexTokenizer.train hurts train_regex_ir.
+> Next try fewer allocations inside get_stats or merge paths in minbpe/basic.py. Or measure pretokenization costs in RegexTokenizer.train before changing the chunk loop.
+>
+> 2026-10-13, episode `c3cb8ce878fd` (no candidate)
 
 > Changed minbpe/base.py. Changed _build_vocab to cache the most recent merge-only vocabulary prefix and reuse it when a tokenizer's merges extend that sequence. The submitted candidate touched 26 changed lines for save_load_ir.
 > perf save_load_ir outcome: accepted. guard: ok, 1 files, 26 lines. build: base ok, candidate ok. equivalence: identical outputs. train_basic_ir ratio 1.0005, train_regex_ir ratio 1.0008, encode_ir ratio 1.0005, decode_ir ratio 1.0022, save_load_ir ratio 0.9698.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try a smaller change with a clearer target. Start from one hot loop only. Keep guards small. No candidate was submitted.
 >
 > 2026-10-13, episode `5dfdd39e072f` (no candidate)
-
-> I changed minbpe/basic.py BasicTokenizer.encode and minbpe/regex.py RegexTokenizer._encode_chunk. I kept the selected pair elements in local variables and used them in the merge pass. I avoided building a temporary pair tuple during the encode loop.
-> Sandbox evaluation 1 was accepted. Equivalence was identical outputs. encode_ir moved from parent 2351337212 to candidate 2317592085, ratio 0.9856. train_basic_ir ratio was 1.0014. train_regex_ir ratio was 1.0001. decode_ir ratio was 0.9995. save_load_ir ratio was 0.9999. Guard was ok, 2 files, 18 lines. Build was base ok, candidate ok.
-> I believe this path is narrow. It reduces allocation and unpacking in the merge application, without changing merge selection or output. The train metrics did not help.
-> Next, wait for independent replays. If encode_ir holds, look for the same temporary tuple pattern elsewhere in encoding code.
->
-> 2026-10-13, episode `45544cbf6328` (accepted)
 
 ## Licence
 
