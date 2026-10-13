@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 73 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 74 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -46,17 +46,24 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_basic_ir
 
-- Attempts: 11 (5 accepted, 4 no candidate, 2 rejected)
+- Attempts: 12 (5 accepted, 5 no candidate, 2 rejected)
 - Best accepted effect: 15.23% (ratio 0.8477), episode `0bddfdfcf08a`
 - Accepted effects: 15.23%, 12.34%, 2.67%, 1.33%, 1.14%
 - Why candidates failed: stale_conflict (1), no_improvement (1)
 - Files changed by accepted candidates: `minbpe/basic.py`
 - Files changed by rejected candidates: `minbpe/basic.py`
-- Median model spend per attempt: 0.3480 USD (over 11 attempts with a recorded cost)
+- Median model spend per attempt: 0.3485 USD (over 12 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I changed minbpe/basic.py in get_stats, merge, BasicTokenizer.train, and BasicTokenizer.encode. I also changed minbpe/regex.py in RegexTokenizer.train. I tried counted pair updates, merge-loop changes, and smaller train-loop rewrites.
+> Evaluation 1 was rejected: train_basic_ir parent 324048710, candidate 322879261, ratio 0.9964. Evaluation 3 was rejected: ratio 0.9944. Evaluation 5 was rejected: ratio 1.0102. Evaluation 7 was rejected: ratio 0.9947. Equivalence was identical outputs each time. No evaluated change met required 0.9900.
+> I believe this path is too small for train_basic_ir. The best measured variant did not clear the guard. Some changes also moved encode_ir and decode_ir the wrong way.
+> Next try a different part of BasicTokenizer.train. Look at allocation in repeated ids replacement, or leave basic.py and inspect regex.py split costs. No candidate was submitted.
+>
+> 2026-10-13, episode `451fcb7031ce` (no candidate)
 
 > I changed minbpe/basic.py. BasicTokenizer.train now updates merge deltas from split parts, not materialized left/right lists and Counter objects. It avoids the tie-candidate set on the common single-top heap case. It reuses the shared byte vocabulary prefix.
 > evaluation 1 was rejected: no_improvement, worst ratio 0.9927 vs required 0.9900. evaluation 3 was rejected: no_improvement, worst ratio 0.9917 vs required 0.9900. evaluation 5 was accepted. train_basic_ir: parent 331614471, candidate 328000212, ratio 0.9891. Equivalence had identical outputs. Guard was ok.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try restoring the evaluation 5 shape in minbpe/base.py lines 74-82 and minbpe/regex.py lines 388-390. Run perf encode_ir before more edits. Watch decode_ir; evaluation 5 had ratio 1.0041.
 >
 > 2026-10-13, episode `f0c24f92817e` (no candidate)
-
-> I changed the str-based encode paths in minbpe/basic.py lines 161-166 and minbpe/regex.py lines 340-343. I removed the membership test before ordered merge replacement and let str.replace return the unchanged string.
-> Sandbox eval perf encode_ir was accepted. Guard ok, 2 files, 6 lines. Build base ok, candidate ok. Equivalence identical outputs. encode_ir parent 751875480, candidate 737516903, ratio 0.9809. train_basic_ir ratio 0.9999. train_regex_ir ratio 0.9998. decode_ir ratio 0.9990. save_load_ir ratio 0.9998.
-> I believe the extra scan in the encode path was wasted work. The change did not alter produced token ids in this eval.
-> Next, wait for independent replay. If it holds, look for the same membership-before-replace shape in nearby encode code.
->
-> 2026-10-13, episode `5940393779a8` (accepted)
 
 ## Licence
 
