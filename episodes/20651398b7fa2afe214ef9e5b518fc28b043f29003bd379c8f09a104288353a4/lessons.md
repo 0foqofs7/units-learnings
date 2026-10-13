@@ -1,18 +1,18 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 12 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 13 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:encode_ir
 
-- Attempts: 5 (3 accepted, 1 rejected, 1 no candidate)
+- Attempts: 6 (4 accepted, 1 rejected, 1 no candidate)
 - Best accepted effect: 34.31% (ratio 0.6569), episode `4297b89143e7`
-- Accepted effects: 34.31%, 12.19%, 3.74%
+- Accepted effects: 34.31%, 12.19%, 3.74%, 1.35%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.2727 USD (over 5 attempts with a recorded cost)
+- Median model spend per attempt: 0.3069 USD (over 6 attempts with a recorded cost)
 
 ## Target perf:train_ir
 
@@ -27,6 +27,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed minbpe/base.py to add a cached nested merge lookup on Tokenizer. Changed BasicTokenizer.encode in minbpe/basic.py. Changed RegexTokenizer.encode_chunk and RegexTokenizer.encode_ordinary in minbpe/regex.py.
+> Sandbox evaluation 1 for perf encode_ir returned outcome: accepted. Guard: ok, 3 files, 24 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_ir parent 2894356096, candidate 2896110474, ratio 1.0006. encode_ir parent 1038805572, candidate 1025301620, ratio 0.9870.
+> The repeated encode path was rebuilding the same lookup. The cache is only safe with invalidation when the merges mapping is replaced or changes size. train_ir did not help: ratio 1.0006.
+> Next try the independent replay result for the queued encode_ir candidate. Then inspect the train_ir path before adding more cache state.
+>
+> 2026-10-13, episode `2b6dd2046340` (accepted)
 
 > I changed minbpe/regex.py lines 65-67 in RegexTokenizer.train. The preprocessing output now drops chunks shorter than two bytes before the merge loop. I read minbpe/base.py lines 1-190, minbpe/basic.py lines 1-80, minbpe/regex.py lines 1-194, minbpe/gpt4.py lines 1-131, and lineage_bench.py lines 1-107.
 > perf train_ir reported "outcome: accepted". It reported "guard: ok, 1 files, 1 lines", "build: base ok, candidate ok", and "equivalence: identical outputs". train_ir was parent 2914285395, candidate 2717054368, ratio 0.9323. encode_ir was parent 992184631, candidate 992053966, ratio 0.9999.
@@ -55,13 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, read the merge loop again before editing. Look for less repeated work around pair counts, not just cleaner iteration. Measure train_ir and encode_ir after each change.
 >
 > 2026-10-13, episode `def7ec96ffd9` (no candidate)
-
-> I changed minbpe/base.py merge and minbpe/regex.py merge. I moved unmatched trailing-token handling out of the scan loop. I read minbpe/base.py, minbpe/basic.py, minbpe/regex.py, minbpe/gpt4.py, and lineage_bench.py.
-> Evaluation 1 was rejected. train_ir was parent 2859591337, candidate 2857360562, ratio 0.9992. encode_ir was parent 1124152912, candidate 1116894643, ratio 0.9935. Evaluation 3 was accepted in sandbox. train_ir was parent 2859591337, candidate 2819054839, ratio 0.9858. encode_ir was parent 1124152906, candidate 1116648972, ratio 0.9933. Outputs were identical.
-> The first change did not help enough. The second change says the end-of-list check in merge mattered inside the hot loop. The code is still doing the same merge work.
-> Submitted the train_ir candidate with 16 changed lines. It was committed and revealed with status waiting. Next, check independent replay, then look for the next branch or bounds check inside training.
->
-> 2026-10-13, episode `f83af6d14c19` (accepted)
 
 ## Licence
 
