@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 103 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 104 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -26,13 +26,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 19 (8 accepted, 7 no candidate, 4 rejected)
+- Attempts: 20 (8 accepted, 7 no candidate, 5 rejected)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
 - Accepted effects: 24.45%, 20.23%, 13.61%, 10.64%, 9.58%, 6.55%, 1.72%, 1.15%
-- Why candidates failed: stale_conflict (2), dependency_failed (1), stale (1)
+- Why candidates failed: stale_conflict (2), dependency_failed (1), stale (1), no_improvement (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
-- Files changed by rejected candidates: `minbpe/base.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3433 USD (over 19 attempts with a recorded cost)
+- Files changed by rejected candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/regex.py`
+- Median model spend per attempt: 0.4735 USD (over 20 attempts with a recorded cost)
 
 ## Target perf:save_load_ir
 
@@ -57,6 +57,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried encode-path cuts in minbpe/basic.py BasicTokenizer.encode, minbpe/regex.py RegexTokenizer.encode, and minbpe/base.py ordered_merge_steps. I removed the merge-step string length check, tried direct special-token string searches, and changed cache-hit work for an unchanged merges dict.
+> evaluation 1 was rejected: worst ratio 0.9985 vs required 0.9900. evaluation 3 was rejected: worst ratio 1.0006. evaluation 5 was rejected: worst ratio 0.9954. evaluation 7 was accepted: encode_ir parent 628170162, candidate 621120431, ratio 0.9888. Equivalence was identical outputs. Guard was ok, 3 files, 50 lines. Status is queued.
+> The early changes did not help enough. The submitted change reduced encode_ir in the sandbox while train_basic_ir ratio 1.0030, train_regex_ir ratio 1.0025, decode_ir ratio 1.0000, and save_load_ir ratio 1.0019 stayed within guard limits.
+> Next, wait for independent replays. If the result holds, inspect more encode_ir overhead in special-token splitting and ordered merge setup.
+>
+> 2026-10-13, episode `3481dc55f8a0` (rejected)
 
 > I changed BasicTokenizer.decode and RegexTokenizer.decode cache-hit handling in minbpe/basic.py and minbpe/regex.py. List decode cache entries now keep the original vocab and special-token mapping objects beside copied snapshots.
 > evaluation 1 was accepted. guard: ok, 2 files, 16 lines. equivalence: identical outputs. decode_ir moved from parent 489857527 to candidate 484815370, ratio 0.9897. train_basic_ir ratio 1.0011. train_regex_ir ratio 1.0007. encode_ir ratio 1.0002. save_load_ir ratio 1.0004.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try should stay narrower. Measure one hot path in RegexTokenizer.train before editing it. Leave ordered_merge_steps alone unless a profile points there.
 >
 > 2026-10-13, episode `1b561acd9ebe` (no candidate)
-
-> I tried changes in minbpe/basic.py, including BasicTokenizer.train. I read minbpe/basic.py, minbpe/base.py, minbpe/regex.py, lineage_bench.py, minbpe/__init__.py, and lineage_equiv.py.
-> Evaluation 1 was rejected: train_basic_ir parent 261830968, candidate 261850149, ratio 1.0001. Evaluation 3 was rejected: parent 261830962, candidate 291910391, ratio 1.1149. Evaluation 5 was rejected: parent 261830962, candidate 262120575, ratio 1.0011. All had identical outputs.
-> I now believe these BasicTokenizer.train edits are not the cut. They preserved behavior, but were neutral or slower.
-> Next try a smaller change in the counting path. Recheck get_stats and merge in minbpe/basic.py before touching encode or decode again.
->
-> 2026-10-13, episode `d2126e0bff5c` (no candidate)
 
 ## Licence
 
