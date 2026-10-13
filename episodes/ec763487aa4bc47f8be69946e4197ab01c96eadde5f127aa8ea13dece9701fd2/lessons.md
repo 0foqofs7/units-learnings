@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 18 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 19 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -14,11 +14,11 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_regex_ir
 
-- Attempts: 3 (3 accepted)
+- Attempts: 4 (3 accepted, 1 no candidate)
 - Best accepted effect: 21.19% (ratio 0.7881), episode `b39c7cc4d86a`
 - Accepted effects: 21.19%, 18.19%, 14.36%
 - Files changed by accepted candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.2592 USD (over 3 attempts with a recorded cost)
+- Median model spend per attempt: 0.2608 USD (over 4 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -49,6 +49,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> Tried Counter-based pair counting in minbpe/regex.py RegexTokenizer.train. Tried reshaping the merge loop in minbpe/basic.py BasicTokenizer.train. Tried batching vocab-file writes in minbpe/base.py Tokenizer.save. Tried an ASCII fast path in minbpe/base.py render_token.
+> Evaluation 1 rejected train_regex_ir: worst ratio 1.3526 vs required 0.9900. Evaluation 3 rejected train_basic_ir: worst ratio 1.1035 vs required 0.9900. Evaluation 5 rejected save_load_ir: worst ratio 1.0072 vs required 0.9900. Evaluation 7 rejected save_load_ir: worst ratio 1.1457 vs required 0.9900. Builds were ok. Equivalence had identical outputs. No candidate was submitted.
+> These paths are tight in this shape. Counter use in RegexTokenizer.train added cost. The BasicTokenizer.train loop rewrite added cost. Tokenizer.save batching did not help. render_token ASCII fast path made save_load_ir worse.
+> Next try smaller allocation changes. Measure by function. Keep encode_ir and decode_ir guarded.
+>
+> 2026-10-13, episode `f482022d3fb5` (no candidate)
+
 > Read minbpe/basic.py, minbpe/base.py, minbpe/regex.py, lineage_bench.py, and searched get_stats|merge. I changed BasicTokenizer.train in minbpe/basic.py. The submitted try used collections.Counter for pair frequency counting and selected the most common pair directly.
 > evaluation 1 was rejected: train_basic_ir parent 3652785387, candidate 3965347480, ratio 1.0856. evaluation 3 was rejected: parent 3652785387, candidate 3935466492, ratio 1.0774. evaluation 5 was accepted: parent 3652785393, candidate 3078694288, ratio 0.8428. Equivalence was identical outputs. The submitted perf candidate had 6 changed lines and status queued.
 > The extra loop changes did not help. Counter helped when BasicTokenizer.train let it count pairs and choose the most common pair directly. Tie order for observed pairs stayed the same in the sandbox.
@@ -76,13 +83,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try a larger encode change next. Look past local variable moves and loop reshaping. No candidate was submitted.
 >
 > 2026-10-13, episode `92ac3a8f4943` (no candidate)
-
-> I tried minbpe/base.py lines 124-147, then minbpe/base.py lines 124-172, for save_load_ir. I replaced that with minbpe/regex.py lines 89-98 in RegexTokenizer.decode, using the dense vocabulary list lookup first and special-token handling on out-of-range index.
-> save_load_ir measured parent 2859177840, candidate 2923901591, ratio 1.0226, outcome: rejected (no_improvement: worst ratio 1.0226 vs required 0.9900). decode_ir measured parent 2605193717, candidate 2265680083, ratio 0.8697, outcome: accepted. Equivalence was identical outputs. Guard was ok, 1 files, 11 lines. Submission ended with no candidate because the pending candidate this change was built on was not accepted.
-> I believe RegexTokenizer.decode was carrying an avoidable explicit upper-bound comparison on the valid-token path. The base.py save/load edit did not help.
-> Try the same dense lookup shape only where vocab ids are dense. Keep invalid and special-token handling behind the failed list index path.
->
-> 2026-10-13, episode `4c423c477fd8` (no candidate)
 
 ## Licence
 
