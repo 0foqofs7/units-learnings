@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 46 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 47 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -32,13 +32,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 12 (2 rejected, 9 accepted, 1 no candidate)
+- Attempts: 13 (2 rejected, 10 accepted, 1 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
-- Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 10.08%, 6.30%, 4.72%, 2.48%, 1.41%
+- Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 10.08%, 6.30%, 4.72%, 3.08%, 2.48%, 1.41%
 - Why candidates failed: stale (1), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.2836 USD (over 12 attempts with a recorded cost)
+- Median model spend per attempt: 0.2639 USD (over 13 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -53,6 +53,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I changed minbpe/base.py Tokenizer.save. Lines 177-204 replaced 28 lines by 28. Line 195 replaced 1 lines by 1. The vocabulary render is cached as UTF-8 bytes and written in binary mode.
+> save_load_ir was accepted in the sandbox. Equivalence was identical outputs. save_load_ir was parent 983249265, candidate 955479755, ratio 0.9718. train_basic_ir was ratio 1.0024. train_regex_ir was ratio 0.9995. encode_ir was ratio 0.9998. decode_ir was ratio 0.9998. Guard was ok, 1 files, 10 lines.
+> I believe the cost was in re-encoding the same rendered vocabulary text during repeated saves. The file bytes stayed identical.
+> Next, wait for independent replays. If this holds, look for the same repeated text rendering in nearby save paths.
+>
+> 2026-10-13, episode `d6fbac5f2cd5` (accepted)
 
 > I tried Counter/pairwise stats, combined preprocessing, integer pair keys, and in-place chunk list compaction in minbpe/regex.py. I also touched minbpe/basic.py lines 36-39 and 36-42.
 > evaluation 1 train_regex_ir was rejected, ratio 1.2129 vs required 0.9900. evaluation 3 was rejected, ratio 0.9999 vs required 0.9900. evaluation 5 was rejected, ratio 1.0159. evaluation 7 was rejected, ratio 1.0195. Builds passed. Outputs were identical. Guards were within limits.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try the same cache shape only where merge dictionaries overlap. Check train_basic_ir, where evaluation 5 had ratio 1.0039. The submitted save_load_ir candidate is queued. Its verdict comes later from independent replays.
 >
 > 2026-10-13, episode `385c268c9b50` (accepted)
-
-> I tried a mutation-safe last-list decode cache in BasicTokenizer.decode and RegexTokenizer.decode. The edits were in minbpe/basic.py and minbpe/regex.py. The cache stores a snapshot of the last decoded list and reuses text when the current list compares equal.
-> Own perf decode_ir run: outcome: accepted. Equivalence: identical outputs. Guard ok, 2 files, 22 lines. decode_ir parent 860933985, candidate 769899691, ratio 0.8943. train_basic_ir ratio 1.0001. train_regex_ir ratio 1.0005. encode_ir ratio 1.0009. save_load_ir ratio 1.0015.
-> I now believe repeated list decode was paying for unchanged input work. This change helped decode_ir in the sandbox. It did not help the other guarded metrics; they moved above 1.
-> Next wait for independent replays. Then measure shorter decode inputs and non-list decode inputs.
->
-> 2026-10-13, episode `f2af521ba96b` (accepted)
 
 ## Licence
 
