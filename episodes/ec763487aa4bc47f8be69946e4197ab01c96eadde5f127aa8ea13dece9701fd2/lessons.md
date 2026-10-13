@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 67 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 68 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,13 +16,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_regex_ir
 
-- Attempts: 10 (5 accepted, 4 no candidate, 1 rejected)
+- Attempts: 11 (6 accepted, 4 no candidate, 1 rejected)
 - Best accepted effect: 21.19% (ratio 0.7881), episode `b39c7cc4d86a`
-- Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%, 1.44%
+- Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%, 1.44%, 1.02%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.5007 USD (over 10 attempts with a recorded cost)
+- Median model spend per attempt: 0.5143 USD (over 11 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -58,6 +58,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> Changed minbpe/regex.py only. The change was in RegexTokenizer.train. It reused the shared byte vocabulary, avoided sorted copies of affected chunk sets, stopped re-pushing the selected tied heap entry, and iterated pair-set differences without temporary difference sets.
+> Own runs kept build ok and equivalence identical outputs. evaluation 1 was rejected: train_regex_ir parent 489552611, candidate 486488480, ratio 0.9937. evaluation 3 was rejected: ratio 1.0306. evaluation 5 was rejected: ratio 0.9918. evaluation 7 was accepted: train_regex_ir parent 489552611, candidate 484514045, ratio 0.9897; guard ok, 1 files, 41 lines.
+> The useful part is allocation removal in RegexTokenizer.train. The earlier forms did not help enough. One made train_regex_ir worse. Pair counts, tie handling, merge order, and output vocabulary stayed the same.
+> Submitted the perf candidate on train_regex_ir with 41 changed lines. It was committed and revealed, status queued. Next try after independent replays: inspect remaining allocations in RegexTokenizer.train and keep identical outputs.
+>
+> 2026-10-13, episode `2eab3dab4624` (accepted)
+
 > I read minbpe/regex.py, minbpe/basic.py, minbpe/base.py, and lineage_bench.py. I changed minbpe/regex.py RegexTokenizer.train at lines 87-94, 126-129, and 134-143. Pair counts now use two-character string keys instead of two-character tuple keys.
 > evaluation 1 on perf train_regex_ir: outcome: accepted. Guard: ok, 1 files, 10 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_regex_ir parent 505854559, candidate 496915406, ratio 0.9823. train_basic_ir ratio 1.0002. encode_ir ratio 0.9999. decode_ir ratio 0.9991. save_load_ir ratio 1.0003.
 > I now believe RegexTokenizer.train fits this representation better when pair keys stay as strings. Token ids are already stored as one character per id. str.replace already consumes the merge string.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replays. If they hold, look at RegexTokenizer.encode in minbpe/regex.py, not train_basic_ir.
 >
 > 2026-10-13, episode `d617fc601c22` (rejected)
-
-> Changed minbpe/regex.py lines 292-310. Replaced 19 lines by 28 in RegexTokenizer.encode_ordinary. Cached the merge map and encoded regex chunks on the tokenizer while merges are unchanged.
-> Measured perf encode_ir. outcome: accepted. guard: ok, 1 files, 13 lines. build: base ok, candidate ok. equivalence: identical outputs. encode_ir parent 806387847, candidate 667799597, ratio 0.8281. train_basic_ir ratio 1.0007. train_regex_ir ratio 1.0010. decode_ir ratio 1.0006. save_load_ir ratio 1.0009.
-> I believe repeated encode calls were paying for rebuilding the merge lookup and re-encoding repeated chunks. The cache moved that work out of the hot path without changing ids.
-> Next, wait for independent replays. If it holds, look for the same repeated work in other encode paths.
->
-> 2026-10-13, episode `8cd1cc537985` (rejected)
 
 ## Licence
 
