@@ -1,6 +1,6 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 11 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 12 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,17 +16,24 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_ir
 
-- Attempts: 6 (4 accepted, 1 rejected, 1 no candidate)
+- Attempts: 7 (5 accepted, 1 rejected, 1 no candidate)
 - Best accepted effect: 15.17% (ratio 0.8483), episode `0bada18988c2`
-- Accepted effects: 15.17%, 14.04%, 1.94%, 1.38%
+- Accepted effects: 15.17%, 14.04%, 6.05%, 1.94%, 1.38%
 - Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.1929 USD (over 6 attempts with a recorded cost)
+- Median model spend per attempt: 0.1917 USD (over 7 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I changed minbpe/regex.py lines 65-67 in RegexTokenizer.train. The preprocessing output now drops chunks shorter than two bytes before the merge loop. I read minbpe/base.py lines 1-190, minbpe/basic.py lines 1-80, minbpe/regex.py lines 1-194, minbpe/gpt4.py lines 1-131, and lineage_bench.py lines 1-107.
+> perf train_ir reported "outcome: accepted". It reported "guard: ok, 1 files, 1 lines", "build: base ok, candidate ok", and "equivalence: identical outputs". train_ir was parent 2914285395, candidate 2717054368, ratio 0.9323. encode_ir was parent 992184631, candidate 992053966, ratio 0.9999.
+> I now believe RegexTokenizer.train was spending work on chunks that cannot form adjacent pairs and cannot be changed by pair merges. Filtering them preserved the learned merges and vocabulary in this run.
+> Next try the same shape only where preprocessing creates inert chunks. Do not widen it without equivalence. The submitted perf candidate on train_ir is queued; independent replays decide later.
+>
+> 2026-10-13, episode `1722008aee7c` (accepted)
 
 > A nested merge lookup replaced the pair-key scan during encoding. It touched get_stats and merge in minbpe/base.py, BasicTokenizer.encode in minbpe/basic.py, RegexTokenizer.encode_ordinary and RegexTokenizer.encode in minbpe/regex.py, and minbpe/gpt4.py lines 81-86.
 > Evaluation 1 on perf encode_ir: outcome: accepted. Guard: ok, 4 files, 49 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_ir parent 2991830558, candidate 2995124820, ratio 1.0011. encode_ir parent 936478710, candidate 907990874, ratio 0.9696. The candidate was committed and revealed with status queued.
@@ -55,13 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Submitted the train_ir candidate with 16 changed lines. It was committed and revealed with status waiting. Next, check independent replay, then look for the next branch or bounds check inside training.
 >
 > 2026-10-13, episode `f83af6d14c19` (accepted)
-
-> Changed minbpe/regex.py RegexTokenizer.train at lines 70-80. It skips regex-training chunks shorter than two tokens when collecting pair counts and when applying a merge.
-> Own sandbox evaluation perf train_ir had outcome: accepted. guard: ok, 1 files, 5 lines. build: base ok, candidate ok. equivalence: identical outputs. train_ir: parent 3093707638, candidate 3001903254, ratio 0.9703. encode_ir: parent 1122634032, candidate 1122743414, ratio 1.0001.
-> Chunks shorter than two tokens cannot contribute adjacent pairs and cannot be changed by a pair merge. The old path spent helper calls and scans there.
-> Submitted the perf candidate on train_ir. Status is waiting. Next, let independent replays decide it, then measure the same kind of skipped work before touching more code.
->
-> 2026-10-13, episode `eb1be42ef413` (rejected)
 
 ## Licence
 
