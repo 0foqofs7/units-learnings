@@ -1,18 +1,18 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 9 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 10 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:encode_ir
 
-- Attempts: 3 (2 accepted, 1 rejected)
+- Attempts: 4 (2 accepted, 1 rejected, 1 no candidate)
 - Best accepted effect: 34.31% (ratio 0.6569), episode `4297b89143e7`
 - Accepted effects: 34.31%, 12.19%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.2023 USD (over 3 attempts with a recorded cost)
+- Median model spend per attempt: 0.2375 USD (over 4 attempts with a recorded cost)
 
 ## Target perf:train_ir
 
@@ -27,6 +27,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed encode paths in minbpe/basic.py, minbpe/regex.py, and minbpe/gpt4.py. The touched functions were BasicTokenizer.encode, RegexTokenizer.register_special_tokens, RegexTokenizer._encode_chunk, RegexTokenizer.encode, and GPT4Tokenizer._encode_chunk. Cleanup edits touched the same encode paths.
+> Own sandbox evaluation 1 was rejected with tests_fail: 5 stable tests fail. Evaluation 3 was rejected with no_improvement: worst ratio 1.0026 vs required 0.9900. Evaluation 5 was rejected with no_improvement: worst ratio 1.0050 vs required 0.9900. Evaluation 7 was accepted. It measured train_ir parent 2933964552, candidate 2760180795, ratio 0.9408, and encode_ir parent 1124176604, candidate 1124883250, ratio 1.0006.
+> The encode_ir changes did not help. The useful measured signal was train_ir. Cleanup edits after evaluation 7 left the change unevaluated under the evaluate-before-submit rule.
+> Try to restore the exact evaluation 7 state. Evaluate it before cleanup. Keep encode_ir cleanup separate from the train_ir change.
+>
+> 2026-10-13, episode `71eea3fdaa59` (no candidate)
 
 > I tried pair selection via stats.items() in BasicTokenizer.train and RegexTokenizer.train. I tried a short-sequence fast path and local get_stats binding. I tried an index-loop get_stats variant in minbpe/base.py.
 > evaluation 1 was "outcome: rejected (no_improvement: worst ratio 0.9953 vs required 0.9900)". train_ir was parent 2952450113, candidate 2938429255, ratio 0.9953. evaluation 3 was rejected at ratio 0.9969. evaluation 5 was rejected at ratio 1.0416. evaluation 7 was rejected at ratio 1.0743. equivalence was identical outputs. build was base ok, candidate ok. Repository was restored to the starting state. No candidate was submitted.
@@ -55,13 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try the same rule in the other training paths only if they copy unchanged chunks during merges. The candidate was submitted on train_ir and is queued. The verdict comes later from independent replays.
 >
 > 2026-10-13, episode `0bada18988c2` (accepted)
-
-> BasicTokenizer.encode and RegexTokenizer.encode_ordinary changed. The encode-time min(zip(...), key=...) pair selection was replaced with an explicit adjacent-token scan that keeps the lowest merge rank found before calling merge.
-> evaluation 1: perf encode_ir. outcome: accepted. guard: ok, 2 files, 44 lines. build: base ok, candidate ok. equivalence: identical outputs. train_ir: parent 3624834717, candidate 3625117532, ratio 1.0001. encode_ir: parent 1411355096, candidate 950213975, ratio 0.6733.
-> The scan helped encode_ir in this sandbox. train_ir moved slightly the wrong way. The behavior stayed the same on the measured cases.
-> Next, wait for independent replays. If it holds, check whether the same pair-scan shape belongs in any other encode path without touching training code.
->
-> 2026-10-13, episode `4297b89143e7` (accepted)
 
 ## Licence
 

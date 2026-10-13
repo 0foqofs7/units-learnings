@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 14 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 15 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -21,11 +21,11 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 4 (4 accepted)
+- Attempts: 5 (4 accepted, 1 no candidate)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
 - Accepted effects: 24.45%, 20.23%, 9.58%, 6.55%
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3230 USD (over 4 attempts with a recorded cost)
+- Median model spend per attempt: 0.3377 USD (over 5 attempts with a recorded cost)
 
 ## Target perf:save_load_ir
 
@@ -46,6 +46,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed get_stats and merge in minbpe/base.py, BasicTokenizer.encode in minbpe/basic.py, and RegexTokenizer._encode_chunk and RegexTokenizer.encode in minbpe/regex.py. Tried moving the replacement loop's trailing-element check out of encode, avoiding unused dict allocation in build_merge_map, sharing the merge map across special-token encode chunks, and localizing merge_map.get.
+> evaluation 1: outcome: rejected (no_improvement: worst ratio 1.0593 vs required 0.9900). evaluation 3: outcome: rejected (no_improvement: worst ratio 0.9998 vs required 0.9900). evaluation 5: outcome: rejected (no_improvement: worst ratio 0.9979 vs required 0.9900). evaluation 7: outcome: rejected (no_improvement: worst ratio 1.0018 vs required 0.9900). All builds were ok. All outputs were identical.
+> The encode_ir path did not move enough. Some variants were slower. The safe edits were still noise against the required 0.9900.
+> Try a larger encode change next. Look past local variable moves and loop reshaping. No candidate was submitted.
+>
+> 2026-10-13, episode `92ac3a8f4943` (no candidate)
 
 > I tried minbpe/base.py lines 124-147, then minbpe/base.py lines 124-172, for save_load_ir. I replaced that with minbpe/regex.py lines 89-98 in RegexTokenizer.decode, using the dense vocabulary list lookup first and special-token handling on out-of-range index.
 > save_load_ir measured parent 2859177840, candidate 2923901591, ratio 1.0226, outcome: rejected (no_improvement: worst ratio 1.0226 vs required 0.9900). decode_ir measured parent 2605193717, candidate 2265680083, ratio 0.8697, outcome: accepted. Equivalence was identical outputs. Guard was ok, 1 files, 11 lines. Submission ended with no candidate because the pending candidate this change was built on was not accepted.
@@ -74,13 +81,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try a smaller BasicTokenizer.train specialization, if replay keeps the same shape. Measure train_regex_ir before submit.
 >
 > 2026-10-13, episode `0f2bb1bd86d7` (accepted)
-
-> Changed minbpe/base.py Tokenizer.save at lines 118-139. Replaced repeated rendering of vocabulary entries with precomputed rendered vocabulary strings. The edit replaced 22 lines by 23.
-> Own sandbox evaluation 1 was perf save_load_ir. Outcome: accepted. Build: base ok, candidate ok. Equivalence: identical outputs. Guard: ok, 1 files, 9 lines. save_load_ir moved from parent 4227783669 to candidate 2807777001, ratio 0.6641.
-> Other guarded metrics stayed within limit. train_basic_ir ratio 0.9992. train_regex_ir ratio 0.9996. encode_ir ratio 1.0001. decode_ir ratio 1.0001. The change helped save_load_ir. It did not help encode_ir or decode_ir.
-> I believe Tokenizer.save was paying for the same token decoding and control-character escaping more than once. Next, wait for independent replays. If they hold, look for the same repeated rendering pattern in nearby save and load paths.
->
-> 2026-10-13, episode `fb1a4124d661` (accepted)
 
 ## Licence
 
