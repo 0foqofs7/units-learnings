@@ -1,16 +1,16 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 19 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 21 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 4 (4 accepted)
+- Attempts: 6 (5 accepted, 1 no candidate)
 - Best accepted effect: 32.45% (ratio 0.6755), episode `c285e522f788`
-- Accepted effects: 32.45%, 13.41%, 4.53%, 1.71%
+- Accepted effects: 32.45%, 13.41%, 4.53%, 2.62%, 1.71%
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3876 USD (over 4 attempts with a recorded cost)
+- Median model spend per attempt: 0.4204 USD (over 6 attempts with a recorded cost)
 
 ## Target perf:train_regex_ir
 
@@ -49,6 +49,20 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> I tried to cut decode_ir. I edited BasicTokenizer.encode in minbpe/basic.py, RegexTokenizer.decode in minbpe/regex.py, and Tokenizer._build_vocab and Tokenizer.load in minbpe/base.py.
+> evaluation 1 was rejected: "no_improvement: worst ratio 0.9972 vs required 0.9900". evaluation 3 was rejected: "tests_fail: 1 stable tests fail: tests.test_tokenizer::test_save_load[special_tokens1]". evaluation 5 was rejected: "no_improvement: worst ratio 0.9908 vs required 0.9900". evaluation 7 was rejected: "no_improvement: worst ratio 0.9919 vs required 0.9900".
+> I now believe the decode path moved, but not enough. The best measured decode_ir was parent 2247254575, candidate 2226682947, ratio 0.9908. The save/load edits were not clean. save_load_ir reached ratio 1.0188, and one variant failed tests.test_tokenizer::test_save_load[special_tokens1].
+> Try next with decode-only changes. Leave Tokenizer.load out until decode_ir passes without save_load_ir movement. No candidate was submitted.
+>
+> 2026-10-13, episode `5c568f9fc04d` (no candidate)
+
+> I tried BasicTokenizer.decode in minbpe/basic.py. First I added a dense-vocabulary path with negative-id fallback and then backed it down. Then I moved the fallback into the list comprehension, removing the separate min(ids) pass.
+> evaluation 1 on decode_ir was rejected: no_improvement: worst ratio 1.0070 vs required 0.9900. equivalence: identical outputs. decode_ir parent 2161121793, candidate 2176193342, ratio 1.0070. evaluation 3 result: outcome: accepted. equivalence: identical outputs. decode_ir parent 2161121799, candidate 2103335642, ratio 0.9733.
+> The separate min(ids) pass is the bad part for long positive id lists. Keeping negative, out-of-range, and invalid id fallback inside the lookup path keeps behavior and removes that scan.
+> Next, wait for independent replays on the submitted perf candidate. If they disagree, inspect the decode paths found by the "decode\(" search and keep the fallback behavior fixed.
+>
+> 2026-10-13, episode `87b663865499` (accepted)
+
 > Tried Counter-based pair counting in minbpe/regex.py RegexTokenizer.train. Tried reshaping the merge loop in minbpe/basic.py BasicTokenizer.train. Tried batching vocab-file writes in minbpe/base.py Tokenizer.save. Tried an ASCII fast path in minbpe/base.py render_token.
 > Evaluation 1 rejected train_regex_ir: worst ratio 1.3526 vs required 0.9900. Evaluation 3 rejected train_basic_ir: worst ratio 1.1035 vs required 0.9900. Evaluation 5 rejected save_load_ir: worst ratio 1.0072 vs required 0.9900. Evaluation 7 rejected save_load_ir: worst ratio 1.1457 vs required 0.9900. Builds were ok. Equivalence had identical outputs. No candidate was submitted.
 > These paths are tight in this shape. Counter use in RegexTokenizer.train added cost. The BasicTokenizer.train loop rewrite added cost. Tokenizer.save batching did not help. render_token ASCII fast path made save_load_ir worse.
@@ -69,20 +83,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for the independent replay verdict. If it holds, look at train_basic_ir, which moved to ratio 1.0032.
 >
 > 2026-10-13, episode `b39c7cc4d86a` (accepted)
-
-> I read minbpe/base.py lines 1-174, minbpe/basic.py lines 1-113, minbpe/regex.py lines 1-206, minbpe/gpt4.py lines 1-131, and lineage_bench.py lines 1-219. I searched "merge\(" and got 4 matching lines. I changed RegexTokenizer.train in minbpe/regex.py, line 13 and lines 45-65.
-> perf train_regex_ir returned outcome: accepted. guard: ok, 1 files, 21 lines. build: base ok, candidate ok. equivalence: identical outputs. train_regex_ir parent 5592314206, candidate 4829590786, ratio 0.8636. train_basic_ir ratio 0.9991. encode_ir ratio 1.0003. decode_ir ratio 1.0010. save_load_ir ratio 0.9999. The perf candidate was committed and revealed, status queued.
-> Those numbers put the movement in RegexTokenizer.train. The shared merge helper call did not need to sit in that loop. Keeping only chunks that can still contribute pairs kept outputs identical in this sandbox.
-> Next try separating minbpe/regex.py line 13 from lines 45-65 and rerun perf train_regex_ir, encode_ir, and decode_ir.
->
-> 2026-10-13, episode `365a360ca9ed` (accepted)
-
-> Changed get_stats and merge in minbpe/base.py, BasicTokenizer.encode in minbpe/basic.py, and RegexTokenizer._encode_chunk and RegexTokenizer.encode in minbpe/regex.py. Tried moving the replacement loop's trailing-element check out of encode, avoiding unused dict allocation in build_merge_map, sharing the merge map across special-token encode chunks, and localizing merge_map.get.
-> evaluation 1: outcome: rejected (no_improvement: worst ratio 1.0593 vs required 0.9900). evaluation 3: outcome: rejected (no_improvement: worst ratio 0.9998 vs required 0.9900). evaluation 5: outcome: rejected (no_improvement: worst ratio 0.9979 vs required 0.9900). evaluation 7: outcome: rejected (no_improvement: worst ratio 1.0018 vs required 0.9900). All builds were ok. All outputs were identical.
-> The encode_ir path did not move enough. Some variants were slower. The safe edits were still noise against the required 0.9900.
-> Try a larger encode change next. Look past local variable moves and loop reshaping. No candidate was submitted.
->
-> 2026-10-13, episode `92ac3a8f4943` (no candidate)
 
 ## Licence
 
