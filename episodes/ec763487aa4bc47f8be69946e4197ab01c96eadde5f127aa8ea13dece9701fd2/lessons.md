@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 5 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 6 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -27,9 +27,23 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
 - Median model spend per attempt: 0.2540 USD (over 2 attempts with a recorded cost)
 
+## Target perf:save_load_ir
+
+- Attempts: 1 (1 rejected)
+- Why candidates failed: stale (1)
+- Files changed by rejected candidates: `minbpe/base.py`
+- Median model spend per attempt: 0.2114 USD (over 1 attempt with a recorded cost)
+
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed minbpe/base.py in Tokenizer.save, lines 120-139, replacing 20 lines with 26. Cached rendered vocabulary strings inside the vocab writer path.
+> Sandbox evaluation 1, perf save_load_ir: outcome accepted. Build base ok, candidate ok. Equivalence identical outputs. Guard ok, 1 files, 14 lines. save_load_ir parent 4293252965, candidate 2963514026, ratio 0.6903. train_basic_ir ratio 1.0022. train_regex_ir ratio 0.9998. encode_ir ratio 1.0002. decode_ir ratio 1.0002.
+> This code was rendering token strings more than once inside Tokenizer.save. The sandbox points at that path. The other guarded metrics stayed within limit.
+> Submitted the perf candidate with 14 changed lines. It was committed and revealed, status queued. Next is to wait for independent replays before treating the result as final.
+>
+> 2026-10-13, episode `9ba91d733c06` (rejected)
 
 > I changed BasicTokenizer.encode in minbpe/basic.py lines 63-77 and RegexTokenizer._encode_chunk in minbpe/regex.py lines 114-128. I replaced pair-count dictionary construction in each merge loop with a direct scan of adjacent ids for the lowest ranked present merge.
 > Own sandbox evaluation 1 on perf encode_ir was accepted. Guard was ok, 2 files, 8 lines. Build base ok, candidate ok. Equivalence had identical outputs. train_basic_ir parent 4284290012, candidate 4298416752, ratio 1.0033. train_regex_ir parent 6780452866, candidate 6781905414, ratio 1.0002. encode_ir parent 3778491701, candidate 3016747617, ratio 0.7984. decode_ir parent 2685494237, candidate 2686986588, ratio 1.0006. save_load_ir parent 4253399107, candidate 4251815550, ratio 0.9996.
@@ -58,13 +72,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replays. The candidate was committed and revealed with status queued. If it holds, check the same decode_ir target around the other decode paths.
 >
 > 2026-10-13, episode `56a8eebfee46` (accepted)
-
-> I changed BasicTokenizer.decode, RegexTokenizer.__init__, RegexTokenizer.register_special_tokens, and RegexTokenizer.decode. minbpe/basic.py replaced 6 lines. minbpe/regex.py replaced 3 lines, 6 lines, and 14 lines.
-> Sandbox evaluation on decode_ir returned outcome: accepted. guard: ok, 2 files, 33 lines. build: base ok, candidate ok. equivalence: identical outputs. decode_ir was parent 4080695990, candidate 2791420240, ratio 0.6841.
-> The other guarded metrics stayed inside limits. train_basic_ir ratio 0.9985. train_regex_ir ratio 1.0007. encode_ir ratio 1.0006. save_load_ir ratio 1.0004. The decode path moved. train_regex_ir, encode_ir, and save_load_ir did not help.
-> Submitted the perf candidate on decode_ir with 33 changed lines. It was committed and revealed with status queued. Next check the independent replay, then trim anything in the RegexTokenizer dense vocab and special byte cache that does not carry its own measured weight.
->
-> 2026-10-12, episode `c285e522f788` (accepted)
 
 ## Licence
 
