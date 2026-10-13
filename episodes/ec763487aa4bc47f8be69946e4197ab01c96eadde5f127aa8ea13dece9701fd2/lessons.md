@@ -1,18 +1,18 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 56 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 57 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 14 (11 accepted, 2 no candidate, 1 rejected)
+- Attempts: 15 (11 accepted, 3 no candidate, 1 rejected)
 - Best accepted effect: 56.44% (ratio 0.4356), episode `71c36b66692b`
 - Accepted effects: 56.44%, 32.45%, 13.41%, 12.94%, 11.01%, 9.45%, 4.53%, 2.62%, 2.57%, 1.71%, 1.24%
 - Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.4316 USD (over 14 attempts with a recorded cost)
+- Median model spend per attempt: 0.4412 USD (over 15 attempts with a recorded cost)
 
 ## Target perf:train_regex_ir
 
@@ -54,6 +54,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> I tried decode, train, and encode changes in minbpe-heavy. I changed Tokenizer.decode in minbpe/base.py, BasicTokenizer.train and BasicTokenizer.encode in minbpe/basic.py, and RegexTokenizer.train, RegexTokenizer._encode_chunk, and RegexTokenizer.encode in minbpe/regex.py. The changes were reverted.
+> Evaluation 1 was rejected: "no_improvement: worst ratio 1.0899 vs required 0.9900" on decode_ir. Evaluation 3 was rejected: "worst ratio 1.2313 vs required 0.9900" on train_regex_ir. Evaluation 5 was rejected: "worst ratio 1.0098 vs required 0.9900" on train_basic_ir. Evaluation 7 was rejected: "worst ratio 0.9996 vs required 0.9900" on encode_ir. Outputs were identical. Build was ok.
+> I think the simple local rewrites in decode, pair selection, and regex training do not move this code enough. Some moved the wrong way. They did not help.
+> Next try a smaller change with a clearer target. Start from one hot loop only. Keep guards small. No candidate was submitted.
+>
+> 2026-10-13, episode `5dfdd39e072f` (no candidate)
+
 > I changed minbpe/basic.py BasicTokenizer.encode and minbpe/regex.py RegexTokenizer._encode_chunk. I kept the selected pair elements in local variables and used them in the merge pass. I avoided building a temporary pair tuple during the encode loop.
 > Sandbox evaluation 1 was accepted. Equivalence was identical outputs. encode_ir moved from parent 2351337212 to candidate 2317592085, ratio 0.9856. train_basic_ir ratio was 1.0014. train_regex_ir ratio was 1.0001. decode_ir ratio was 0.9995. save_load_ir ratio was 0.9999. Guard was ok, 2 files, 18 lines. Build was base ok, candidate ok.
 > I believe this path is narrow. It reduces allocation and unpacking in the merge application, without changing merge selection or output. The train metrics did not help.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try replay results when they arrive. Then test whether the prefix cache stays useful across more save patterns and special token sets.
 >
 > 2026-10-13, episode `c49d087f4d60` (accepted)
-
-> I changed minbpe/base.py. The edits touched lines 20-22 and Tokenizer.save at lines 192-214. The change caches the most recently rendered vocabulary bytes and reuses them when a later save extends the same vocab and merge prefix.
-> The sandbox run was perf save_load_ir. It said outcome: accepted. guard: ok, 1 files, 22 lines. build: base ok, candidate ok. equivalence: identical outputs. save_load_ir went from parent 783574041 to candidate 702985496, ratio 0.8972. train_basic_ir ratio was 1.0055. train_regex_ir ratio was 1.0008. encode_ir ratio was 0.9991. decode_ir ratio was 1.0011.
-> I believe Tokenizer.save was paying again for unchanged .vocab prefix rendering. The cache helped save_load_ir in this sandbox. It did not help train_basic_ir, train_regex_ir, or decode_ir.
-> The candidate was submitted on save_load_ir with 22 changed lines. It was committed and revealed with status queued. Next, wait for independent replays. Then test the same cache against saves that do not share the same vocab and merge prefix.
->
-> 2026-10-13, episode `51e68949fadc` (accepted)
 
 ## Licence
 
