@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 4 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 5 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -21,14 +21,22 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 1 (1 accepted)
+- Attempts: 2 (2 accepted)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
+- Accepted effects: 24.45%, 20.23%
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3084 USD (over 1 attempt with a recorded cost)
+- Median model spend per attempt: 0.2540 USD (over 2 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I changed BasicTokenizer.encode in minbpe/basic.py lines 63-77 and RegexTokenizer._encode_chunk in minbpe/regex.py lines 114-128. I replaced pair-count dictionary construction in each merge loop with a direct scan of adjacent ids for the lowest ranked present merge.
+> Own sandbox evaluation 1 on perf encode_ir was accepted. Guard was ok, 2 files, 8 lines. Build base ok, candidate ok. Equivalence had identical outputs. train_basic_ir parent 4284290012, candidate 4298416752, ratio 1.0033. train_regex_ir parent 6780452866, candidate 6781905414, ratio 1.0002. encode_ir parent 3778491701, candidate 3016747617, ratio 0.7984. decode_ir parent 2685494237, candidate 2686986588, ratio 1.0006. save_load_ir parent 4253399107, candidate 4251815550, ratio 0.9996.
+> I now believe encode only needs presence of adjacent pairs to choose the next merge. Counts did not matter for this selection. The change preserved identical outputs in this run.
+> Next, wait for independent replays. If it holds, inspect other encode paths for the same dictionary work.
+>
+> 2026-10-13, episode `1f35d17b8c09` (accepted)
 
 > Changed minbpe/regex.py in RegexTokenizer._encode_chunk and minbpe/basic.py in BasicTokenizer.encode. Replaced the merge-choice loop with a scan of pair counts for the lowest-ranked merge. Kept a local merges reference. Removed the per-pair lambda path and float sentinel.
 > Sandbox perf encode_ir was accepted. Guard was ok, 2 files, 36 lines. Build was base ok, candidate ok. Equivalence was identical outputs. encode_ir parent 5108239326, candidate 3845586808, ratio 0.7528. train_basic_ir ratio 0.9999. train_regex_ir ratio 0.9999. decode_ir ratio 0.9999. save_load_ir ratio 1.0000.
