@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 45 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 46 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,11 +16,11 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_regex_ir
 
-- Attempts: 6 (4 accepted, 2 no candidate)
+- Attempts: 7 (4 accepted, 3 no candidate)
 - Best accepted effect: 21.19% (ratio 0.7881), episode `b39c7cc4d86a`
 - Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%
 - Files changed by accepted candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.3747 USD (over 6 attempts with a recorded cost)
+- Median model spend per attempt: 0.4870 USD (over 7 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -54,6 +54,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> I tried Counter/pairwise stats, combined preprocessing, integer pair keys, and in-place chunk list compaction in minbpe/regex.py. I also touched minbpe/basic.py lines 36-39 and 36-42.
+> evaluation 1 train_regex_ir was rejected, ratio 1.2129 vs required 0.9900. evaluation 3 was rejected, ratio 0.9999 vs required 0.9900. evaluation 5 was rejected, ratio 1.0159. evaluation 7 was rejected, ratio 1.0195. Builds passed. Outputs were identical. Guards were within limits.
+> I believe these changes do not help this code. The best measured train_regex_ir ratio was 0.9999, and that did not meet the 1% threshold. The other tries were slower.
+> Next try should stay in minbpe/regex.py and look past pair counting shape. Recheck the train_regex_ir path before changing minbpe/basic.py again.
+>
+> 2026-10-13, episode `cceaf194c2b8` (no candidate)
+
 > Changed minbpe/basic.py and minbpe/regex.py. The changed functions were BasicTokenizer.decode and RegexTokenizer.decode. Added a small recent-list decode cache on RegexTokenizer. Changed BasicTokenizer and RegexTokenizer list decode validation to use dictionary snapshots instead of rebuilt item tuples.
 > evaluation 1: outcome: rejected (no_improvement: worst ratio 0.9930 vs required 0.9900). decode_ir ratio 0.9930. That change did not help enough. evaluation 3: outcome: accepted, decode_ir ratio 0.9809. evaluation 5: outcome: accepted, decode_ir ratio 0.9009. equivalence: identical outputs. guard: ok, 2 files, 30 lines.
 > I now believe repeated list decodes were paying for dense lookup setup and tuple construction. The cache and snapshot check removed more work from decode_ir than the guarded metrics gained.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next wait for independent replays. Then measure shorter decode inputs and non-list decode inputs.
 >
 > 2026-10-13, episode `f2af521ba96b` (accepted)
-
-> I tried decoded-text caches in minbpe/basic.py and minbpe/regex.py. I changed BasicTokenizer.decode, BasicTokenizer.train, RegexTokenizer.decode, RegexTokenizer.train, RegexTokenizer.register_special_tokens, and RegexTokenizer.encode.
-> evaluation 1 was rejected: decode_ir parent 1824601523, candidate 2503056695, ratio 1.3718. Outputs were identical. evaluation 5 was accepted: decode_ir parent 1824601523, candidate 782034493, ratio 0.4286. guard: ok, 2 files, 35 lines.
-> The first cache shape did not help. The submitted shape fits repeated list/tuple id decodes. Current vocab and special-token mappings have to be part of the cache state.
-> Next try smaller invalidation state. Check memory growth from cached id sequences. The submitted perf candidate is queued, and the replay verdict comes later.
->
-> 2026-10-13, episode `71c36b66692b` (accepted)
 
 ## Licence
 
