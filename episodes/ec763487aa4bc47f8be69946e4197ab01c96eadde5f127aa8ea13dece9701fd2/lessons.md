@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 34 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 35 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -30,13 +30,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 8 (2 rejected, 5 accepted, 1 no candidate)
+- Attempts: 9 (2 rejected, 6 accepted, 1 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
-- Accepted effects: 32.82%, 30.47%, 10.08%, 6.30%, 1.41%
+- Accepted effects: 32.82%, 30.47%, 16.02%, 10.08%, 6.30%, 1.41%
 - Why candidates failed: stale (1), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.2485 USD (over 8 attempts with a recorded cost)
+- Median model spend per attempt: 0.2488 USD (over 9 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -51,6 +51,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed minbpe/base.py in Tokenizer.load. Replaced lines 175-198, then lines 175-195. Changed lines 13-14 and lines 177-203 to cache parsed model contents by tokenizer type and file text, then restore copies.
+> evaluation 1 on perf save_load_ir was rejected: worst ratio 1.0033 vs required 0.9900. save_load_ir was parent 1644420757, candidate 1649815121, ratio 1.0033. It did not help. evaluation 3 was accepted in sandbox: save_load_ir parent 1644420757, candidate 1380927170, ratio 0.8398. Equivalence was identical outputs.
+> I now believe the useful change is in Tokenizer.load, not around it. Repeated loads of the same model text were paying parse and rebuild cost. The cache keeps independent mutable tokenizer state by restoring copies.
+> Next try measuring the copy path inside Tokenizer.load. Keep the key as tokenizer type and file text. Watch encode_ir ratio 1.0011 and train_regex_ir ratio 1.0002. The submitted perf candidate has status queued.
+>
+> 2026-10-13, episode `424dca7e96a1` (accepted)
 
 > Changed minbpe/regex.py in RegexTokenizer.train. Tried Counter/pairwise counting, combined preprocessing, and a local stats.get binding.
 > evaluation 5: train_regex_ir parent 3389510551, candidate 3372944958, ratio 0.9951, outcome: rejected (no_improvement: worst ratio 0.9951 vs required 0.9900). evaluation 1 was 1.2058. evaluation 3 was 1.0003. evaluation 7 was 1.1221. equivalence: identical outputs. guard: ok.
@@ -79,13 +86,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try replay results. If they hold, look at the remaining save_load_ir cost outside rendered .vocab text.
 >
 > 2026-10-13, episode `cb3f0ad0015a` (accepted)
-
-> I changed BasicTokenizer.encode in minbpe/basic.py and RegexTokenizer._encode_chunk in minbpe/regex.py. The merge pass reuses the first position found for the selected pair. It copies the unchanged prefix once and handles the trailing token outside the inner loop.
-> Own sandbox evaluation 1, perf encode_ir: outcome: accepted. Guard: ok, 2 files, 28 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_basic_ir ratio 0.9992. train_regex_ir ratio 1.0000. encode_ir ratio 0.9040. decode_ir ratio 1.0008. save_load_ir ratio 1.0004.
-> The code had a second scan over the prefix and an extra bounds check in the hot merge loop. Removing them helped encode_ir in the sandbox. It did not help decode_ir or save_load_ir.
-> Submitted the perf candidate on encode_ir. It was committed and revealed with status queued. Next, wait for independent replays. If they hold, look for the same merge-pass shape elsewhere.
->
-> 2026-10-13, episode `1cf685b3ce6a` (accepted)
 
 ## Licence
 
