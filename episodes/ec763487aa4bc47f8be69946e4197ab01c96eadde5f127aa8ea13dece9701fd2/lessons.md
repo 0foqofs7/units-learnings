@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 31 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 32 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -30,13 +30,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 7 (2 rejected, 4 accepted, 1 no candidate)
+- Attempts: 8 (2 rejected, 5 accepted, 1 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
-- Accepted effects: 32.82%, 30.47%, 10.08%, 1.41%
+- Accepted effects: 32.82%, 30.47%, 10.08%, 6.30%, 1.41%
 - Why candidates failed: stale (1), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.2488 USD (over 7 attempts with a recorded cost)
+- Median model spend per attempt: 0.2485 USD (over 8 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -51,6 +51,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed Tokenizer.save in minbpe/base.py lines 113-126. 14 lines were replaced by 20. The edit caches rendered .model file text when pattern, special token entries, and merge key order are unchanged.
+> Sandbox perf save_load_ir: outcome accepted. Equivalence: identical outputs. train_basic_ir 3003524708 to 3000280376, ratio 0.9989. train_regex_ir 3543416754 to 3545619360, ratio 1.0006. encode_ir 2516614095 to 2517762438, ratio 1.0005. decode_ir 1930165865 to 1925141128, ratio 0.9974. save_load_ir 1709476901 to 1599217258, ratio 0.9355. Guard: ok, 1 files, 26 lines.
+> The change helped the target in my sandbox. It did not improve train_regex_ir or encode_ir there. The cache belongs in Tokenizer.save, where the repeated model text build happens.
+> Next, wait for independent replays on the submitted perf candidate. Status is waiting.
+>
+> 2026-10-13, episode `0b97eaad65af` (accepted)
 
 > I changed minbpe/base.py in Tokenizer.save. I replaced 30 lines with 40. The change caches the complete rendered .vocab file text when vocabulary items and merges are unchanged.
 > perf save_load_ir gave outcome: accepted. Equivalence: identical outputs. Guard: ok, 1 files, 28 lines. save_load_ir moved from parent 1935351281 to candidate 1739401552, ratio 0.8988. train_basic_ir ratio 1.0003. train_regex_ir ratio 1.0002. encode_ir ratio 0.9995. decode_ir ratio 1.0012.
@@ -79,13 +86,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, separate the Tokenizer._build_vocab cache from the Tokenizer.load line read change and measure save_load_ir again. Keep train_basic_ir, train_regex_ir, encode_ir, and decode_ir guarded.
 >
 > 2026-10-13, episode `48bee9cb7a90` (accepted)
-
-> I read minbpe/base.py, minbpe/basic.py, minbpe/regex.py, minbpe/gpt4.py, and lineage_bench.py. I changed minbpe/regex.py in RegexTokenizer.decode and RegexTokenizer.train. I tested decode alternatives, then a train_regex counting change. Changes were reverted.
-> evaluation 1 decode_ir was rejected: worst ratio 1.1799 vs required 0.9900. evaluation 3 was rejected: 1.0167 vs 0.9900. evaluation 5 was rejected: 1.0000 vs 0.9900. evaluation 7 train_regex_ir was rejected: 1.2202 vs 0.9900. Build was base ok and candidate ok. Outputs were identical. Guards were ok.
-> RegexTokenizer.decode preserved outputs but did not improve decode_ir. Two variants regressed. One was neutral. The RegexTokenizer.train counting change regressed train_regex_ir.
-> Next try a different decode path, not these reverted variants. Measure decode_ir first. If touching RegexTokenizer.train again, measure train_regex_ir immediately. No candidate was submitted.
->
-> 2026-10-13, episode `a3fb90575499` (no candidate)
 
 ## Licence
 
