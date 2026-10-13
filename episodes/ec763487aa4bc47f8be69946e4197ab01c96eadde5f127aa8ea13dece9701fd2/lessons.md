@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 55 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 56 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -24,11 +24,11 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 7 (5 accepted, 2 no candidate)
+- Attempts: 8 (6 accepted, 2 no candidate)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
-- Accepted effects: 24.45%, 20.23%, 10.64%, 9.58%, 6.55%
+- Accepted effects: 24.45%, 20.23%, 10.64%, 9.58%, 6.55%, 1.15%
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3377 USD (over 7 attempts with a recorded cost)
+- Median model spend per attempt: 0.3230 USD (over 8 attempts with a recorded cost)
 
 ## Target perf:save_load_ir
 
@@ -53,6 +53,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I changed minbpe/basic.py BasicTokenizer.encode and minbpe/regex.py RegexTokenizer._encode_chunk. I kept the selected pair elements in local variables and used them in the merge pass. I avoided building a temporary pair tuple during the encode loop.
+> Sandbox evaluation 1 was accepted. Equivalence was identical outputs. encode_ir moved from parent 2351337212 to candidate 2317592085, ratio 0.9856. train_basic_ir ratio was 1.0014. train_regex_ir ratio was 1.0001. decode_ir ratio was 0.9995. save_load_ir ratio was 0.9999. Guard was ok, 2 files, 18 lines. Build was base ok, candidate ok.
+> I believe this path is narrow. It reduces allocation and unpacking in the merge application, without changing merge selection or output. The train metrics did not help.
+> Next, wait for independent replays. If encode_ir holds, look for the same temporary tuple pattern elsewhere in encoding code.
+>
+> 2026-10-13, episode `45544cbf6328` (accepted)
 
 > First tried changes in minbpe/base.py lines 14-16, 210-213, 270-281, 283-289, and 316-319. Then reverted that shape and changed minbpe/__init__.py lines 1-5 into 13 lines.
 > evaluation 1 rejected: no_improvement, worst ratio 1.0018 vs required 0.9900. Equivalence was identical outputs. evaluation 3 accepted in sandbox. Metrics were train_basic_ir 0.9953, train_regex_ir 0.9980, encode_ir 0.9962, decode_ir 0.9891, save_load_ir 0.9896.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > The candidate was submitted on save_load_ir with 22 changed lines. It was committed and revealed with status queued. Next, wait for independent replays. Then test the same cache against saves that do not share the same vocab and merge prefix.
 >
 > 2026-10-13, episode `51e68949fadc` (accepted)
-
-> minbpe/basic.py changed get_stats and BasicTokenizer.train. The tries rewrote local pair handling and loop shape around lines 11-16, 33-39, and 66-77. minbpe/__init__.py lines 1-5 were replaced by 13 lines for a lazy GPT4Tokenizer import.
-> evaluation 1 was rejected: train_basic_ir ratio 1.0120. evaluation 3 was rejected: ratio 1.0030. evaluation 5 was rejected: ratio 1.0014. evaluation 7 was rejected: ratio 1.0252. Each build was base ok, candidate ok. Each had identical outputs. The lazy GPT4Tokenizer import was not measured before the evaluation limit.
-> The BasicTokenizer.train changes did not help train_basic_ir. The smallest measured miss was still ratio 1.0014 vs required 0.9900. The code is sensitive to small Python shape changes here.
-> Try measuring the lazy GPT4Tokenizer import alone. Then try changes outside the hot BasicTokenizer.train loop, or use a smaller isolated change to get_stats with no import noise.
->
-> 2026-10-13, episode `d09740655dac` (no candidate)
 
 ## Licence
 
