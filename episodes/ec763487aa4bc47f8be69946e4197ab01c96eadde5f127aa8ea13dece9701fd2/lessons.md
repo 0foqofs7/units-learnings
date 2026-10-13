@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 66 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 67 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,13 +16,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_regex_ir
 
-- Attempts: 9 (4 accepted, 4 no candidate, 1 rejected)
+- Attempts: 10 (5 accepted, 4 no candidate, 1 rejected)
 - Best accepted effect: 21.19% (ratio 0.7881), episode `b39c7cc4d86a`
-- Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%
+- Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%, 1.44%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.5143 USD (over 9 attempts with a recorded cost)
+- Median model spend per attempt: 0.5007 USD (over 10 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -58,6 +58,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> I read minbpe/regex.py, minbpe/basic.py, minbpe/base.py, and lineage_bench.py. I changed minbpe/regex.py RegexTokenizer.train at lines 87-94, 126-129, and 134-143. Pair counts now use two-character string keys instead of two-character tuple keys.
+> evaluation 1 on perf train_regex_ir: outcome: accepted. Guard: ok, 1 files, 10 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_regex_ir parent 505854559, candidate 496915406, ratio 0.9823. train_basic_ir ratio 1.0002. encode_ir ratio 0.9999. decode_ir ratio 0.9991. save_load_ir ratio 1.0003.
+> I now believe RegexTokenizer.train fits this representation better when pair keys stay as strings. Token ids are already stored as one character per id. str.replace already consumes the merge string.
+> Next, wait for independent replays. If the candidate fails, inspect tie-breaking and merge construction in minbpe/regex.py RegexTokenizer.train.
+>
+> 2026-10-13, episode `9d4e5941f250` (accepted)
+
 > I tried bounded edits in minbpe/base.py and minbpe/basic.py. I touched get_stats, Tokenizer.save, Tokenizer.load, and the BasicTokenizer encode path. The save_load cache variants were changed, measured, then backed out. The small encode change was also backed out.
 > evaluation 1 save_load_ir was rejected: parent 476231057, candidate 485020351, ratio 1.0185. evaluation 3 save_load_ir was rejected: parent 476231055, candidate 479192578, ratio 1.0062. evaluation 5 encode_ir was rejected: parent 745684685, candidate 742013031, ratio 0.9951. Equivalence was identical outputs in all runs.
 > The cache work in base.py did not help save_load_ir. The encode edit in basic.py helped encode_ir by the measured ratio, but not enough for the required 0.9900.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replays. If it holds, look for the same repeated work in other encode paths.
 >
 > 2026-10-13, episode `8cd1cc537985` (rejected)
-
-> I tried save/load caching variants in minbpe/base.py and a regex training counting/replacement rewrite in minbpe/regex.py. The edits touched base.py lines 1-2, 7-10, 14-16, 23-26, 72-76, 148-167, 217-223, 273-295, 308-325, and regex.py lines 88-100.
-> save_load_ir was rejected twice: 1.0254 and 1.0008 vs required 0.9900. decode_ir was rejected at 1.0004. train_regex_ir was rejected at 1.1635. Builds were ok. Equivalence was identical outputs. Guards were ok.
-> I now believe these variants did not help this code. The save/load changes moved too little or got slower. The regex rewrite made train_regex_ir slower.
-> Next try a smaller change around encode_ir, since it showed 0.9989, 0.9987, and 0.9994 in rejected runs. Do not carry over the regex rewrite.
->
-> 2026-10-13, episode `abb69b21704c` (no candidate)
 
 ## Licence
 
