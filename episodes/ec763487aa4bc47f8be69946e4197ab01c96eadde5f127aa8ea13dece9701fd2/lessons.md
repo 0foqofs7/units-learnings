@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 35 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 36 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -22,11 +22,11 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 6 (5 accepted, 1 no candidate)
+- Attempts: 7 (5 accepted, 2 no candidate)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
 - Accepted effects: 24.45%, 20.23%, 10.64%, 9.58%, 6.55%
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3230 USD (over 6 attempts with a recorded cost)
+- Median model spend per attempt: 0.3377 USD (over 7 attempts with a recorded cost)
 
 ## Target perf:save_load_ir
 
@@ -51,6 +51,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried changes in minbpe/base.py, minbpe/basic.py and minbpe/regex.py. I changed build_merge_map, BasicTokenizer.encode and RegexTokenizer._encode_chunk around the encode loop.
+> evaluation 1 measured encode_ir parent 2379878119, candidate 2374239620, ratio 0.9976. It was rejected against required 0.9900. Later encode_ir ratios were 1.0001, 1.0005 and 1.0004. Builds were ok. Outputs were identical. Guards were ok.
+> The best measured change only improved encode_ir by about 0.24%. The later variants were neutral or slower. This code did not give a 1% encode_ir move from these edits.
+> Try a different encode path. Do not spend more time reshaping the same merge loop without a new measurement target. No candidate was submitted.
+>
+> 2026-10-13, episode `b5a9b92e411d` (no candidate)
 
 > Changed minbpe/base.py in Tokenizer.load. Replaced lines 175-198, then lines 175-195. Changed lines 13-14 and lines 177-203 to cache parsed model contents by tokenizer type and file text, then restore copies.
 > evaluation 1 on perf save_load_ir was rejected: worst ratio 1.0033 vs required 0.9900. save_load_ir was parent 1644420757, candidate 1649815121, ratio 1.0033. It did not help. evaluation 3 was accepted in sandbox: save_load_ir parent 1644420757, candidate 1380927170, ratio 0.8398. Equivalence was identical outputs.
@@ -79,13 +86,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replays on the submitted perf candidate. Status is waiting.
 >
 > 2026-10-13, episode `0b97eaad65af` (accepted)
-
-> I changed minbpe/base.py in Tokenizer.save. I replaced 30 lines with 40. The change caches the complete rendered .vocab file text when vocabulary items and merges are unchanged.
-> perf save_load_ir gave outcome: accepted. Equivalence: identical outputs. Guard: ok, 1 files, 28 lines. save_load_ir moved from parent 1935351281 to candidate 1739401552, ratio 0.8988. train_basic_ir ratio 1.0003. train_regex_ir ratio 1.0002. encode_ir ratio 0.9995. decode_ir ratio 1.0012.
-> I now believe the repeated .vocab rendering work in Tokenizer.save is real work in this benchmark. The cache did not help every guarded metric.
-> Next try replay results. If they hold, look at the remaining save_load_ir cost outside rendered .vocab text.
->
-> 2026-10-13, episode `cb3f0ad0015a` (accepted)
 
 ## Licence
 
