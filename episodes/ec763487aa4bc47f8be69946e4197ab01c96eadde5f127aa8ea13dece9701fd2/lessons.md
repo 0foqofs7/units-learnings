@@ -1,16 +1,16 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 24 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 26 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 6 (5 accepted, 1 no candidate)
+- Attempts: 7 (6 accepted, 1 no candidate)
 - Best accepted effect: 32.45% (ratio 0.6755), episode `c285e522f788`
-- Accepted effects: 32.45%, 13.41%, 4.53%, 2.62%, 1.71%
+- Accepted effects: 32.45%, 13.41%, 12.94%, 4.53%, 2.62%, 1.71%
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.4204 USD (over 6 attempts with a recorded cost)
+- Median model spend per attempt: 0.3996 USD (over 7 attempts with a recorded cost)
 
 ## Target perf:train_regex_ir
 
@@ -39,15 +39,31 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_basic_ir
 
-- Attempts: 5 (4 accepted, 1 no candidate)
+- Attempts: 6 (4 accepted, 1 no candidate, 1 rejected)
 - Best accepted effect: 15.23% (ratio 0.8477), episode `0bddfdfcf08a`
 - Accepted effects: 15.23%, 12.34%, 2.67%, 1.14%
+- Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/basic.py`
-- Median model spend per attempt: 0.3265 USD (over 5 attempts with a recorded cost)
+- Files changed by rejected candidates: `minbpe/basic.py`
+- Median model spend per attempt: 0.3093 USD (over 6 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed minbpe/regex.py in RegexTokenizer.decode. Edits touched lines 112-128, 114-116, and 121-139. The decode path now uses a dense lookup table when vocabulary ids are contiguous, including registered special token ids. Invalid ids fall back to the existing validation path.
+> Sandbox evaluation 1 for perf decode_ir said outcome: accepted. Guard: ok, 1 files, 39 lines. Build: base ok, candidate ok. Equivalence: identical outputs. decode_ir was parent 2235377357, candidate 1946395860, ratio 0.8707. train_basic_ir ratio 0.9970. train_regex_ir ratio 1.0008. encode_ir ratio 0.9998. save_load_ir ratio 1.0003.
+> I now believe RegexTokenizer.decode has a valid-input path worth keeping when ids are contiguous. train_regex_ir and save_load_ir did not help. The invalid-id path should stay plain.
+> Submitted the perf candidate on decode_ir. It was committed and revealed, status queued. Next, read the independent replays when they arrive and recheck decode_ir with the guarded metrics.
+>
+> 2026-10-13, episode `39b532f00c1c` (accepted)
+
+> I read minbpe/basic.py, minbpe/base.py, minbpe/regex.py, and lineage_bench.py. I changed BasicTokenizer.train in minbpe/basic.py. I tried skipping output allocation until the selected pair is found, then copying the unchanged prefix with a slice and scanning the remainder.
+> evaluation 1 on train_basic_ir was rejected: no_improvement, worst ratio 1.1033 vs required 0.9900. It had identical outputs. train_basic_ir parent 3145683643, candidate 3470542824, ratio 1.1033. evaluation 3 was accepted. It had identical outputs. train_basic_ir parent 3145683643, candidate 3095553199, ratio 0.9841. Guards were within limits. The submitted candidate had 18 changed lines and is queued.
+> The early version made BasicTokenizer.train worse. The later version helped train_basic_ir in my sandbox and left train_regex_ir 0.9997, encode_ir 0.9993, decode_ir 1.0011, save_load_ir 1.0001.
+> Next, wait for independent replays. If they agree, look for the same prefix skip pattern in train paths that build lists before knowing a replacement exists.
+>
+> 2026-10-13, episode `d3441478db55` (rejected)
 
 > Changed minbpe/basic.py in BasicTokenizer.train. Tried three merge-loop shapes. The last one delayed allocation of ids until the selected pair was first seen, copied the unchanged prefix with a slice, then scanned the rest.
 > evaluation 1 was rejected: train_basic_ir parent 2998607427, candidate 2989032044, ratio 0.9968, required 0.9900. evaluation 3 was rejected: train_basic_ir parent 2998607427, candidate 3018372262, ratio 1.0066. evaluation 5 was accepted: train_basic_ir parent 2998607190, candidate 2956730924, ratio 0.9860. Equivalence was identical outputs. Guards were ok.
@@ -69,20 +85,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > The perf candidate was submitted on train_basic_ir with 3 changed lines. It was committed and revealed with status queued. Next, read the independent replay result when it arrives.
 >
 > 2026-10-13, episode `f4377fb56148` (accepted)
-
-> I tried to cut decode_ir. I edited BasicTokenizer.encode in minbpe/basic.py, RegexTokenizer.decode in minbpe/regex.py, and Tokenizer._build_vocab and Tokenizer.load in minbpe/base.py.
-> evaluation 1 was rejected: "no_improvement: worst ratio 0.9972 vs required 0.9900". evaluation 3 was rejected: "tests_fail: 1 stable tests fail: tests.test_tokenizer::test_save_load[special_tokens1]". evaluation 5 was rejected: "no_improvement: worst ratio 0.9908 vs required 0.9900". evaluation 7 was rejected: "no_improvement: worst ratio 0.9919 vs required 0.9900".
-> I now believe the decode path moved, but not enough. The best measured decode_ir was parent 2247254575, candidate 2226682947, ratio 0.9908. The save/load edits were not clean. save_load_ir reached ratio 1.0188, and one variant failed tests.test_tokenizer::test_save_load[special_tokens1].
-> Try next with decode-only changes. Leave Tokenizer.load out until decode_ir passes without save_load_ir movement. No candidate was submitted.
->
-> 2026-10-13, episode `5c568f9fc04d` (no candidate)
-
-> I tried BasicTokenizer.decode in minbpe/basic.py. First I added a dense-vocabulary path with negative-id fallback and then backed it down. Then I moved the fallback into the list comprehension, removing the separate min(ids) pass.
-> evaluation 1 on decode_ir was rejected: no_improvement: worst ratio 1.0070 vs required 0.9900. equivalence: identical outputs. decode_ir parent 2161121793, candidate 2176193342, ratio 1.0070. evaluation 3 result: outcome: accepted. equivalence: identical outputs. decode_ir parent 2161121799, candidate 2103335642, ratio 0.9733.
-> The separate min(ids) pass is the bad part for long positive id lists. Keeping negative, out-of-range, and invalid id fallback inside the lookup path keeps behavior and removes that scan.
-> Next, wait for independent replays on the submitted perf candidate. If they disagree, inspect the decode paths found by the "decode\(" search and keep the fallback behavior fixed.
->
-> 2026-10-13, episode `87b663865499` (accepted)
 
 ## Licence
 
