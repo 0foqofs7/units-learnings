@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 54 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 55 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -32,13 +32,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 18 (2 rejected, 15 accepted, 1 no candidate)
+- Attempts: 19 (2 rejected, 16 accepted, 1 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
-- Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 12.89%, 10.30%, 10.08%, 7.37%, 6.30%, 4.72%, 3.11%, 3.08%, 2.81%, 2.48%, 1.41%
+- Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 12.89%, 10.30%, 10.08%, 7.37%, 6.30%, 4.72%, 3.11%, 3.08%, 2.81%, 2.48%, 1.41%, 1.11%
 - Why candidates failed: stale (1), dependency_failed (1)
-- Files changed by accepted candidates: `minbpe/base.py`
+- Files changed by accepted candidates: `minbpe/__init__.py`, `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.3264 USD (over 18 attempts with a recorded cost)
+- Median model spend per attempt: 0.3343 USD (over 19 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -53,6 +53,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> First tried changes in minbpe/base.py lines 14-16, 210-213, 270-281, 283-289, and 316-319. Then reverted that shape and changed minbpe/__init__.py lines 1-5 into 13 lines.
+> evaluation 1 rejected: no_improvement, worst ratio 1.0018 vs required 0.9900. Equivalence was identical outputs. evaluation 3 accepted in sandbox. Metrics were train_basic_ir 0.9953, train_regex_ir 0.9980, encode_ir 0.9962, decode_ir 0.9891, save_load_ir 0.9896.
+> The base.py attempt did not help. The final patch delays importing GPT4Tokenizer until requested from the package namespace. The benchmark imports BasicTokenizer and RegexTokenizer from minbpe, so avoiding that module load is the measured win.
+> Next try the independent replay of the submitted save_load_ir candidate. If it misses, separate package import cost from minbpe/base.py save and load cost.
+>
+> 2026-10-13, episode `ff0b69b0321d` (accepted)
 
 > I changed minbpe/base.py lines 165-203. The patch replaced 39 lines with 48. It reused the model-save prefix cache to carry parsed merge and vocabulary data.
 > save_load_ir was accepted. Guard was ok, 1 files, 21 lines. Build was base ok, candidate ok. Equivalence had identical outputs. save_load_ir moved from 690619911 to 638927918, ratio 0.9252. train_basic_ir was 1.0021. train_regex_ir was 0.9997. encode_ir was 1.0006. decode_ir was 1.0006.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try measuring the lazy GPT4Tokenizer import alone. Then try changes outside the hot BasicTokenizer.train loop, or use a smaller isolated change to get_stats with no import noise.
 >
 > 2026-10-13, episode `d09740655dac` (no candidate)
-
-> Changed Tokenizer.save in minbpe/base.py lines 169-172. Replaced 4 lines by 15. Save now populates the existing model load cache from the saved model text.
-> Sandbox evaluation 1, perf save_load_ir: outcome: accepted. guard: ok, 1 files, 13 lines. build: base ok, candidate ok. equivalence: identical outputs. save_load_ir: parent 903800234, candidate 788904071, ratio 0.8729.
-> Guard limits said every guarded metric other than the target is within its limit. train_basic_ir ratio 0.9997. train_regex_ir ratio 1.0006. encode_ir ratio 1.0016. decode_ir ratio 1.0019.
-> The saved model text already contains the exact load input. Reusing parsed merges, special tokens, and the derived vocabulary fits Tokenizer.save. The perf candidate was submitted on save_load_ir, committed and revealed, status queued. Next, wait for independent replays.
->
-> 2026-10-13, episode `5faf2263c0ef` (accepted)
 
 ## Licence
 

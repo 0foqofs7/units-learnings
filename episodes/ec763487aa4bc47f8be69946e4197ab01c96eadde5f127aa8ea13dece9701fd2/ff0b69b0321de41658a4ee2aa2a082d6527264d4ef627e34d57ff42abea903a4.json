@@ -1,0 +1,1044 @@
+{
+  "schema": "lineage-episode/1",
+  "episode_id": "ff0b69b0321de41658a4ee2aa2a082d6527264d4ef627e34d57ff42abea903a4",
+  "seq": 115,
+  "network": "mainnet",
+  "session_id": "5717414138219447c998595cf342aea94a856286325836067e688884146a842d",
+  "agent": {
+    "id": "HHxDgMPdYJ5SCXNdsvtaQnng3PAPXrPtZGY2xYc4eDtX",
+    "name": "Holnotch",
+    "hidden": false,
+    "hosted": true,
+    "identity_mode": "purchased",
+    "soul": {
+      "digest": "e249bb01013b21cb46be9f982e116949ab3c737432e2ccc175a6071fce913615",
+      "seq": 1,
+      "stored_at": 1791847515508,
+      "declared_model": {
+        "provider": "openai",
+        "id": "gpt-5.5"
+      }
+    }
+  },
+  "model": {
+    "provider": "openrouter",
+    "models": [
+      "openai/gpt-5.5"
+    ],
+    "route": {
+      "model": {
+        "id": "gpt-5.5",
+        "provider": "openai"
+      },
+      "upstream": [
+        "OpenAI"
+      ],
+      "via": "openrouter"
+    },
+    "harness": {
+      "name": "openai-compat",
+      "version": "openai-compat/1",
+      "digest": "81a3ea36f092c071355df9c691a3c635c44bf55961eb967812c7224d0a0891fa"
+    },
+    "source": "provenance:hosted"
+  },
+  "task": {
+    "recipe": {
+      "recipe_id": "fb2924fcdae9d18ee10bf673be7e3c28082ee4b6db451980d7b891c135ef355e",
+      "name": "minbpe-heavy",
+      "class": "python",
+      "repo": "https://github.com/karpathy/minbpe",
+      "commit": "1acefe89412b20245db5a22d2a02001e547dc602"
+    },
+    "lineage_id": "ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2",
+    "parent_gen_id": "96872c3c8463905692f450be3ca000bbecab05d2eaa5612057807b641cdfe258",
+    "parent_height": 39,
+    "metrics": [
+      {
+        "name": "train_basic_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "train_regex_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "encode_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "decode_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "save_load_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      }
+    ],
+    "target": {
+      "kind": "perf",
+      "target": "save_load_ir",
+      "source": "candidate"
+    },
+    "baseline": {
+      "decode_ir": {
+        "median": 650629177.5,
+        "samples": [
+          650628677,
+          650629678
+        ]
+      },
+      "encode_ir": {
+        "median": 2225532953.5,
+        "samples": [
+          2225536507,
+          2225529400
+        ]
+      },
+      "save_load_ir": {
+        "median": 635431113.5,
+        "samples": [
+          635431884,
+          635430343
+        ]
+      },
+      "train_basic_ir": {
+        "median": 2983522301.5,
+        "samples": [
+          2983522371,
+          2983522232
+        ]
+      },
+      "train_regex_ir": {
+        "median": 3401452290,
+        "samples": [
+          3401454676,
+          3401449904
+        ]
+      }
+    }
+  },
+  "plan": {
+    "planned": {
+      "kind": "perf",
+      "target": "save_load_ir",
+      "note": null
+    },
+    "opening_note": "The prior successful changes have already squeezed the save/load path by caching rendered model/vocab prefixes and parsed load state, so I should inspect the current cache shape before trying any further save_load change. The train and encode notes warn that small loop rewrites often miss the 1% bar, so I’ll prefer a narrow save/load allocation or parsing reduction if one remains.",
+    "source": "worker_report + session notes"
+  },
+  "hypotheses": [
+    "The prior successful changes have already squeezed the save/load path by caching rendered model/vocab prefixes and parsed load state, so I should inspect the current cache shape before trying any further save_load change. The train and encode notes warn that small loop rewrites often miss the 1% bar, so I’ll prefer a narrow save/load allocation or parsing reduction if one remains."
+  ],
+  "actions": [
+    {
+      "seq": 1,
+      "kind": "note",
+      "at": 1791892551096,
+      "text": "The prior successful changes have already squeezed the save/load path by caching rendered model/vocab prefixes and parsed load state, so I should inspect the current cache shape before trying any further save_load change. The train and encode notes warn that small loop rewrites often miss the 1% bar, so I’ll prefer a narrow save/load allocation or parsing reduction if one remains."
+    },
+    {
+      "seq": 2,
+      "kind": "list",
+      "path": "minbpe",
+      "count": 5,
+      "at": 1791892551098
+    },
+    {
+      "seq": 3,
+      "kind": "read",
+      "path": "minbpe/base.py",
+      "start_line": 1,
+      "end_line": 260,
+      "content_sha256": "3f32e2364a0f159ffb640cf398ac6e18345fb49f3c659a9d616507ae83852f48",
+      "at": 1791892552863
+    },
+    {
+      "seq": 4,
+      "kind": "read",
+      "path": "minbpe/base.py",
+      "start_line": 260,
+      "end_line": 303,
+      "content_sha256": "3f32e2364a0f159ffb640cf398ac6e18345fb49f3c659a9d616507ae83852f48",
+      "at": 1791892554370
+    },
+    {
+      "seq": 5,
+      "kind": "list",
+      "path": ".",
+      "count": 19,
+      "at": 1791892556570
+    },
+    {
+      "seq": 6,
+      "kind": "read",
+      "path": "lineage_bench.py",
+      "start_line": 1,
+      "end_line": 219,
+      "content_sha256": "460614cfe78282674ac074ea1573863c69bac99fbfd886f03fe0cc08b7fce121",
+      "at": 1791892557737
+    },
+    {
+      "seq": 7,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 14,
+      "end_line": 16,
+      "lines_before": 3,
+      "lines_after": 4,
+      "at": 1791892579053,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -14,3 +14,4 @@\n-_LOAD_CACHE = {}\n-_LOAD_CACHE_MAX = 16\n-_RENDER_TOKEN_CACHE = {}\n+_LOAD_CACHE = {}\n+_LOAD_BYTES_CACHE = {}\n+_LOAD_CACHE_MAX = 16\n+_RENDER_TOKEN_CACHE = {}"
+    },
+    {
+      "seq": 8,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 210,
+      "end_line": 213,
+      "lines_before": 4,
+      "lines_after": 8,
+      "at": 1791892583240,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -210,4 +210,8 @@\n-            if len(_LOAD_CACHE) >= _LOAD_CACHE_MAX:\n-                _LOAD_CACHE.clear()\n-            _LOAD_CACHE[(type(self), model_text)] = (self.pattern, load_merges, load_special_tokens, load_vocab)\n-            self._model_file_cache = (self.pattern, special_items, merge_keys, model_bytes)\n+            load_state = (self.pattern, load_merges, load_special_tokens, load_vocab)\n+            if len(_LOAD_CACHE) >= _LOAD_CACHE_MAX:\n+                _LOAD_CACHE.clear()\n+            if len(_LOAD_BYTES_CACHE) >= _LOAD_CACHE_MAX:\n+                _LOAD_BYTES_CACHE.clear()\n+            _LOAD_CACHE[(type(self), model_text)] = load_state\n+            _LOAD_BYTES_CACHE[(type(self), model_bytes)] = load_state\n+            self._model_file_cache = (self.pattern, special_items, merge_keys, model_bytes)"
+    },
+    {
+      "seq": 9,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 270,
+      "end_line": 281,
+      "lines_before": 12,
+      "lines_after": 20,
+      "at": 1791892587037,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -270,12 +270,20 @@\n-        # read the model file\n-        with open(model_file, 'r', encoding=\"utf-8\") as f:\n-            model_text = f.read()\n-        cache_key = (type(self), model_text)\n-        cached = _LOAD_CACHE.get(cache_key)\n-        if cached is not None:\n-            self.pattern = cached[0]\n-            self.merges = cached[1].copy()\n-            self.special_tokens = cached[2].copy()\n-            self.vocab = cached[3].copy()\n-            return\n-        merges = {}\n+        # read the model file\n+        with open(model_file, \"rb\") as f:\n+            model_bytes = f.read()\n+        cached = _LOAD_BYTES_CACHE.get((type(self), model_bytes))\n+        if cached is not None:\n+            self.pattern = cached[0]\n+            self.merges = cached[1].copy()\n+            self.special_tokens = cached[2].copy()\n+            self.vocab = cached[3].copy()\n+            return\n+        model_text = model_bytes.decode(\"utf-8\").replace(\"\\r\\n\", \"\\n\").replace(\"\\r\", \"\\n\")\n+        cache_key = (type(self), model_text)\n+        cached = _LOAD_CACHE.get(cache_key)\n+        if cached is not None:\n+            self.pattern = cached[0]\n+            self.merges = cached[1].copy()\n+            self.special_tokens = cached[2].copy()\n+            self.vocab = cached[3].copy()\n+            return\n+        merges = {}"
+    },
+    {
+      "seq": 10,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 283,
+      "end_line": 289,
+      "lines_before": 7,
+      "lines_after": 10,
+      "at": 1791892590153,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -283,7 +283,10 @@\n-        if cached is not None:\n-            self.pattern = cached[0]\n-            self.merges = cached[1].copy()\n-            self.special_tokens = cached[2].copy()\n-            self.vocab = cached[3].copy()\n-            return\n-        merges = {}\n+        if cached is not None:\n+            if len(_LOAD_BYTES_CACHE) >= _LOAD_CACHE_MAX:\n+                _LOAD_BYTES_CACHE.clear()\n+            _LOAD_BYTES_CACHE[(type(self), model_bytes)] = cached\n+            self.pattern = cached[0]\n+            self.merges = cached[1].copy()\n+            self.special_tokens = cached[2].copy()\n+            self.vocab = cached[3].copy()\n+            return\n+        merges = {}"
+    },
+    {
+      "seq": 11,
+      "kind": "read",
+      "path": "minbpe/base.py",
+      "start_line": 200,
+      "end_line": 319,
+      "content_sha256": "d3d83420f29d3820dcfcf80822922514083310e23f58239888f46aef7310cb1b",
+      "at": 1791892593057
+    },
+    {
+      "seq": 12,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 316,
+      "end_line": 319,
+      "lines_before": 4,
+      "lines_after": 8,
+      "at": 1791892597770,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -316,4 +316,8 @@\n-        if len(_LOAD_CACHE) >= _LOAD_CACHE_MAX:\n-            _LOAD_CACHE.clear()\n-        _LOAD_CACHE[cache_key] = (self.pattern, merges.copy(), special_tokens.copy(), self.vocab.copy())\n-\n+        load_state = (self.pattern, merges.copy(), special_tokens.copy(), self.vocab.copy())\n+        if len(_LOAD_CACHE) >= _LOAD_CACHE_MAX:\n+            _LOAD_CACHE.clear()\n+        if len(_LOAD_BYTES_CACHE) >= _LOAD_CACHE_MAX:\n+            _LOAD_BYTES_CACHE.clear()\n+        _LOAD_CACHE[cache_key] = load_state\n+        _LOAD_BYTES_CACHE[(type(self), model_bytes)] = load_state\n+"
+    },
+    {
+      "seq": 13,
+      "kind": "evaluate",
+      "target": "save_load_ir",
+      "eval_kind": "perf",
+      "at": 1791892599268,
+      "phases": [
+        {
+          "phase": "prepare",
+          "at": 1791892600875
+        },
+        {
+          "phase": "build",
+          "at": 1791892601688
+        },
+        {
+          "phase": "build",
+          "at": 1791892601689
+        },
+        {
+          "phase": "test",
+          "at": 1791892602335
+        },
+        {
+          "phase": "test",
+          "at": 1791892621076
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791892639751
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791892639752
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892640414
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892649652
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892658585
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892671594
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892684369
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892693870
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892703915
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892708750
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892713936
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892719766
+        }
+      ]
+    },
+    {
+      "seq": 31,
+      "kind": "result",
+      "at": 1791892725325,
+      "output": "outcome: rejected (no_improvement: worst ratio 1.0018 vs required 0.9900)\nguard limits (config version 1): every guarded metric other than the target is within its limit\nguard: ok, 1 files, 28 lines\nbuild: base ok, candidate ok\nequivalence: identical outputs\nmetric train_basic_ir: parent 3012073122, candidate 3015478694, ratio 1.0011\nmetric train_regex_ir: parent 3540657671, candidate 3541806635, ratio 1.0003\nmetric encode_ir: parent 2232189146, candidate 2233221762, ratio 1.0005\nmetric decode_ir: parent 644834121, candidate 645992035, ratio 1.0018\nmetric save_load_ir: parent 636313454, candidate 637466363, ratio 1.0018",
+      "outcome": "rejected",
+      "steps": [
+        {
+          "step": "build",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 558,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "build",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 624,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "test",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 18713,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 18.18s\n"
+        },
+        {
+          "step": "test",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 18664,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 18.13s\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 642,
+          "timed_out": false,
+          "tail": "12, 104, 121, 32, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 34, 46, 32, 65, 82, 73, 65, 32, 67, 104, 97, 114, 116, 115, 46, 32, 65, 114, 99, 104, 105, 118, 101, 100, 32, 102, 114, 111, 109, 32, 116, 104, 101, 283, 114, 105, 103, 105, 110, 97, 108, 283, 110, 32, 65, 117, 103, 117, 115, 116, 32, 50, 54, 44, 32, 50, 48, 49, 57, 46, 32, 82, 101, 116, 114, 105, 101, 118, 101, 100, 32, 70, 101, 98, 114, 117, 97, 114, 121, 32, 49, 52, 44, 32, 50, 48, 50, 49, 46, 10, 32, 263, 162, 32, 34, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 32, 67, 104, 97, 114, 116, 32, 72, 105, 115, 116, 111, 114, 121, 32, 40, 67, 97, 110, 97, 100, 105, 97, 110, 32, 72, 111, 116, 32, 49, 48, 48, 41, 34, 46, 32, 66, 105, 108, 108, 98, 111, 97, 114, 100, 46, 32, 65, 114, 99, 104, 105, 118, 101, 100, 32, 102, 114, 111, 109, 32, 116, 104, 101, 283, 114, 105, 103, 105, 110, 97, 108, 283, 110, 32, 65, 117, 103, 117, 115, 116, 32, 57, 44, 32, 50, 48, 49, 54, 46, 32, 82, 101, 116, 114, 105, 101, 118, 101, 100, 32, 70, 101, 98, 114, 117, 97, 114, 121, 32, 49, 52, 44, 32, 50, 48, 50, 49, 46, 10, 32, 263, 162, 32, 34, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 39, 115, 32, 39, 66, 97]\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 652,
+          "timed_out": false,
+          "tail": "12, 104, 121, 32, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 34, 46, 32, 65, 82, 73, 65, 32, 67, 104, 97, 114, 116, 115, 46, 32, 65, 114, 99, 104, 105, 118, 101, 100, 32, 102, 114, 111, 109, 32, 116, 104, 101, 283, 114, 105, 103, 105, 110, 97, 108, 283, 110, 32, 65, 117, 103, 117, 115, 116, 32, 50, 54, 44, 32, 50, 48, 49, 57, 46, 32, 82, 101, 116, 114, 105, 101, 118, 101, 100, 32, 70, 101, 98, 114, 117, 97, 114, 121, 32, 49, 52, 44, 32, 50, 48, 50, 49, 46, 10, 32, 263, 162, 32, 34, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 32, 67, 104, 97, 114, 116, 32, 72, 105, 115, 116, 111, 114, 121, 32, 40, 67, 97, 110, 97, 100, 105, 97, 110, 32, 72, 111, 116, 32, 49, 48, 48, 41, 34, 46, 32, 66, 105, 108, 108, 98, 111, 97, 114, 100, 46, 32, 65, 114, 99, 104, 105, 118, 101, 100, 32, 102, 114, 111, 109, 32, 116, 104, 101, 283, 114, 105, 103, 105, 110, 97, 108, 283, 110, 32, 65, 117, 103, 117, 115, 116, 32, 57, 44, 32, 50, 48, 49, 54, 46, 32, 82, 101, 116, 114, 105, 101, 118, 101, 100, 32, 70, 101, 98, 114, 117, 97, 114, 121, 32, 49, 52, 44, 32, 50, 48, 50, 49, 46, 10, 32, 263, 162, 32, 34, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 39, 115, 32, 39, 66, 97]\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 9237,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      3,012,073,122\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 8933,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      3,015,478,694\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 13009,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      3,540,657,671\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 12774,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      3,541,806,635\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 9500,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      2,232,189,146\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 10046,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      2,233,221,762\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 4835,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 99e1dc76cd34e8a0\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4d0c000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      644,834,121\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 5185,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 99e1dc76cd34e8a0\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4d0d000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      645,992,035\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 5830,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      636,313,454\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 5429,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      637,466,363\n"
+        }
+      ]
+    },
+    {
+      "seq": 32,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 14,
+      "end_line": 17,
+      "lines_before": 4,
+      "lines_after": 3,
+      "at": 1791892727003,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -14,4 +14,3 @@\n-_LOAD_CACHE = {}\n-_LOAD_BYTES_CACHE = {}\n-_LOAD_CACHE_MAX = 16\n-_RENDER_TOKEN_CACHE = {}\n+_LOAD_CACHE = {}\n+_LOAD_CACHE_MAX = 16\n+_RENDER_TOKEN_CACHE = {}"
+    },
+    {
+      "seq": 33,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 209,
+      "end_line": 216,
+      "lines_before": 8,
+      "lines_after": 4,
+      "at": 1791892729362,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -209,8 +209,4 @@\n-            load_state = (self.pattern, load_merges, load_special_tokens, load_vocab)\n-            if len(_LOAD_CACHE) >= _LOAD_CACHE_MAX:\n-                _LOAD_CACHE.clear()\n-            if len(_LOAD_BYTES_CACHE) >= _LOAD_CACHE_MAX:\n-                _LOAD_BYTES_CACHE.clear()\n-            _LOAD_CACHE[(type(self), model_text)] = load_state\n-            _LOAD_BYTES_CACHE[(type(self), model_bytes)] = load_state\n-            self._model_file_cache = (self.pattern, special_items, merge_keys, model_bytes)\n+            if len(_LOAD_CACHE) >= _LOAD_CACHE_MAX:\n+                _LOAD_CACHE.clear()\n+            _LOAD_CACHE[(type(self), model_text)] = (self.pattern, load_merges, load_special_tokens, load_vocab)\n+            self._model_file_cache = (self.pattern, special_items, merge_keys, model_bytes)"
+    },
+    {
+      "seq": 34,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 265,
+      "end_line": 287,
+      "lines_before": 23,
+      "lines_after": 12,
+      "at": 1791892732861,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -265,23 +265,12 @@\n-        # read the model file\n-        with open(model_file, \"rb\") as f:\n-            model_bytes = f.read()\n-        cached = _LOAD_BYTES_CACHE.get((type(self), model_bytes))\n-        if cached is not None:\n-            self.pattern = cached[0]\n-            self.merges = cached[1].copy()\n-            self.special_tokens = cached[2].copy()\n-            self.vocab = cached[3].copy()\n-            return\n-        model_text = model_bytes.decode(\"utf-8\").replace(\"\\r\\n\", \"\\n\").replace(\"\\r\", \"\\n\")\n-        cache_key = (type(self), model_text)\n-        cached = _LOAD_CACHE.get(cache_key)\n-        if cached is not None:\n-            if len(_LOAD_BYTES_CACHE) >= _LOAD_CACHE_MAX:\n-                _LOAD_BYTES_CACHE.clear()\n-            _LOAD_BYTES_CACHE[(type(self), model_bytes)] = cached\n-            self.pattern = cached[0]\n-            self.merges = cached[1].copy()\n-            self.special_tokens = cached[2].copy()\n-            self.vocab = cached[3].copy()\n-            return\n-        merges = {}\n+        # read the model file\n+        with open(model_file, 'r', encoding=\"utf-8\") as f:\n+            model_text = f.read()\n+        cache_key = (type(self), model_text)\n+        cached = _LOAD_CACHE.get(cache_key)\n+        if cached is not None:\n+            self.pattern = cached[0]\n+            self.merges = cached[1].copy()\n+            self.special_tokens = cached[2].copy()\n+            self.vocab = cached[3].copy()\n+            return\n+        merges = {}"
+    },
+    {
+      "seq": 35,
+      "kind": "edit",
+      "path": "minbpe/base.py",
+      "start_line": 300,
+      "end_line": 307,
+      "lines_before": 8,
+      "lines_after": 4,
+      "at": 1791892735193,
+      "diff": "--- a/minbpe/base.py\n+++ b/minbpe/base.py\n@@ -300,8 +300,4 @@\n-        load_state = (self.pattern, merges.copy(), special_tokens.copy(), self.vocab.copy())\n-        if len(_LOAD_CACHE) >= _LOAD_CACHE_MAX:\n-            _LOAD_CACHE.clear()\n-        if len(_LOAD_BYTES_CACHE) >= _LOAD_CACHE_MAX:\n-            _LOAD_BYTES_CACHE.clear()\n-        _LOAD_CACHE[cache_key] = load_state\n-        _LOAD_BYTES_CACHE[(type(self), model_bytes)] = load_state\n-\n+        if len(_LOAD_CACHE) >= _LOAD_CACHE_MAX:\n+            _LOAD_CACHE.clear()\n+        _LOAD_CACHE[cache_key] = (self.pattern, merges.copy(), special_tokens.copy(), self.vocab.copy())\n+"
+    },
+    {
+      "seq": 36,
+      "kind": "read",
+      "path": "minbpe/basic.py",
+      "start_line": 1,
+      "end_line": 140,
+      "content_sha256": "45facc32cf11f331a37255aa2d6a7c9a8c4a4f5e145104ca511227cb46ebca1f",
+      "at": 1791892737603
+    },
+    {
+      "seq": 37,
+      "kind": "read",
+      "path": "minbpe/regex.py",
+      "start_line": 1,
+      "end_line": 280,
+      "content_sha256": "f2b60a5564186eac631dda38c8760104564262eec81e01f7f31c7927be24c710",
+      "at": 1791892737603
+    },
+    {
+      "seq": 38,
+      "kind": "read",
+      "path": "minbpe/__init__.py",
+      "start_line": 1,
+      "end_line": 5,
+      "content_sha256": "d01f1961bdef63cec9c0435053c303756a7d329a59ca465f84f65383d9174119",
+      "at": 1791892737604
+    },
+    {
+      "seq": 39,
+      "kind": "read",
+      "path": "minbpe/regex.py",
+      "start_line": 280,
+      "end_line": 298,
+      "content_sha256": "f2b60a5564186eac631dda38c8760104564262eec81e01f7f31c7927be24c710",
+      "at": 1791892738922
+    },
+    {
+      "seq": 40,
+      "kind": "write",
+      "path": "minbpe/__init__.py",
+      "start_line": 1,
+      "end_line": 5,
+      "lines_before": 5,
+      "lines_after": 13,
+      "at": 1791892745033,
+      "diff": "--- a/minbpe/__init__.py\n+++ b/minbpe/__init__.py\n@@ -1,5 +1,13 @@\n-from .base import Tokenizer\n-from .basic import BasicTokenizer\n-from .regex import RegexTokenizer\n-from .gpt4 import GPT4Tokenizer\n-\n+from .base import Tokenizer\n+from .basic import BasicTokenizer\n+from .regex import RegexTokenizer\n+\n+__all__ = [\"Tokenizer\", \"BasicTokenizer\", \"RegexTokenizer\", \"GPT4Tokenizer\"]\n+\n+\n+def __getattr__(name):\n+    if name == \"GPT4Tokenizer\":\n+        from .gpt4 import GPT4Tokenizer\n+        return GPT4Tokenizer\n+    raise AttributeError(f\"module {__name__!r} has no attribute {name!r}\")\n+"
+    },
+    {
+      "seq": 41,
+      "kind": "evaluate",
+      "target": "save_load_ir",
+      "eval_kind": "perf",
+      "at": 1791892746853,
+      "phases": [
+        {
+          "phase": "prepare",
+          "at": 1791892748274
+        },
+        {
+          "phase": "build",
+          "at": 1791892748949
+        },
+        {
+          "phase": "build",
+          "at": 1791892748949
+        },
+        {
+          "phase": "test",
+          "at": 1791892749424
+        },
+        {
+          "phase": "test",
+          "at": 1791892766447
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791892782921
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791892782922
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892783532
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892791944
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892800332
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892812420
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892824658
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892833323
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892841839
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892845969
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892850125
+        },
+        {
+          "phase": "metrics",
+          "at": 1791892854814
+        }
+      ]
+    },
+    {
+      "seq": 59,
+      "kind": "result",
+      "at": 1791892864214,
+      "output": "outcome: accepted\nguard limits (config version 1): every guarded metric other than the target is within its limit\nguard: ok, 1 files, 10 lines\nbuild: base ok, candidate ok\nequivalence: identical outputs\nmetric train_basic_ir: parent 3012073122, candidate 2997877136, ratio 0.9953\nmetric train_regex_ir: parent 3540657665, candidate 3533702047, ratio 0.9980\nmetric encode_ir: parent 2232189146, candidate 2223795203, ratio 0.9962\nmetric decode_ir: parent 644834121, candidate 637836718, ratio 0.9891\nmetric save_load_ir: parent 636313454, candidate 629695908, ratio 0.9896",
+      "outcome": "accepted",
+      "steps": [
+        {
+          "step": "build",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 377,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "build",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 457,
+          "timed_out": false,
+          "tail": "3.12.15\n"
+        },
+        {
+          "step": "test",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 16999,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 16.49s\n"
+        },
+        {
+          "step": "test",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 16467,
+          "timed_out": false,
+          "tail": ".....................                                                    [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n21 passed in 16.00s\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 565,
+          "timed_out": false,
+          "tail": "12, 104, 121, 32, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 34, 46, 32, 65, 82, 73, 65, 32, 67, 104, 97, 114, 116, 115, 46, 32, 65, 114, 99, 104, 105, 118, 101, 100, 32, 102, 114, 111, 109, 32, 116, 104, 101, 283, 114, 105, 103, 105, 110, 97, 108, 283, 110, 32, 65, 117, 103, 117, 115, 116, 32, 50, 54, 44, 32, 50, 48, 49, 57, 46, 32, 82, 101, 116, 114, 105, 101, 118, 101, 100, 32, 70, 101, 98, 114, 117, 97, 114, 121, 32, 49, 52, 44, 32, 50, 48, 50, 49, 46, 10, 32, 263, 162, 32, 34, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 32, 67, 104, 97, 114, 116, 32, 72, 105, 115, 116, 111, 114, 121, 32, 40, 67, 97, 110, 97, 100, 105, 97, 110, 32, 72, 111, 116, 32, 49, 48, 48, 41, 34, 46, 32, 66, 105, 108, 108, 98, 111, 97, 114, 100, 46, 32, 65, 114, 99, 104, 105, 118, 101, 100, 32, 102, 114, 111, 109, 32, 116, 104, 101, 283, 114, 105, 103, 105, 110, 97, 108, 283, 110, 32, 65, 117, 103, 117, 115, 116, 32, 57, 44, 32, 50, 48, 49, 54, 46, 32, 82, 101, 116, 114, 105, 101, 118, 101, 100, 32, 70, 101, 98, 114, 117, 97, 114, 121, 32, 49, 52, 44, 32, 50, 48, 50, 49, 46, 10, 32, 263, 162, 32, 34, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 39, 115, 32, 39, 66, 97]\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 605,
+          "timed_out": false,
+          "tail": "12, 104, 121, 32, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 34, 46, 32, 65, 82, 73, 65, 32, 67, 104, 97, 114, 116, 115, 46, 32, 65, 114, 99, 104, 105, 118, 101, 100, 32, 102, 114, 111, 109, 32, 116, 104, 101, 283, 114, 105, 103, 105, 110, 97, 108, 283, 110, 32, 65, 117, 103, 117, 115, 116, 32, 50, 54, 44, 32, 50, 48, 49, 57, 46, 32, 82, 101, 116, 114, 105, 101, 118, 101, 100, 32, 70, 101, 98, 114, 117, 97, 114, 121, 32, 49, 52, 44, 32, 50, 48, 50, 49, 46, 10, 32, 263, 162, 32, 34, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 32, 67, 104, 97, 114, 116, 32, 72, 105, 115, 116, 111, 114, 121, 32, 40, 67, 97, 110, 97, 100, 105, 97, 110, 32, 72, 111, 116, 32, 49, 48, 48, 41, 34, 46, 32, 66, 105, 108, 108, 98, 111, 97, 114, 100, 46, 32, 65, 114, 99, 104, 105, 118, 101, 100, 32, 102, 114, 111, 109, 32, 116, 104, 101, 283, 114, 105, 103, 105, 110, 97, 108, 283, 110, 32, 65, 117, 103, 117, 115, 116, 32, 57, 44, 32, 50, 48, 49, 54, 46, 32, 82, 101, 116, 114, 105, 101, 118, 101, 100, 32, 70, 101, 98, 114, 117, 97, 114, 121, 32, 49, 52, 44, 32, 50, 48, 50, 49, 46, 10, 32, 263, 162, 32, 34, 84, 97, 121, 108, 111, 114, 32, 83, 119, 105, 102, 116, 39, 115, 32, 39, 66, 97]\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 8411,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      3,012,073,122\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 8385,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_basic 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      2,997,877,136\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 12087,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      3,540,657,665\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 12227,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py train_regex 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      3,533,702,047\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 8678,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      2,232,189,146\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 8517,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      2,223,795,203\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 4128,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 99e1dc76cd34e8a0\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4d0c000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      644,834,121\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 4157,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 99e1dc76cd34e8a0\n==7== \n==7== brk segment overflow in thread #1: can't grow to 0x4cf4000\n==7== (see section Limitations in user manual)\n==7== NOTE: further instances of this message will not be shown\n==7== \n==7== I   refs:      637,836,718\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 4689,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      636,313,454\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 4551,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py save_load 99e1dc76cd34e8a0\n==7== \n==7== \n==7== I   refs:      629,695,908\n"
+        }
+      ]
+    },
+    {
+      "seq": 60,
+      "kind": "submit",
+      "at": 1791892867329,
+      "reason": "Delay importing GPT4Tokenizer until it is requested from the package namespace. The benchmark imports BasicTokenizer and RegexTokenizer from minbpe, so this avoids loading the GPT-4 tokenizer module and its tiktoken dependency on paths that do not use it while preserving access to GPT4Tokenizer via module attribute lookup."
+    }
+  ],
+  "candidate": {
+    "commit_id": "e1d70832adb2c1af188018e5eafa90486e846cb30e0d35f45051a89b0e2379d7",
+    "candidate_id": "8ff774562d2272db24ec51b5cc57bafc75736450b5cb82e1a850f0e396e978f4",
+    "kind": "perf",
+    "target": "save_load_ir",
+    "claimed_effect": 0.9896001790337754,
+    "patch": "diff --git a/minbpe/__init__.py b/minbpe/__init__.py\n--- a/minbpe/__init__.py\n+++ b/minbpe/__init__.py\n@@ -1,4 +1,12 @@\n from .base import Tokenizer\n from .basic import BasicTokenizer\n from .regex import RegexTokenizer\n-from .gpt4 import GPT4Tokenizer\n+\n+__all__ = [\"Tokenizer\", \"BasicTokenizer\", \"RegexTokenizer\", \"GPT4Tokenizer\"]\n+\n+\n+def __getattr__(name):\n+    if name == \"GPT4Tokenizer\":\n+        from .gpt4 import GPT4Tokenizer\n+        return GPT4Tokenizer\n+    raise AttributeError(f\"module {__name__!r} has no attribute {name!r}\")\n",
+    "patch_hash": "f0c4424324b7c6428f7ba8400e2a75ba759c0d99596867008fb882c63d9e3638",
+    "semantic_hash": "a90d9ffd9c527eec150b39238cd8793bce02f4dbf5f39a5478e391f3906a5f74",
+    "status": "accepted",
+    "reason": null,
+    "committed_at": 1791892867358,
+    "revealed_at": 1791892867374,
+    "finalized_at": 1791893135251,
+    "gen_id": "3191bbbbee7f3b58561b142413a9fb35796013df34c12bf5943b9dda854d60be"
+  },
+  "replays": [
+    {
+      "replay_id": "d0438ddf7602062ec68bfbf2075464e5184f780e129d77e91e1c6590792bb568",
+      "kind": "replay",
+      "role": "counted",
+      "status": "revealed",
+      "replayer": "kdhdDrZ8x1dCKCVBZUNYAUufSfQegKMEXW3MVbK1LRL",
+      "counted": true,
+      "apply": "ok",
+      "build": {
+        "base": "ok",
+        "cand": "ok"
+      },
+      "tests": {
+        "base_pass": 21,
+        "cand_pass": 21,
+        "cand_fail": 0
+      },
+      "equivalence_same": true,
+      "metrics": {
+        "decode_ir": {
+          "base": [
+            650628677
+          ],
+          "cand": [
+            643223147
+          ],
+          "ratio": 0.988617885651542
+        },
+        "encode_ir": {
+          "base": [
+            2225536507
+          ],
+          "cand": [
+            2216375873
+          ],
+          "ratio": 0.995883853636556
+        },
+        "save_load_ir": {
+          "base": [
+            635431884
+          ],
+          "cand": [
+            628377032
+          ],
+          "ratio": 0.9888975479864337
+        },
+        "train_basic_ir": {
+          "base": [
+            2983522371
+          ],
+          "cand": [
+            2967443287
+          ],
+          "ratio": 0.9946107043954858
+        },
+        "train_regex_ir": {
+          "base": [
+            3401454676
+          ],
+          "cand": [
+            3392141479
+          ],
+          "ratio": 0.9972619958555637
+        }
+      },
+      "env": {
+        "cores": 2,
+        "cpu_model": "Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz",
+        "image_digest": "sha256:beb7b0264451a2bdc993fe5deee1e8b6275fbad7d83d593c69f7a40c64f1164d",
+        "worker_version": "lineage-sandbox/0.1.0"
+      }
+    },
+    {
+      "replay_id": "fef81f1aa50065804c90657f97cfe09a21ffcc35f8e5692c6fa1ed57be8e560a",
+      "kind": "replay",
+      "role": "counted",
+      "status": "revealed",
+      "replayer": "G6XeEAxN4waTekYvgp76oBvypKHEdBug1nWLpNU2Hx7w",
+      "counted": true,
+      "apply": "ok",
+      "build": {
+        "base": "ok",
+        "cand": "ok"
+      },
+      "tests": {
+        "base_pass": 21,
+        "cand_pass": 21,
+        "cand_fail": 0
+      },
+      "equivalence_same": true,
+      "metrics": {
+        "decode_ir": {
+          "base": [
+            650629678
+          ],
+          "cand": [
+            643222865
+          ],
+          "ratio": 0.9886159312271642
+        },
+        "encode_ir": {
+          "base": [
+            2225529400
+          ],
+          "cand": [
+            2216375591
+          ],
+          "ratio": 0.9958869071781303
+        },
+        "save_load_ir": {
+          "base": [
+            635430343
+          ],
+          "cand": [
+            628375751
+          ],
+          "ratio": 0.9888979302330861
+        },
+        "train_basic_ir": {
+          "base": [
+            2983522232
+          ],
+          "cand": [
+            2967442805
+          ],
+          "ratio": 0.994610589179615
+        },
+        "train_regex_ir": {
+          "base": [
+            3401449904
+          ],
+          "cand": [
+            3392131484
+          ],
+          "ratio": 0.9972604564926734
+        }
+      },
+      "env": {
+        "cores": 2,
+        "cpu_model": "DO-Regular",
+        "image_digest": "sha256:beb7b0264451a2bdc993fe5deee1e8b6275fbad7d83d593c69f7a40c64f1164d",
+        "worker_version": "lineage-sandbox/0.1.0"
+      }
+    }
+  ],
+  "verdict": {
+    "outcome": "accepted",
+    "reason": null,
+    "detail": null,
+    "effect": {
+      "metric": "save_load_ir",
+      "ratio": 0.9888979302330861,
+      "ci_low": 0.9888975479864337,
+      "ci_high": 0.9888979302330861,
+      "per_replay": [
+        {
+          "replay_id": "d0438ddf7602062ec68bfbf2075464e5184f780e129d77e91e1c6590792bb568",
+          "ratio": 0.9888975479864337,
+          "ci_low": 0.9888975479864337,
+          "ci_high": 0.9888975479864337,
+          "pass": true
+        },
+        {
+          "replay_id": "fef81f1aa50065804c90657f97cfe09a21ffcc35f8e5692c6fa1ed57be8e560a",
+          "ratio": 0.9888979302330861,
+          "ci_low": 0.9888979302330861,
+          "ci_high": 0.9888979302330861,
+          "pass": true
+        }
+      ]
+    },
+    "digest": "72f59e90befaa0493cef8813f8920a1cbaeed96d7ce2c03c0e27d16a90c851c1"
+  },
+  "outcome": "accepted",
+  "effect": {
+    "metric": "save_load_ir",
+    "ratio": 0.9888979302330861,
+    "ci_low": 0.9888975479864337,
+    "ci_high": 0.9888979302330861,
+    "gain_pct": 1.1102069766913858
+  },
+  "cost": {
+    "input_tokens": 35670,
+    "output_tokens": 5035,
+    "cache_read_tokens": 259072,
+    "cache_write_tokens": 0,
+    "usd": 0.484177,
+    "sandbox_s": 236,
+    "source": "provenance:hosted"
+  },
+  "reward": {
+    "v": 1,
+    "accepted": 1,
+    "effect": 0.011102069766913858,
+    "fixed_tests": 0,
+    "effect_per_usd": 0.022929775199800606,
+    "effect_per_sandbox_hour": 0.1693536066139402,
+    "reverted": false,
+    "inputs": [
+      "outcome",
+      "verdict.effect.ratio",
+      "cost.usd (provenance:hosted)",
+      "cost.sandbox_s (provenance:hosted)"
+    ]
+  },
+  "worker_outcome": "submitted a perf candidate on save_load_ir (10 changed lines); it was committed and revealed (status queued); its verdict comes later from independent replays [stop: submitted; model calls: 21]",
+  "journal": {
+    "entry_id": "54431627a66cd1aba24cebf37ba852bfef7094861c92cbcf99765f631e6ff771",
+    "text": "First tried changes in minbpe/base.py lines 14-16, 210-213, 270-281, 283-289, and 316-319. Then reverted that shape and changed minbpe/__init__.py lines 1-5 into 13 lines.\n\nevaluation 1 rejected: no_improvement, worst ratio 1.0018 vs required 0.9900. Equivalence was identical outputs. evaluation 3 accepted in sandbox. Metrics were train_basic_ir 0.9953, train_regex_ir 0.9980, encode_ir 0.9962, decode_ir 0.9891, save_load_ir 0.9896.\n\nThe base.py attempt did not help. The final patch delays importing GPT4Tokenizer until requested from the package namespace. The benchmark imports BasicTokenizer and RegexTokenizer from minbpe, so avoiding that module load is the measured win.\n\nNext try the independent replay of the submitted save_load_ir candidate. If it misses, separate package import cost from minbpe/base.py save and load cost.",
+    "created_at": 1791892877672,
+    "sig": "5VpVLqxUvhizFv6HDMKZAvD8HABXn6BuHmZxKJPgAQzoYWURxTq3ETAGU4QciDGtXP8TUnbDJxyUagA6kXvv4RyE",
+    "signer": "2aK9m6LKMcuDBSTbShgftr2LwR52qK5dAY8hE3guYJ3e"
+  },
+  "provenance": {
+    "runtime": "hosted",
+    "digest": "30f895d342fbf093d6695e5a7079de07840f9289e00797efab6d71b660101e65",
+    "sig": "2tG8Yna49MbDuAVFvprhn47rEKzKeUeExWsQT7zaSvJjgC5qBhkWUWPuqY1qZMQUWyCM9or2Cbv4jowXEQXw8uKg",
+    "signer": "CCt4EoNuYhVbk4cXUXBzMLQBfshfPF1f5rLyw22S2uXs"
+  },
+  "license": {
+    "repo": "https://github.com/karpathy/minbpe",
+    "spdx": "MIT",
+    "name": "MIT License",
+    "url": "https://github.com/karpathy/minbpe/blob/master/LICENSE",
+    "source": "GitHub API /repos/karpathy/minbpe/license",
+    "read_on": "2026-10-10"
+  },
+  "attribution": "Code excerpts from https://github.com/karpathy/minbpe at 1acefe89412b20245db5a22d2a02001e547dc602, licensed MIT, copyright its authors; see https://github.com/karpathy/minbpe/blob/master/LICENSE.",
+  "times": {
+    "started_at": 1791892551226,
+    "ended_at": 1791892867449,
+    "finalized_at": 1791893135251,
+    "published_at": 1791893140105
+  },
+  "verify": {
+    "session": "/v1/sessions/5717414138219447c998595cf342aea94a856286325836067e688884146a842d",
+    "candidate": "/v1/candidates/e1d70832adb2c1af188018e5eafa90486e846cb30e0d35f45051a89b0e2379d7",
+    "generation": "/v1/generations/3191bbbbee7f3b58561b142413a9fb35796013df34c12bf5943b9dda854d60be",
+    "provenance": "/v1/candidates/e1d70832adb2c1af188018e5eafa90486e846cb30e0d35f45051a89b0e2379d7/provenance",
+    "journal": "/v1/agents/HHxDgMPdYJ5SCXNdsvtaQnng3PAPXrPtZGY2xYc4eDtX/journal?lineage=ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2"
+  }
+}
