@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 107 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 108 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -26,13 +26,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 20 (8 accepted, 7 no candidate, 5 rejected)
+- Attempts: 21 (8 accepted, 8 no candidate, 5 rejected)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
 - Accepted effects: 24.45%, 20.23%, 13.61%, 10.64%, 9.58%, 6.55%, 1.72%, 1.15%
 - Why candidates failed: stale_conflict (2), dependency_failed (1), stale (1), no_improvement (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.4735 USD (over 20 attempts with a recorded cost)
+- Median model spend per attempt: 0.6038 USD (over 21 attempts with a recorded cost)
 
 ## Target perf:save_load_ir
 
@@ -57,6 +57,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I changed RegexTokenizer.encode for special-token pattern caching. I changed merge and Tokenizer.__init__ in minbpe/base.py for ordered merge cache validation. I changed BasicTokenizer.train for a small count tweak.
+> evaluation 1: outcome: rejected, worst ratio 1.0047 vs required 0.9900. evaluation 3: outcome: rejected, worst ratio 1.0039 vs required 0.9900. evaluation 5: outcome: rejected, worst ratio 0.9993 vs required 0.9900. evaluation 7: outcome: rejected, worst ratio 1.2940 vs required 0.9900. Equivalence was identical outputs.
+> The encode special-token pattern cache did not help. The ordered merge cache validation did not help. The BasicTokenizer.train count tweak measured only 0.9993 on train_basic_ir and still failed the required 0.9900.
+> Try a different path in BasicTokenizer.train or RegexTokenizer.encode_ordinary. Do not keep the cache changes from this session.
+>
+> 2026-10-13, episode `8f1cb2209d23` (no candidate)
 
 > I tried one save/load cache change in minbpe/base.py. I touched the def save and def load path and the _LOAD_CACHE, _MODEL_BYTES_PREFIX_CACHE, and _VOCAB_BYTES_PREFIX_CACHE area.
 > evaluation 1: perf save_load_ir returned outcome: rejected (no_improvement: worst ratio 1.0013 vs required 0.9900). Outputs were identical. save_load_ir was parent 437674408, candidate 438231692, ratio 1.0013. train_basic_ir ratio 1.0025, train_regex_ir ratio 1.0018, encode_ir ratio 1.0003, decode_ir ratio 1.0018.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replays. If the result holds, inspect more encode_ir overhead in special-token splitting and ordered merge setup.
 >
 > 2026-10-13, episode `3481dc55f8a0` (rejected)
-
-> I changed BasicTokenizer.decode and RegexTokenizer.decode cache-hit handling in minbpe/basic.py and minbpe/regex.py. List decode cache entries now keep the original vocab and special-token mapping objects beside copied snapshots.
-> evaluation 1 was accepted. guard: ok, 2 files, 16 lines. equivalence: identical outputs. decode_ir moved from parent 489857527 to candidate 484815370, ratio 0.9897. train_basic_ir ratio 1.0011. train_regex_ir ratio 1.0007. encode_ir ratio 1.0002. save_load_ir ratio 1.0004.
-> I believe the unchanged mapping case was paying repeated equality cost on decode cache hits. Object identity helped that target in my sandbox. It did not help the other measured metrics.
-> Next, wait for the independent replays. If they hold, inspect the same decode cache path for smaller guard cost without touching encode behavior.
->
-> 2026-10-13, episode `d1922ef2b765` (rejected)
 
 ## Licence
 
