@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 89 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 91 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -36,27 +36,41 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 27 (3 rejected, 17 accepted, 7 no candidate)
+- Attempts: 28 (3 rejected, 17 accepted, 8 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
 - Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 12.89%, 10.30%, 10.08%, 7.37%, 6.30%, 4.72%, 3.80%, 3.11%, 3.08%, 2.81%, 2.48%, 1.41%, 1.11%
 - Why candidates failed: stale (2), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/__init__.py`, `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.3741 USD (over 27 attempts with a recorded cost)
+- Median model spend per attempt: 0.3786 USD (over 28 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
-- Attempts: 15 (5 accepted, 8 no candidate, 2 rejected)
+- Attempts: 16 (5 accepted, 9 no candidate, 2 rejected)
 - Best accepted effect: 15.23% (ratio 0.8477), episode `0bddfdfcf08a`
 - Accepted effects: 15.23%, 12.34%, 2.67%, 1.33%, 1.14%
 - Why candidates failed: stale_conflict (1), no_improvement (1)
 - Files changed by accepted candidates: `minbpe/basic.py`
 - Files changed by rejected candidates: `minbpe/basic.py`
-- Median model spend per attempt: 0.5765 USD (over 15 attempts with a recorded cost)
+- Median model spend per attempt: 0.5783 USD (over 16 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I read minbpe/basic.py, minbpe/base.py, minbpe/regex.py, and lineage_bench.py. I searched "where\[p\]\.append". I tried edits in minbpe/basic.py lines 158-167, 66-70, and 86-89, then reverted them. I tried edits in minbpe/regex.py lines 12-16, 101-111, 14-23, 83-87, 99-106, and 114-116.
+> evaluation 1 was rejected: train_basic_ir ratio 1.0038. evaluation 3 was rejected: train_basic_ir ratio 1.0003. evaluation 5 was rejected: train_basic_ir ratio 1.0005. evaluation 7 was rejected: train_regex_ir ratio 0.9959 vs required 0.9900. Builds were ok. Equivalence was identical outputs.
+> The train_basic changes did not help. They were neutral or worse. The train_regex heap import change moved train_regex_ir to 0.9959, but that was not enough. The guards stayed within limits.
+> Try a different part of the train loop. Do not spend more time on these basic.py line edits. Look again at the regex training update path around "where\[p\]\.append".
+>
+> 2026-10-13, episode `4198c98902b6` (no candidate)
+
+> I tried save/load path edits in minbpe/base.py, changing Tokenizer.decode, Tokenizer._build_vocab, Tokenizer.save, and Tokenizer.load. I also touched BasicTokenizer.encode in minbpe/basic.py and RegexTokenizer.encode_ordinary and RegexTokenizer.encode in minbpe/regex.py.
+> evaluation 1 was rejected: save_load_ir parent 437423510, candidate 436775009, ratio 0.9985. evaluation 3 was rejected: ratio 0.9984. evaluation 5 was rejected: ratio 0.9956. evaluation 7 was rejected: ratio 0.9956. The required ratio was 0.9900. Builds passed. Outputs were identical. Guards were ok.
+> I now believe this code path is not moved enough by small formatting and loop changes in base.py. The best sandbox save_load_ir ratio shown here was 0.9956, and encode_ir moved the wrong way in every run.
+> Try a narrower change inside Tokenizer.load and Tokenizer.save only. Leave encode paths alone unless save_load_ir first clears the required ratio.
+>
+> 2026-10-13, episode `e544e91f7ede` (no candidate)
 
 > I tried a save/load cache change in minbpe/base.py. The edits touched lines 12-17, 220-222, 224-241, 259-272, 269-279, 312-331, 312-344, 340-343, 390-393, and 144-146.
 > evaluation 1 was rejected: save_load_ir parent 442229920, candidate 439587215, ratio 0.9940, required 0.9900. evaluation 3 was rejected: save_load_ir ratio 1.0131. evaluation 5 was rejected: save_load_ir parent 442229916, candidate 439554118, ratio 0.9939. Builds were base ok, candidate ok. Equivalence was identical outputs. Guard was ok.
@@ -78,20 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, try a different BasicTokenizer.train path around pair-stat updates. Keep the equivalence checks. Do not submit the current patch.
 >
 > 2026-10-13, episode `40078a4082b1` (no candidate)
-
-> I tried a save/load cache change in minbpe/base.py. The changed code was in Tokenizer.save and Tokenizer.load, with nearby vocab handling. I read base.py, basic.py, regex.py, gpt4.py, __init__.py, lineage_bench.py, and lineage_equiv.py.
-> evaluation 1 was rejected: save_load_ir ratio 1.0006. evaluation 3 was rejected: save_load_ir ratio 0.9961. evaluation 5 was rejected: save_load_ir ratio 0.9957. Builds passed. Equivalence was identical outputs. Guards were ok.
-> The cache change did not help enough. It preserved behavior. It moved save_load_ir by about 0.4%, below the required 1% threshold. It also added small cost to train_basic_ir, train_regex_ir, and decode_ir.
-> Next try a smaller change in Tokenizer.load only. Do not keep extra cache state unless the load path pays for it. Measure save_load_ir first, then check encode_ir and decode_ir.
->
-> 2026-10-13, episode `3cf8d4f87ca6` (no candidate)
-
-> I tried import and counting changes in minbpe/regex.py, including RegexTokenizer.train. I replaced edits across lines 12-15, 68-70, 84-103, 113-131, and 262-271. I also read minbpe/base.py, minbpe/basic.py, lineage_bench.py, and minbpe/__init__.py.
-> Evaluation 1 was rejected: train_regex_ir ratio 1.0119. Evaluation 3 was rejected: decode_ir ratio 1.0002. Evaluation 5 was rejected: train_regex_ir ratio 0.9979. Evaluation 7 was rejected: train_regex_ir ratio 0.9971. Outputs were identical. Builds were ok. Guards were ok. The best train_regex_ir result was 0.9971, below required 0.9900.
-> I now believe these regex.py import and counting edits are too small for this benchmark. Some changes regressed. The useful movement was only about 0.29% on train_regex_ir.
-> Next try a different path in RegexTokenizer.train or leave regex.py alone and inspect base.py/basic.py hot loops against lineage_bench.py.
->
-> 2026-10-13, episode `cf1d166dbdd0` (no candidate)
 
 ## Licence
 
