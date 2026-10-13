@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 72 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 73 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -46,17 +46,24 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_basic_ir
 
-- Attempts: 10 (5 accepted, 4 no candidate, 1 rejected)
+- Attempts: 11 (5 accepted, 4 no candidate, 2 rejected)
 - Best accepted effect: 15.23% (ratio 0.8477), episode `0bddfdfcf08a`
 - Accepted effects: 15.23%, 12.34%, 2.67%, 1.33%, 1.14%
-- Why candidates failed: stale_conflict (1)
+- Why candidates failed: stale_conflict (1), no_improvement (1)
 - Files changed by accepted candidates: `minbpe/basic.py`
 - Files changed by rejected candidates: `minbpe/basic.py`
-- Median model spend per attempt: 0.3377 USD (over 10 attempts with a recorded cost)
+- Median model spend per attempt: 0.3480 USD (over 11 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I changed minbpe/basic.py. BasicTokenizer.train now updates merge deltas from split parts, not materialized left/right lists and Counter objects. It avoids the tie-candidate set on the common single-top heap case. It reuses the shared byte vocabulary prefix.
+> evaluation 1 was rejected: no_improvement, worst ratio 0.9927 vs required 0.9900. evaluation 3 was rejected: no_improvement, worst ratio 0.9917 vs required 0.9900. evaluation 5 was accepted. train_basic_ir: parent 331614471, candidate 328000212, ratio 0.9891. Equivalence had identical outputs. Guard was ok.
+> I now believe the useful change is the direct delta accounting in BasicTokenizer.train. The earlier forms moved train_basic_ir but did not help enough. The guard ratios moved up: train_regex_ir 1.0009, encode_ir 1.0043, decode_ir 1.0031, save_load_ir 1.0013.
+> Next, wait for independent replays. Then try more BasicTokenizer.train work only if the guard movement stays inside limits. The submitted perf candidate has 64 changed lines and status queued.
+>
+> 2026-10-13, episode `04e347bfb1c3` (rejected)
 
 > Read minbpe/basic.py 1-207, minbpe/base.py 1-260, lineage_bench.py 1-219, and minbpe/regex.py 1-220. Searched "BYTE_VOCAB|BasicTokenizer": 36 matching lines. Changed BasicTokenizer.train in minbpe/basic.py 73-82, replacing 10 lines by 27.
 > Sandbox evaluation 1, perf train_basic_ir: outcome accepted. Guard ok, 1 files, 33 lines. Build base ok, candidate ok. Equivalence: identical outputs. train_basic_ir parent 329898824, candidate 325663410, ratio 0.9872. train_regex_ir ratio 1.0001. encode_ir ratio 0.9997. decode_ir ratio 1.0000. save_load_ir ratio 0.9999.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replay. If it holds, look for the same membership-before-replace shape in nearby encode code.
 >
 > 2026-10-13, episode `5940393779a8` (accepted)
-
-> Changed minbpe/regex.py only. The change was in RegexTokenizer.train. It reused the shared byte vocabulary, avoided sorted copies of affected chunk sets, stopped re-pushing the selected tied heap entry, and iterated pair-set differences without temporary difference sets.
-> Own runs kept build ok and equivalence identical outputs. evaluation 1 was rejected: train_regex_ir parent 489552611, candidate 486488480, ratio 0.9937. evaluation 3 was rejected: ratio 1.0306. evaluation 5 was rejected: ratio 0.9918. evaluation 7 was accepted: train_regex_ir parent 489552611, candidate 484514045, ratio 0.9897; guard ok, 1 files, 41 lines.
-> The useful part is allocation removal in RegexTokenizer.train. The earlier forms did not help enough. One made train_regex_ir worse. Pair counts, tie handling, merge order, and output vocabulary stayed the same.
-> Submitted the perf candidate on train_regex_ir with 41 changed lines. It was committed and revealed, status queued. Next try after independent replays: inspect remaining allocations in RegexTokenizer.train and keep identical outputs.
->
-> 2026-10-13, episode `2eab3dab4624` (accepted)
 
 ## Licence
 
