@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 75 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 76 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -36,13 +36,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 23 (3 rejected, 17 accepted, 3 no candidate)
+- Attempts: 24 (3 rejected, 17 accepted, 4 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
 - Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 12.89%, 10.30%, 10.08%, 7.37%, 6.30%, 4.72%, 3.80%, 3.11%, 3.08%, 2.81%, 2.48%, 1.41%, 1.11%
 - Why candidates failed: stale (2), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/__init__.py`, `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.3368 USD (over 23 attempts with a recorded cost)
+- Median model spend per attempt: 0.3374 USD (over 24 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -57,6 +57,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Tried a save/load file-cache change in minbpe/base.py. Changed Tokenizer.save and Tokenizer.load around lines 302-331, then support code at lines 12-17, 218-221, 267-273, 338-343, and 272-275.
+> evaluation 1 said "outcome: rejected (no_improvement: worst ratio 1.0069 vs required 0.9900)". evaluation 3 said "outcome: rejected (no_improvement: worst ratio 0.9963 vs required 0.9900)". evaluation 5 said "outcome: rejected (no_improvement: worst ratio 0.9965 vs required 0.9900)". Build was base ok, candidate ok. Equivalence was identical outputs. Guard was ok.
+> I now believe this cache path is not enough for save_load_ir. It preserved behavior, but save_load_ir only reached ratio 0.9963 here, not 0.9900. No candidate was submitted.
+> Try fewer text parsing steps in minbpe/base.py load next. Measure save_load_ir first, then watch decode_ir, which reached ratio 1.0060.
+>
+> 2026-10-13, episode `7181664a3882` (no candidate)
 
 > minbpe/regex.py was changed. The touched functions were RegexTokenizer.train, RegexTokenizer.decode, RegexTokenizer._encode_chunk, RegexTokenizer.encode_ordinary, and RegexTokenizer.encode. Edits hit lines 63-65, 85-92, 108-126, 145-147, and 188-191.
 > perf train_regex_ir was rejected every time. evaluation 1 had train_regex_ir ratio 0.9980. evaluation 3 had 0.9981. evaluation 5 had 1.0448. evaluation 7 had 0.9999. The required ratio was 0.9900. Builds passed. Equivalence was identical outputs. Guards were ok. No candidate was submitted.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Submitted the perf candidate on train_basic_ir. It was committed and revealed, status queued. Next is independent replay. After that, compare the guarded metrics again before changing more code.
 >
 > 2026-10-13, episode `daea1c52c9be` (accepted)
-
-> Changed minbpe/basic.py lines 112-115 and 150-151. Changed minbpe/regex.py lines 220-227, 286-288, and 306-308. The change adds a same-object fast path to the existing decode list caches.
-> Sandbox perf decode_ir was outcome: accepted. Equivalence had identical outputs. decode_ir moved from 598411188 to 558360739, ratio 0.9331. train_basic_ir ratio was 1.0031. train_regex_ir ratio was 1.0027. encode_ir ratio was 0.9988. save_load_ir ratio was 1.0020.
-> The useful part is in decode. Reusing cached text for the same list helped in the sandbox. The guard stayed ok. The content-comparison fallback stayed for other lists.
-> Next, wait for the independent replay verdict on the queued decode_ir candidate. If it disagrees, look first at the same-object guards around the decode caches.
->
-> 2026-10-13, episode `b94f4fce9159` (accepted)
 
 ## Licence
 
