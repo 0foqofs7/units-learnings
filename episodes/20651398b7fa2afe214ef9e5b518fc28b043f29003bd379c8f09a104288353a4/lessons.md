@@ -1,6 +1,6 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 13 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 14 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,17 +16,24 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_ir
 
-- Attempts: 7 (5 accepted, 1 rejected, 1 no candidate)
+- Attempts: 8 (6 accepted, 1 rejected, 1 no candidate)
 - Best accepted effect: 15.17% (ratio 0.8483), episode `0bada18988c2`
-- Accepted effects: 15.17%, 14.04%, 6.05%, 1.94%, 1.38%
+- Accepted effects: 15.17%, 14.04%, 6.05%, 4.39%, 1.94%, 1.38%
 - Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.1917 USD (over 7 attempts with a recorded cost)
+- Median model spend per attempt: 0.1961 USD (over 8 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed minbpe/regex.py in RegexTokenizer.train. First replaced lines 82-85, then lines 82-90, then lines 62-68 and 71-75. The submitted version inlined pair counting for already-filtered chunks and combined chunk encoding with the length filter.
+> evaluation 1 was rejected: train_ir parent 2797777683, candidate 2816665451, ratio 1.0068. evaluation 3 was rejected: train_ir parent 2797777689, candidate 2796513514, ratio 0.9995. evaluation 5 was accepted: train_ir parent 2797777689, candidate 2674367201, ratio 0.9559. All had identical outputs.
+> The helper-call change did not help. The smaller rewrite did not meet required 0.9900. The last sandbox result kept encode_ir at ratio 1.0002 and moved train_ir to ratio 0.9559.
+> Next try is still in RegexTokenizer.train. Check whether more work in the merge loop can be kept local without changing pair insertion order or learned merges. The submitted perf candidate is queued. The verdict comes later from independent replays.
+>
+> 2026-10-13, episode `5e5c5325aef7` (accepted)
 
 > Changed minbpe/base.py to add a cached nested merge lookup on Tokenizer. Changed BasicTokenizer.encode in minbpe/basic.py. Changed RegexTokenizer.encode_chunk and RegexTokenizer.encode_ordinary in minbpe/regex.py.
 > Sandbox evaluation 1 for perf encode_ir returned outcome: accepted. Guard: ok, 3 files, 24 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_ir parent 2894356096, candidate 2896110474, ratio 1.0006. encode_ir parent 1038805572, candidate 1025301620, ratio 0.9870.
@@ -55,13 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try to restore the exact evaluation 7 state. Evaluate it before cleanup. Keep encode_ir cleanup separate from the train_ir change.
 >
 > 2026-10-13, episode `71eea3fdaa59` (no candidate)
-
-> I tried pair selection via stats.items() in BasicTokenizer.train and RegexTokenizer.train. I tried a short-sequence fast path and local get_stats binding. I tried an index-loop get_stats variant in minbpe/base.py.
-> evaluation 1 was "outcome: rejected (no_improvement: worst ratio 0.9953 vs required 0.9900)". train_ir was parent 2952450113, candidate 2938429255, ratio 0.9953. evaluation 3 was rejected at ratio 0.9969. evaluation 5 was rejected at ratio 1.0416. evaluation 7 was rejected at ratio 1.0743. equivalence was identical outputs. build was base ok, candidate ok. Repository was restored to the starting state. No candidate was submitted.
-> I now believe the train_ir cost here is not in the small Python reshapes I tried. The short-sequence fast path did not help. The index-loop get_stats variant was slower.
-> Next, read the merge loop again before editing. Look for less repeated work around pair counts, not just cleaner iteration. Measure train_ir and encode_ir after each change.
->
-> 2026-10-13, episode `def7ec96ffd9` (no candidate)
 
 ## Licence
 
