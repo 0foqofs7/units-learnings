@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 62 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 63 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -24,11 +24,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 9 (6 accepted, 3 no candidate)
+- Attempts: 10 (6 accepted, 3 no candidate, 1 rejected)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
 - Accepted effects: 24.45%, 20.23%, 10.64%, 9.58%, 6.55%, 1.15%
+- Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3377 USD (over 9 attempts with a recorded cost)
+- Files changed by rejected candidates: `minbpe/regex.py`
+- Median model spend per attempt: 0.3230 USD (over 10 attempts with a recorded cost)
 
 ## Target perf:save_load_ir
 
@@ -53,6 +55,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed minbpe/regex.py lines 292-310. Replaced 19 lines by 28 in RegexTokenizer.encode_ordinary. Cached the merge map and encoded regex chunks on the tokenizer while merges are unchanged.
+> Measured perf encode_ir. outcome: accepted. guard: ok, 1 files, 13 lines. build: base ok, candidate ok. equivalence: identical outputs. encode_ir parent 806387847, candidate 667799597, ratio 0.8281. train_basic_ir ratio 1.0007. train_regex_ir ratio 1.0010. decode_ir ratio 1.0006. save_load_ir ratio 1.0009.
+> I believe repeated encode calls were paying for rebuilding the merge lookup and re-encoding repeated chunks. The cache moved that work out of the hot path without changing ids.
+> Next, wait for independent replays. If it holds, look for the same repeated work in other encode paths.
+>
+> 2026-10-13, episode `8cd1cc537985` (rejected)
 
 > I tried save/load caching variants in minbpe/base.py and a regex training counting/replacement rewrite in minbpe/regex.py. The edits touched base.py lines 1-2, 7-10, 14-16, 23-26, 72-76, 148-167, 217-223, 273-295, 308-325, and regex.py lines 88-100.
 > save_load_ir was rejected twice: 1.0254 and 1.0008 vs required 0.9900. decode_ir was rejected at 1.0004. train_regex_ir was rejected at 1.1635. Builds were ok. Equivalence was identical outputs. Guards were ok.
@@ -81,13 +90,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try a different path in RegexTokenizer.train. Keep the output identical. Measure train_regex_ir before touching more surface area.
 >
 > 2026-10-13, episode `08e29116de7c` (no candidate)
-
-> Tried merge-map reuse in minbpe/base.py with build_merge_map and get_cached_merge_map. Wired it through minbpe/basic.py and minbpe/regex.py. Tried special-token encode inlining in regex.py.
-> evaluation 1 was rejected: no_improvement, worst ratio 0.9988 vs required 0.9900. encode_ir was parent 2273935302, candidate 2271294091, ratio 0.9988. evaluation 3 was rejected: no_improvement, worst ratio 0.9970 vs required 0.9900. encode_ir was parent 2273884202, candidate 2267009808, ratio 0.9970. evaluation 5 was rejected: tests_fail, 7 stable tests fail. Earlier guarded metrics were within limits and outputs were identical.
-> The encode path has little spare cost in this shape. Reusing merge maps helped, but not enough. The special-token path is easy to break.
-> Next try should stay inside _encode_chunk or the byte-pair loop. Keep GPT4Tokenizer tests first. Avoid touching special-token splitting unless equality with tiktoken is checked immediately.
->
-> 2026-10-13, episode `012322d66144` (no candidate)
 
 ## Licence
 
