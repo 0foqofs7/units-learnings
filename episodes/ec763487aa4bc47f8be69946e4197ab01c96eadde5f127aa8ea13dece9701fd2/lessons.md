@@ -1,18 +1,18 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 70 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 71 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 15 (11 accepted, 3 no candidate, 1 rejected)
+- Attempts: 16 (12 accepted, 3 no candidate, 1 rejected)
 - Best accepted effect: 56.44% (ratio 0.4356), episode `71c36b66692b`
-- Accepted effects: 56.44%, 32.45%, 13.41%, 12.94%, 11.01%, 9.45%, 4.53%, 2.62%, 2.57%, 1.71%, 1.24%
+- Accepted effects: 56.44%, 32.45%, 13.41%, 12.94%, 11.01%, 9.45%, 6.64%, 4.53%, 2.62%, 2.57%, 1.71%, 1.24%
 - Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.4412 USD (over 15 attempts with a recorded cost)
+- Median model spend per attempt: 0.4461 USD (over 16 attempts with a recorded cost)
 
 ## Target perf:train_regex_ir
 
@@ -58,6 +58,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> Changed minbpe/basic.py lines 112-115 and 150-151. Changed minbpe/regex.py lines 220-227, 286-288, and 306-308. The change adds a same-object fast path to the existing decode list caches.
+> Sandbox perf decode_ir was outcome: accepted. Equivalence had identical outputs. decode_ir moved from 598411188 to 558360739, ratio 0.9331. train_basic_ir ratio was 1.0031. train_regex_ir ratio was 1.0027. encode_ir ratio was 0.9988. save_load_ir ratio was 1.0020.
+> The useful part is in decode. Reusing cached text for the same list helped in the sandbox. The guard stayed ok. The content-comparison fallback stayed for other lists.
+> Next, wait for the independent replay verdict on the queued decode_ir candidate. If it disagrees, look first at the same-object guards around the decode caches.
+>
+> 2026-10-13, episode `b94f4fce9159` (accepted)
+
 > I tried encode_ir changes in minbpe/base.py get_stats and in minbpe/regex.py lines 388-401. The edits touched minbpe/base.py lines 12-14 and 74-82, then moved through smaller variants.
 > evaluation 1 was rejected: encode_ir parent 725318297, candidate 720052355, ratio 0.9927. evaluation 3 was rejected: ratio 0.9946. evaluation 5 result: outcome: accepted, guard ok, 2 files, 16 lines, identical outputs, encode_ir parent 725318297, candidate 714968450, ratio 0.9857. evaluation 7 was rejected: ratio 0.9967. The session ended with no candidate.
 > The measurement points at the evaluation 5 state. The later exploratory state did not help. The accepted state was lost before it could be re-evaluated.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replays. If the candidate fails, inspect tie-breaking and merge construction in minbpe/regex.py RegexTokenizer.train.
 >
 > 2026-10-13, episode `9d4e5941f250` (accepted)
-
-> I tried bounded edits in minbpe/base.py and minbpe/basic.py. I touched get_stats, Tokenizer.save, Tokenizer.load, and the BasicTokenizer encode path. The save_load cache variants were changed, measured, then backed out. The small encode change was also backed out.
-> evaluation 1 save_load_ir was rejected: parent 476231057, candidate 485020351, ratio 1.0185. evaluation 3 save_load_ir was rejected: parent 476231055, candidate 479192578, ratio 1.0062. evaluation 5 encode_ir was rejected: parent 745684685, candidate 742013031, ratio 0.9951. Equivalence was identical outputs in all runs.
-> The cache work in base.py did not help save_load_ir. The encode edit in basic.py helped encode_ir by the measured ratio, but not enough for the required 0.9900.
-> Next try a different save_load_ir shape in Tokenizer.save and Tokenizer.load, or leave save/load alone and look for a larger encode_ir change than the 3 line edit.
->
-> 2026-10-13, episode `997561bd32d4` (no candidate)
 
 ## Licence
 
