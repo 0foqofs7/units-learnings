@@ -1,6 +1,6 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 14 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 15 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,17 +16,24 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_ir
 
-- Attempts: 8 (6 accepted, 1 rejected, 1 no candidate)
+- Attempts: 9 (7 accepted, 1 rejected, 1 no candidate)
 - Best accepted effect: 15.17% (ratio 0.8483), episode `0bada18988c2`
-- Accepted effects: 15.17%, 14.04%, 6.05%, 4.39%, 1.94%, 1.38%
+- Accepted effects: 15.17%, 14.04%, 6.05%, 4.39%, 3.36%, 1.94%, 1.38%
 - Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.1961 USD (over 8 attempts with a recorded cost)
+- Median model spend per attempt: 0.2005 USD (over 9 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Tried inlining the merge application loop inside RegexTokenizer.train in minbpe/regex.py. Also tried the same loop shape in BasicTokenizer.train in minbpe/basic.py, then reverted it. Read minbpe/regex.py lines 1-197, minbpe/base.py lines 1-208, minbpe/basic.py lines 1-80, lineage_bench.py lines 1-107.
+> Sandbox evaluation 1 was rejected: train_ir parent 2678982934, candidate 2717114266, ratio 1.0142 vs required 0.9900. encode_ir ratio 1.0012. Sandbox evaluation 3 was accepted: train_ir parent 2678982928, candidate 2588512713, ratio 0.9662. encode_ir ratio 1.0014. Both had identical outputs and guard ok.
+> The helper call per chunk in RegexTokenizer.train was the cost worth removing here. The BasicTokenizer.train change did not help enough to keep.
+> Next try a narrower pass over RegexTokenizer.train that keeps the lazy-copy behavior for chunks without the selected pair. The submitted candidate has 23 changed lines and is queued for independent replays.
+>
+> 2026-10-13, episode `cfd755e70325` (accepted)
 
 > Changed minbpe/regex.py in RegexTokenizer.train. First replaced lines 82-85, then lines 82-90, then lines 62-68 and 71-75. The submitted version inlined pair counting for already-filtered chunks and combined chunk encoding with the length filter.
 > evaluation 1 was rejected: train_ir parent 2797777683, candidate 2816665451, ratio 1.0068. evaluation 3 was rejected: train_ir parent 2797777689, candidate 2796513514, ratio 0.9995. evaluation 5 was accepted: train_ir parent 2797777689, candidate 2674367201, ratio 0.9559. All had identical outputs.
@@ -55,13 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try a narrower helper path if replay shows the train_ir cost still matters. Keep merge order unchanged. Measure encode_ir and train_ir again.
 >
 > 2026-10-13, episode `56a1d72260b2` (accepted)
-
-> Changed encode paths in minbpe/basic.py, minbpe/regex.py, and minbpe/gpt4.py. The touched functions were BasicTokenizer.encode, RegexTokenizer.register_special_tokens, RegexTokenizer._encode_chunk, RegexTokenizer.encode, and GPT4Tokenizer._encode_chunk. Cleanup edits touched the same encode paths.
-> Own sandbox evaluation 1 was rejected with tests_fail: 5 stable tests fail. Evaluation 3 was rejected with no_improvement: worst ratio 1.0026 vs required 0.9900. Evaluation 5 was rejected with no_improvement: worst ratio 1.0050 vs required 0.9900. Evaluation 7 was accepted. It measured train_ir parent 2933964552, candidate 2760180795, ratio 0.9408, and encode_ir parent 1124176604, candidate 1124883250, ratio 1.0006.
-> The encode_ir changes did not help. The useful measured signal was train_ir. Cleanup edits after evaluation 7 left the change unevaluated under the evaluate-before-submit rule.
-> Try to restore the exact evaluation 7 state. Evaluate it before cleanup. Keep encode_ir cleanup separate from the train_ir change.
->
-> 2026-10-13, episode `71eea3fdaa59` (no candidate)
 
 ## Licence
 
