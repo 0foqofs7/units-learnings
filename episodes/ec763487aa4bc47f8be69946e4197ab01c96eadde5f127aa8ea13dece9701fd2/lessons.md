@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 99 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 100 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,13 +16,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_regex_ir
 
-- Attempts: 13 (6 accepted, 6 no candidate, 1 rejected)
+- Attempts: 14 (6 accepted, 7 no candidate, 1 rejected)
 - Best accepted effect: 21.19% (ratio 0.7881), episode `b39c7cc4d86a`
 - Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%, 1.44%, 1.02%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.5189 USD (over 13 attempts with a recorded cost)
+- Median model spend per attempt: 0.5337 USD (over 14 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -58,6 +58,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> Changed minbpe/regex.py in RegexTokenizer.train. Tried compiled-pattern findall and tie-set allocation changes. Changed minbpe/base.py in ordered_merge_steps for cache-hit validation. Reverted pieces that did not hold.
+> evaluation 1 train_regex_ir was rejected, no_improvement: worst ratio 0.9994 vs required 0.9900. evaluation 3 was rejected, worst ratio 1.0127. evaluation 5 was rejected, worst ratio 0.9996. evaluation 7 encode_ir was rejected, worst ratio 1.0006. Builds were ok. Equivalence was identical outputs.
+> I now believe RegexTokenizer.train is not helped by these compiled-pattern findall or tie-set allocation edits. The ordered_merge_steps cache-hit validation rewrite did not help encode_ir. Neutral is not enough here.
+> Next try should stay narrower. Measure one hot path in RegexTokenizer.train before editing it. Leave ordered_merge_steps alone unless a profile points there.
+>
+> 2026-10-13, episode `1b561acd9ebe` (no candidate)
+
 > I tried changes in minbpe/basic.py, including BasicTokenizer.train. I read minbpe/basic.py, minbpe/base.py, minbpe/regex.py, lineage_bench.py, minbpe/__init__.py, and lineage_equiv.py.
 > Evaluation 1 was rejected: train_basic_ir parent 261830968, candidate 261850149, ratio 1.0001. Evaluation 3 was rejected: parent 261830962, candidate 291910391, ratio 1.1149. Evaluation 5 was rejected: parent 261830962, candidate 262120575, ratio 1.0011. All had identical outputs.
 > I now believe these BasicTokenizer.train edits are not the cut. They preserved behavior, but were neutral or slower.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try the next encode path after ordered_merge_steps. Wait for independent replays on the queued encode_ir candidate.
 >
 > 2026-10-13, episode `350fca6f3a76` (rejected)
-
-> I changed minbpe/base.py in the save/load cache-key path. The edits touched lines 216-345. I changed Tokenizer.save and Tokenizer.load.
-> Own sandbox evaluation 1: save_load_ir parent 445670142, candidate 445179846, ratio 0.9989. Outcome: rejected, no_improvement: worst ratio 0.9989 vs required 0.9900. Equivalence: identical outputs. Evaluation 3: save_load_ir parent 445670142, candidate 486390309, ratio 1.0914. Outcome: rejected. The follow-up was worse.
-> I now believe this local cache-key change is behavior-preserving but too small. It moved save_load_ir by 0.11%, below the 1% requirement.
-> Next try a different save/load path in minbpe/base.py, not this cache-key shape. Keep train_basic_ir, train_regex_ir, encode_ir, and decode_ir guarded.
->
-> 2026-10-13, episode `33f355457b76` (no candidate)
 
 ## Licence
 
