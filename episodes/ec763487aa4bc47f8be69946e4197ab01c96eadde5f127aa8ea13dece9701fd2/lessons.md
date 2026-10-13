@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 105 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 106 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,13 +16,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_regex_ir
 
-- Attempts: 14 (6 accepted, 7 no candidate, 1 rejected)
+- Attempts: 15 (6 accepted, 8 no candidate, 1 rejected)
 - Best accepted effect: 21.19% (ratio 0.7881), episode `b39c7cc4d86a`
 - Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%, 1.44%, 1.02%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.5337 USD (over 14 attempts with a recorded cost)
+- Median model spend per attempt: 0.5486 USD (over 15 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -58,6 +58,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> I worked in minbpe/regex.py. I changed RegexTokenizer.train and the encode path. I also read minbpe/base.py, lineage_bench.py, minbpe/basic.py, and minbpe/__init__.py.
+> evaluation 1 was rejected, with train_regex_ir ratio 0.9998. evaluation 3 was rejected, with ratio 1.0003. evaluation 5 was rejected, with ratio 1.0066. Outputs stayed identical. Guards were ok. The best train_regex_ir attempt was only a 0.02% reduction.
+> I now believe these local changes in minbpe/regex.py did not move the target enough. Some edits made train_regex_ir worse. encode_ir also moved worse in the measured attempts.
+> Try a different shape next. Look past the small line edits in RegexTokenizer.train. Check get_stats and merge use from minbpe/base.py, then measure train_regex_ir again.
+>
+> 2026-10-13, episode `62b0dcd76f05` (no candidate)
+
 > I tried edits in minbpe/regex.py lines 316-324, 381-386, 406-411, 381-391, 401-411, and 527-529. I tried edits in minbpe/basic.py lines 67-70, 166-168, and 252-256. The session facts do not name functions.
 > evaluation 1 decode_ir was rejected: worst ratio 1.0006 vs required 0.9900. decode_ir was parent 532746210, candidate 533066424, ratio 1.0006. evaluation 3 train_basic_ir was rejected: ratio 0.9994. evaluation 5 train_basic_ir was rejected: ratio 0.9998. evaluation 7 encode_ir was rejected: ratio 0.9948. Builds passed. Outputs were identical.
 > Decode cache lookup was neutral/slower. The small train and encode edits improved some metrics and did not meet the required 0.9900. No candidate was submitted.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try narrower work in RegexTokenizer.train. Reduce merge allocation without changing outputs. Leave BasicTokenizer.encode alone unless encode_ir is the target. Session ended with no candidate and no submitted change.
 >
 > 2026-10-13, episode `9f71cbbf86f4` (no candidate)
-
-> Tried minbpe/base.py Tokenizer.save_vocab first. Replaced merge lookup for save/load vocab, then reverted the larger form. Tried minbpe/regex.py RegexTokenizer.train chunk counting. Tried minbpe/basic.py BasicTokenizer.train initial pair-count slicing.
-> evaluation 1: perf save_load_ir: "outcome: rejected (no_improvement: worst ratio 1.0089 vs required 0.9900)" with "equivalence: identical outputs". evaluation 3: perf train_regex_ir: "outcome: rejected (no_improvement: worst ratio 1.0001 vs required 0.9900)". evaluation 5: perf train_basic_ir: "outcome: rejected (no_improvement: worst ratio 1.0002 vs required 0.9900)".
-> The three touched spots were neutral or slower in this sandbox. Tokenizer.save_vocab moved save_load_ir to ratio 1.0089. RegexTokenizer.train moved train_regex_ir to ratio 1.0001. BasicTokenizer.train moved train_basic_ir to ratio 1.0002.
-> No candidate was submitted. Next try should look outside these small local rewrites, or use lineage_bench.py and lineage_equiv.py to find a measured hotspot before editing.
->
-> 2026-10-13, episode `7b08d79220b7` (no candidate)
 
 ## Licence
 
