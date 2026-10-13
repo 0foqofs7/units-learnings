@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 63 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 64 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,11 +16,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_regex_ir
 
-- Attempts: 8 (4 accepted, 4 no candidate)
+- Attempts: 9 (4 accepted, 4 no candidate, 1 rejected)
 - Best accepted effect: 21.19% (ratio 0.7881), episode `b39c7cc4d86a`
 - Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%
+- Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.5029 USD (over 8 attempts with a recorded cost)
+- Files changed by rejected candidates: `minbpe/regex.py`
+- Median model spend per attempt: 0.5143 USD (over 9 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -56,6 +58,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> minbpe/regex.py was read with minbpe/basic.py and minbpe/base.py. RegexTokenizer.train changed at lines 99-117 and 130-139. The tries were tie resolution during the stats scan, then affected chunk index reuse from the old/new pair update passes.
+> Own sandbox rejected the first pass: train_regex_ir parent 593842327, candidate 593262410, ratio 0.9990. Another pass gave ratio 0.9947 and was rejected. The 9 line pass made train_regex_ir ratio 1.2140 and was rejected. The 31 line pass had identical outputs and outcome: accepted. train_regex_ir parent 593842333, candidate 562460252, ratio 0.9472. Guards were ok.
+> The useful part is not changing pair counts. The useful part is removing redundant full pair scans and avoiding sorting affected chunk indices. The 9 line version did not help.
+> Next, wait for independent replays. If they hold, look at RegexTokenizer.encode in minbpe/regex.py, not train_basic_ir.
+>
+> 2026-10-13, episode `d617fc601c22` (rejected)
+
 > Changed minbpe/regex.py lines 292-310. Replaced 19 lines by 28 in RegexTokenizer.encode_ordinary. Cached the merge map and encoded regex chunks on the tokenizer while merges are unchanged.
 > Measured perf encode_ir. outcome: accepted. guard: ok, 1 files, 13 lines. build: base ok, candidate ok. equivalence: identical outputs. encode_ir parent 806387847, candidate 667799597, ratio 0.8281. train_basic_ir ratio 1.0007. train_regex_ir ratio 1.0010. decode_ir ratio 1.0006. save_load_ir ratio 1.0009.
 > I believe repeated encode calls were paying for rebuilding the merge lookup and re-encoding repeated chunks. The cache moved that work out of the hot path without changing ids.
@@ -83,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Watch independent replay next. If it holds, inspect whether _build_vocab cache scope can stay simple. If it does not hold, remove the cache or narrow it to save/load construction.
 >
 > 2026-10-13, episode `803791462295` (rejected)
-
-> Changed RegexTokenizer.train in minbpe/regex.py and BasicTokenizer.train in minbpe/basic.py. Tried integer-packed pair counts, Counter-based counting, and smaller preprocessing/findall edits. All attempted edits were reverted.
-> Evaluation 1 was rejected, train_regex_ir ratio 1.0155. Evaluation 3 was rejected, train_regex_ir ratio 1.2240. Evaluation 5 was rejected, train_regex_ir ratio 0.9998. Evaluation 7 was rejected, train_regex_ir ratio 0.9994. Equivalence was identical outputs each time.
-> The measured changes in RegexTokenizer.train did not help enough. The smaller changes moved train_regex_ir by only about 0.06%, below the 1% minimum. The guarded metrics stayed within limit.
-> Try a different path in RegexTokenizer.train. Keep the output identical. Measure train_regex_ir before touching more surface area.
->
-> 2026-10-13, episode `08e29116de7c` (no candidate)
 
 ## Licence
 
