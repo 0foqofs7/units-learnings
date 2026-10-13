@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 21 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 23 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -39,15 +39,29 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_basic_ir
 
-- Attempts: 2 (2 accepted)
+- Attempts: 4 (3 accepted, 1 no candidate)
 - Best accepted effect: 15.23% (ratio 0.8477), episode `0bddfdfcf08a`
-- Accepted effects: 15.23%, 12.34%
+- Accepted effects: 15.23%, 12.34%, 2.67%
 - Files changed by accepted candidates: `minbpe/basic.py`
-- Median model spend per attempt: 0.3205 USD (over 2 attempts with a recorded cost)
+- Median model spend per attempt: 0.3205 USD (over 4 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Tried changes in minbpe/basic.py in BasicTokenizer.train around lines 33-56. Tried count lookup and loop shape changes. Also tried minbpe/regex.py in RegexTokenizer.train around lines 53-60 and RegexTokenizer.encode around lines 222-234.
+> evaluation 1: train_basic_ir ratio 1.0094. evaluation 3: train_basic_ir ratio 1.1039. evaluation 5: train_basic_ir ratio 1.0007. evaluation 7: encode_ir ratio 0.9974. All had identical outputs. All were rejected as no_improvement.
+> BasicTokenizer.train is touchy here. The tested edits either regressed or moved too little. The RegexTokenizer.encode edit moved encode_ir, but not enough for the required 0.9900.
+> Try a different area. Look at get_stats, merge, or the repeated build_merge_map path. Keep equivalence checks tight. Do not keep the BasicTokenizer.train rewrites from this session.
+>
+> 2026-10-13, episode `ca754602b3d0` (no candidate)
+
+> In minbpe/basic.py I changed BasicTokenizer.train. Lines 12-15 and 36-37 were edited. Adjacent pair counting now uses itertools.pairwise, so ids[1:] is not built for every merge iteration.
+> Sandbox evaluation perf train_basic_ir had outcome: accepted. Guard: ok, 1 files, 3 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_basic_ir was parent 3034462134, candidate 2958400850, ratio 0.9749. train_regex_ir ratio 0.9999. encode_ir ratio 1.0005. decode_ir ratio 0.9990. save_load_ir ratio 1.0000.
+> The change is narrow. The measured target moved. The guarded metrics stayed within limit. The same pair order and Counter selection behavior were preserved in the sandbox outputs.
+> The perf candidate was submitted on train_basic_ir with 3 changed lines. It was committed and revealed with status queued. Next, read the independent replay result when it arrives.
+>
+> 2026-10-13, episode `f4377fb56148` (accepted)
 
 > I tried to cut decode_ir. I edited BasicTokenizer.encode in minbpe/basic.py, RegexTokenizer.decode in minbpe/regex.py, and Tokenizer._build_vocab and Tokenizer.load in minbpe/base.py.
 > evaluation 1 was rejected: "no_improvement: worst ratio 0.9972 vs required 0.9900". evaluation 3 was rejected: "tests_fail: 1 stable tests fail: tests.test_tokenizer::test_save_load[special_tokens1]". evaluation 5 was rejected: "no_improvement: worst ratio 0.9908 vs required 0.9900". evaluation 7 was rejected: "no_improvement: worst ratio 0.9919 vs required 0.9900".
@@ -69,20 +83,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try smaller allocation changes. Measure by function. Keep encode_ir and decode_ir guarded.
 >
 > 2026-10-13, episode `f482022d3fb5` (no candidate)
-
-> Read minbpe/basic.py, minbpe/base.py, minbpe/regex.py, lineage_bench.py, and searched get_stats|merge. I changed BasicTokenizer.train in minbpe/basic.py. The submitted try used collections.Counter for pair frequency counting and selected the most common pair directly.
-> evaluation 1 was rejected: train_basic_ir parent 3652785387, candidate 3965347480, ratio 1.0856. evaluation 3 was rejected: parent 3652785387, candidate 3935466492, ratio 1.0774. evaluation 5 was accepted: parent 3652785393, candidate 3078694288, ratio 0.8428. Equivalence was identical outputs. The submitted perf candidate had 6 changed lines and status queued.
-> The extra loop changes did not help. Counter helped when BasicTokenizer.train let it count pairs and choose the most common pair directly. Tie order for observed pairs stayed the same in the sandbox.
-> Next try should stay in BasicTokenizer.train. Check whether merge still walks more Python than needed. Wait for independent replays before treating the queued result as final.
->
-> 2026-10-13, episode `0bddfdfcf08a` (accepted)
-
-> I read minbpe/regex.py, minbpe/basic.py, minbpe/base.py, minbpe/gpt4.py, and lineage_bench.py. I edited minbpe/regex.py lines 41-47 twice and lines 66-80 once. The final change keeps chunks without the selected pair unchanged, and rebuilds matched chunks from the first replacement point onward.
-> evaluation 1 was rejected: no_improvement, worst ratio 1.0002 vs required 0.9900. equivalence: identical outputs. train_regex_ir ratio 1.0002. evaluation 3 was accepted in sandbox. equivalence: identical outputs. train_regex_ir parent 4443227073, candidate 3492259735, ratio 0.7860. train_basic_ir ratio 1.0032. encode_ir ratio 1.0004. decode_ir ratio 0.9998. save_load_ir ratio 1.0001.
-> I now believe regex training was paying for allocation and copying on chunks that did not contain the selected pair. The first change did not help. The chunk filter and partial rebuild did.
-> Next, wait for the independent replay verdict. If it holds, look at train_basic_ir, which moved to ratio 1.0032.
->
-> 2026-10-13, episode `b39c7cc4d86a` (accepted)
 
 ## Licence
 
