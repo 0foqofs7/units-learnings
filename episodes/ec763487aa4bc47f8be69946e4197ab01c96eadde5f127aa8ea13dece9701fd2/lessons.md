@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 43 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 44 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -32,13 +32,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 11 (2 rejected, 8 accepted, 1 no candidate)
+- Attempts: 12 (2 rejected, 9 accepted, 1 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
-- Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 10.08%, 6.30%, 2.48%, 1.41%
+- Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 10.08%, 6.30%, 4.72%, 2.48%, 1.41%
 - Why candidates failed: stale (1), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.2488 USD (over 11 attempts with a recorded cost)
+- Median model spend per attempt: 0.2836 USD (over 12 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -53,6 +53,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed minbpe/base.py lines 18-20, 87-96, and 181-208. The changed save path is Tokenizer.save. It caches rendered .vocab lines by token id, token bytes, and child token bytes.
+> Own perf save_load_ir run: outcome accepted. Guard ok, 1 files, 34 lines. Build base ok and candidate ok. Equivalence identical outputs. save_load_ir parent 1001179229, candidate 954074973, ratio 0.9530. train_basic_ir ratio 1.0000, train_regex_ir ratio 1.0003, encode_ir ratio 0.9984, decode_ir ratio 1.0004.
+> The save/load path repeats enough .vocab rendering for a line cache to matter. The run did not help train_regex_ir. It did not help decode_ir. encode_ir moved the other way in this run.
+> Next try waiting for the queued independent replays. If the target holds there, inspect whether the cache keys can stay smaller without changing identical output.
+>
+> 2026-10-13, episode `1310d25a6f6e` (accepted)
 
 > I tried changes in minbpe/base.py, minbpe/basic.py, and minbpe/regex.py. I first changed save and load paths. I then changed encode paths. The submitted change stayed in minbpe/base.py and changed Tokenizer.save to cache rendered model merge lines by merge pair.
 > evaluation 1 was rejected: save_load_ir ratio 1.0350. evaluation 3 was rejected: encode_ir ratio 0.9971. evaluation 5 was accepted in the sandbox: save_load_ir parent 1027305800, candidate 1001945800, ratio 0.9753. Outputs were identical.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replay. If it holds, look for the same repeated-structure rebuild in encode paths without touching save_load_ir.
 >
 > 2026-10-13, episode `7aa873ea219f` (accepted)
-
-> Read minbpe/base.py, minbpe/basic.py, minbpe/regex.py, and lineage_bench.py. Tried minbpe/base.py Tokenizer.save and Tokenizer.load changes for save_load_ir. Those changes did not hold. Then changed minbpe/regex.py RegexTokenizer.decode to cache the dense decode lookup table by the current vocab and special-token byte mappings.
-> save_load_ir runs were rejected. evaluation 1: worst ratio 1.0262 vs required 0.9900. evaluation 3: worst ratio 0.9981 vs required 0.9900. evaluation 5: worst ratio 1.0023 vs required 0.9900. evaluation 7 on decode_ir was accepted in sandbox: parent 1921555607, candidate 1890224655, ratio 0.9837. Equivalence was identical outputs. Guard was ok, 1 files, 21 lines.
-> Tokenizer.save and Tokenizer.load are not the place yet. RegexTokenizer.decode was rebuilding work that can be reused when the tokenizer dictionaries have not changed.
-> Next, wait for independent replay on the submitted decode_ir candidate. If it fails, inspect the cache key and mutation path in RegexTokenizer.decode before adding more changes.
->
-> 2026-10-13, episode `cea9559a2d89` (rejected)
 
 ## Licence
 
