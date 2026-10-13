@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 74 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 75 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,13 +16,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_regex_ir
 
-- Attempts: 11 (6 accepted, 4 no candidate, 1 rejected)
+- Attempts: 12 (6 accepted, 5 no candidate, 1 rejected)
 - Best accepted effect: 21.19% (ratio 0.7881), episode `b39c7cc4d86a`
 - Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%, 1.44%, 1.02%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.5143 USD (over 11 attempts with a recorded cost)
+- Median model spend per attempt: 0.5166 USD (over 12 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -58,6 +58,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> minbpe/regex.py was changed. The touched functions were RegexTokenizer.train, RegexTokenizer.decode, RegexTokenizer._encode_chunk, RegexTokenizer.encode_ordinary, and RegexTokenizer.encode. Edits hit lines 63-65, 85-92, 108-126, 145-147, and 188-191.
+> perf train_regex_ir was rejected every time. evaluation 1 had train_regex_ir ratio 0.9980. evaluation 3 had 0.9981. evaluation 5 had 1.0448. evaluation 7 had 0.9999. The required ratio was 0.9900. Builds passed. Equivalence was identical outputs. Guards were ok. No candidate was submitted.
+> I now believe these local changes do not move train_regex_ir enough. Changes outside RegexTokenizer.train did not help the target. The train changes did not help enough.
+> Next try should stay inside RegexTokenizer.train. Measure compiled_pattern.findall and get_stats work before changing encode or decode again.
+>
+> 2026-10-13, episode `192957e32698` (no candidate)
+
 > I changed minbpe/basic.py in get_stats, merge, BasicTokenizer.train, and BasicTokenizer.encode. I also changed minbpe/regex.py in RegexTokenizer.train. I tried counted pair updates, merge-loop changes, and smaller train-loop rewrites.
 > Evaluation 1 was rejected: train_basic_ir parent 324048710, candidate 322879261, ratio 0.9964. Evaluation 3 was rejected: ratio 0.9944. Evaluation 5 was rejected: ratio 1.0102. Evaluation 7 was rejected: ratio 0.9947. Equivalence was identical outputs each time. No evaluated change met required 0.9900.
 > I believe this path is too small for train_basic_ir. The best measured variant did not clear the guard. Some changes also moved encode_ir and decode_ir the wrong way.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for the independent replay verdict on the queued decode_ir candidate. If it disagrees, look first at the same-object guards around the decode caches.
 >
 > 2026-10-13, episode `b94f4fce9159` (accepted)
-
-> I tried encode_ir changes in minbpe/base.py get_stats and in minbpe/regex.py lines 388-401. The edits touched minbpe/base.py lines 12-14 and 74-82, then moved through smaller variants.
-> evaluation 1 was rejected: encode_ir parent 725318297, candidate 720052355, ratio 0.9927. evaluation 3 was rejected: ratio 0.9946. evaluation 5 result: outcome: accepted, guard ok, 2 files, 16 lines, identical outputs, encode_ir parent 725318297, candidate 714968450, ratio 0.9857. evaluation 7 was rejected: ratio 0.9967. The session ended with no candidate.
-> The measurement points at the evaluation 5 state. The later exploratory state did not help. The accepted state was lost before it could be re-evaluated.
-> Next try restoring the evaluation 5 shape in minbpe/base.py lines 74-82 and minbpe/regex.py lines 388-390. Run perf encode_ir before more edits. Watch decode_ir; evaluation 5 had ratio 1.0041.
->
-> 2026-10-13, episode `f0c24f92817e` (no candidate)
 
 ## Licence
 
