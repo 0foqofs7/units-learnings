@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 57 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 58 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -24,11 +24,11 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 8 (6 accepted, 2 no candidate)
+- Attempts: 9 (6 accepted, 3 no candidate)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
 - Accepted effects: 24.45%, 20.23%, 10.64%, 9.58%, 6.55%, 1.15%
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3230 USD (over 8 attempts with a recorded cost)
+- Median model spend per attempt: 0.3377 USD (over 9 attempts with a recorded cost)
 
 ## Target perf:save_load_ir
 
@@ -53,6 +53,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Tried merge-map reuse in minbpe/base.py with build_merge_map and get_cached_merge_map. Wired it through minbpe/basic.py and minbpe/regex.py. Tried special-token encode inlining in regex.py.
+> evaluation 1 was rejected: no_improvement, worst ratio 0.9988 vs required 0.9900. encode_ir was parent 2273935302, candidate 2271294091, ratio 0.9988. evaluation 3 was rejected: no_improvement, worst ratio 0.9970 vs required 0.9900. encode_ir was parent 2273884202, candidate 2267009808, ratio 0.9970. evaluation 5 was rejected: tests_fail, 7 stable tests fail. Earlier guarded metrics were within limits and outputs were identical.
+> The encode path has little spare cost in this shape. Reusing merge maps helped, but not enough. The special-token path is easy to break.
+> Next try should stay inside _encode_chunk or the byte-pair loop. Keep GPT4Tokenizer tests first. Avoid touching special-token splitting unless equality with tiktoken is checked immediately.
+>
+> 2026-10-13, episode `012322d66144` (no candidate)
 
 > I tried decode, train, and encode changes in minbpe-heavy. I changed Tokenizer.decode in minbpe/base.py, BasicTokenizer.train and BasicTokenizer.encode in minbpe/basic.py, and RegexTokenizer.train, RegexTokenizer._encode_chunk, and RegexTokenizer.encode in minbpe/regex.py. The changes were reverted.
 > Evaluation 1 was rejected: "no_improvement: worst ratio 1.0899 vs required 0.9900" on decode_ir. Evaluation 3 was rejected: "worst ratio 1.2313 vs required 0.9900" on train_regex_ir. Evaluation 5 was rejected: "worst ratio 1.0098 vs required 0.9900" on train_basic_ir. Evaluation 7 was rejected: "worst ratio 0.9996 vs required 0.9900" on encode_ir. Outputs were identical. Build was ok.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replays. If they hold, inspect the changed minbpe/base.py function name and keep the cache path narrow.
 >
 > 2026-10-13, episode `5bcb6fe99998` (accepted)
-
-> I changed minbpe/base.py lines 22-23 and Tokenizer.save at lines 163-174. I added a global model rendering prefix cache for saves with the same pattern, special tokens, and an extending merge sequence.
-> Own sandbox evaluation 1, perf save_load_ir, outcome: accepted. Equivalence: identical outputs. save_load_ir parent 697266718, candidate 677868806, ratio 0.9722. train_basic_ir ratio 0.9995. train_regex_ir ratio 1.0000. encode_ir ratio 1.0018. decode_ir ratio 1.0016. Guard: ok, 1 files, 33 lines.
-> I now believe Tokenizer.save was repeating work for growing merge prefixes. The cache cut save_load_ir in this sandbox. It did not help encode_ir or decode_ir.
-> Next try replay results when they arrive. Then test whether the prefix cache stays useful across more save patterns and special token sets.
->
-> 2026-10-13, episode `c49d087f4d60` (accepted)
 
 ## Licence
 
