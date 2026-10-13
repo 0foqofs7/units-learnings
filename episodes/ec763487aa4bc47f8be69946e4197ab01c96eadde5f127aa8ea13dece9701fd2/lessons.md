@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 37 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 38 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -30,13 +30,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 9 (2 rejected, 6 accepted, 1 no candidate)
+- Attempts: 10 (2 rejected, 7 accepted, 1 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
-- Accepted effects: 32.82%, 30.47%, 16.02%, 10.08%, 6.30%, 1.41%
+- Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 10.08%, 6.30%, 1.41%
 - Why candidates failed: stale (1), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.2488 USD (over 9 attempts with a recorded cost)
+- Median model spend per attempt: 0.2485 USD (over 10 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -51,6 +51,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I changed minbpe/base.py. I changed render_token. I added a bounded module-level cache for token bytes. I also changed the save path to reuse cached rendered tokens.
+> perf save_load_ir returned outcome: accepted. Guard: ok, 1 files, 8 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_basic_ir ratio 1.0008. train_regex_ir ratio 1.0004. encode_ir ratio 0.9998. decode_ir ratio 1.0012. save_load_ir parent 1367474013, candidate 1026081136, ratio 0.7503.
+> I think save_load_ir was paying to decode and scan the same byte tokens across overlapping vocabularies. The cache helped that target. The guarded metrics stayed within limits in this sandbox run.
+> Next, wait for independent replay. If it holds, check whether regex.py has similar repeated render or decode work in save and load paths.
+>
+> 2026-10-13, episode `ba5a0f589b0e` (accepted)
 
 > I tried edits in BasicTokenizer.train in minbpe/basic.py, then BasicTokenizer.decode and RegexTokenizer.decode. I also tried get_stats and merge in minbpe/base.py.
 > Evaluation 1 was rejected: no_improvement, worst ratio 1.0030 vs required 0.9900. train_basic_ir was parent 3009607040, candidate 3018592556, ratio 1.0030. Evaluation 3 was rejected at ratio 1.0136. Evaluation 5 was rejected at ratio 1.0003. Evaluation 7 was rejected on decode_ir: parent 1937967896, candidate 2118178241, ratio 1.0930. Equivalence was identical.
@@ -79,13 +86,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try another part of RegexTokenizer.train. Look at the merge loop and stats update shape before touching preprocessing again.
 >
 > 2026-10-13, episode `332a1256f3fa` (no candidate)
-
-> I changed minbpe/regex.py lines 41-42 and 199-200. I changed minbpe/basic.py lines 32-34 and 65-73. I changed minbpe/regex.py lines 49-51 and 90-98. Then I changed RegexTokenizer.train in minbpe/regex.py lines 67-85.
-> encode_ir was rejected: parent 2037802585, candidate 2038675217, ratio 1.0004. train_basic_ir was rejected: parent 2889227992, candidate 2896625218, ratio 1.0026. train_regex_ir was accepted: parent 3412259748, candidate 3345209413, ratio 0.9804. Equivalence was identical outputs.
-> The useful change is in RegexTokenizer.train. It keeps the last valid pair position in a local variable and handles a trailing token after the inner loop. The minbpe/basic.py change did not help.
-> Next, wait for the queued independent replay on train_regex_ir. Then look again at RegexTokenizer.train for checks inside the merge scan.
->
-> 2026-10-13, episode `5cc7e48e593f` (accepted)
 
 ## Licence
 
