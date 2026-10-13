@@ -1,6 +1,6 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 16 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 17 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,17 +16,24 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_ir
 
-- Attempts: 9 (7 accepted, 1 rejected, 1 no candidate)
+- Attempts: 10 (7 accepted, 1 rejected, 2 no candidate)
 - Best accepted effect: 15.17% (ratio 0.8483), episode `0bada18988c2`
 - Accepted effects: 15.17%, 14.04%, 6.05%, 4.39%, 3.36%, 1.94%, 1.38%
 - Why candidates failed: no_improvement (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.2005 USD (over 9 attempts with a recorded cost)
+- Median model spend per attempt: 0.2393 USD (over 10 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Tried edits in minbpe/regex.py and minbpe/basic.py after reading minbpe/base.py lines 1-208, minbpe/regex.py lines 1-233, minbpe/basic.py lines 1-95, and lineage_bench.py lines 1-107. The target was perf train_ir.
+> Evaluation 1 was rejected: train_ir parent 2600031455, candidate 2616236728, ratio 1.0062. Evaluation 3 was rejected: ratio 1.0768. Evaluation 5 was rejected: ratio 0.9939. Evaluation 7 was rejected: ratio 0.9937. Every build was base ok and candidate ok. Equivalence was identical outputs.
+> No measured candidate met the required train_ir improvement before the evaluation limit was reached. The best accepted-equivalent attempt improved train_ir by only about 0.6%, below the 1.0% threshold. No candidate was submitted.
+> Next try a change outside these edited lines, still measured by perf train_ir. If it misses required 0.9900, stop earlier.
+>
+> 2026-10-13, episode `64e0edb30661` (no candidate)
 
 > Changed minbpe/regex.py RegexTokenizer.encode_ordinary and minbpe/basic.py BasicTokenizer.encode. Inlined the encode-time merge step after the lowest-rank adjacent pair is selected. Kept the selected pair as scalar values.
 > Own sandbox evaluation 1 on perf encode_ir: outcome: accepted. Guard: ok, 2 files, 46 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_ir parent 2570885327, candidate 2570714396, ratio 0.9999. encode_ir parent 1000196880, candidate 989394437, ratio 0.9892.
@@ -55,13 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try the independent replay result for the queued encode_ir candidate. Then inspect the train_ir path before adding more cache state.
 >
 > 2026-10-13, episode `2b6dd2046340` (accepted)
-
-> I changed minbpe/regex.py lines 65-67 in RegexTokenizer.train. The preprocessing output now drops chunks shorter than two bytes before the merge loop. I read minbpe/base.py lines 1-190, minbpe/basic.py lines 1-80, minbpe/regex.py lines 1-194, minbpe/gpt4.py lines 1-131, and lineage_bench.py lines 1-107.
-> perf train_ir reported "outcome: accepted". It reported "guard: ok, 1 files, 1 lines", "build: base ok, candidate ok", and "equivalence: identical outputs". train_ir was parent 2914285395, candidate 2717054368, ratio 0.9323. encode_ir was parent 992184631, candidate 992053966, ratio 0.9999.
-> I now believe RegexTokenizer.train was spending work on chunks that cannot form adjacent pairs and cannot be changed by pair merges. Filtering them preserved the learned merges and vocabulary in this run.
-> Next try the same shape only where preprocessing creates inert chunks. Do not widen it without equivalence. The submitted perf candidate on train_ir is queued; independent replays decide later.
->
-> 2026-10-13, episode `1722008aee7c` (accepted)
 
 ## Licence
 
