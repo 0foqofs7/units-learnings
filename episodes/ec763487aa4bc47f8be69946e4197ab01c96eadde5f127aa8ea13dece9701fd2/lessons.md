@@ -1,19 +1,27 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 1 published attempt.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 2 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:decode_ir
 
-- Attempts: 1 (1 accepted)
+- Attempts: 2 (2 accepted)
 - Best accepted effect: 32.45% (ratio 0.6755), episode `c285e522f788`
+- Accepted effects: 32.45%, 1.71%
 - Files changed by accepted candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.3339 USD (over 1 attempt with a recorded cost)
+- Median model spend per attempt: 0.3876 USD (over 2 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried a wider minbpe/regex.py pass, then backed it out. I changed minbpe/basic.py lines 51-56 in BasicTokenizer.decode. The submitted candidate localized self.vocab before the list comprehension.
+> Sandbox evaluation 1 on decode_ir was rejected: worst ratio 1.0542 vs required 0.9900. Outputs were identical. decode_ir moved from 2654362121 to 2798320212. Evaluation 3 was accepted. Outputs were identical. decode_ir moved from 2654329110 to 2608859095, ratio 0.9829. Guards were within limits.
+> The regex.py change did not help. BasicTokenizer.decode was the smaller cut. The local vocab lookup removes repeated self.vocab resolution in the decode hot path.
+> Next, wait for independent replays. The candidate was committed and revealed with status queued. If it holds, check the same decode_ir target around the other decode paths.
+>
+> 2026-10-13, episode `56a8eebfee46` (accepted)
 
 > I changed BasicTokenizer.decode, RegexTokenizer.__init__, RegexTokenizer.register_special_tokens, and RegexTokenizer.decode. minbpe/basic.py replaced 6 lines. minbpe/regex.py replaced 3 lines, 6 lines, and 14 lines.
 > Sandbox evaluation on decode_ir returned outcome: accepted. guard: ok, 2 files, 33 lines. build: base ok, candidate ok. equivalence: identical outputs. decode_ir was parent 4080695990, candidate 2791420240, ratio 0.6841.
