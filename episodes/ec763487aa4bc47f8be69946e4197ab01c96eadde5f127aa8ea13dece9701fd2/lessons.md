@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 69 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 70 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -26,13 +26,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 11 (7 accepted, 3 no candidate, 1 rejected)
+- Attempts: 12 (7 accepted, 4 no candidate, 1 rejected)
 - Best accepted effect: 24.45% (ratio 0.7555), episode `a9cb1663eff2`
 - Accepted effects: 24.45%, 20.23%, 10.64%, 9.58%, 6.55%, 1.72%, 1.15%
 - Why candidates failed: stale_conflict (1)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.3084 USD (over 11 attempts with a recorded cost)
+- Median model spend per attempt: 0.3230 USD (over 12 attempts with a recorded cost)
 
 ## Target perf:save_load_ir
 
@@ -57,6 +57,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried encode_ir changes in minbpe/base.py get_stats and in minbpe/regex.py lines 388-401. The edits touched minbpe/base.py lines 12-14 and 74-82, then moved through smaller variants.
+> evaluation 1 was rejected: encode_ir parent 725318297, candidate 720052355, ratio 0.9927. evaluation 3 was rejected: ratio 0.9946. evaluation 5 result: outcome: accepted, guard ok, 2 files, 16 lines, identical outputs, encode_ir parent 725318297, candidate 714968450, ratio 0.9857. evaluation 7 was rejected: ratio 0.9967. The session ended with no candidate.
+> The measurement points at the evaluation 5 state. The later exploratory state did not help. The accepted state was lost before it could be re-evaluated.
+> Next try restoring the evaluation 5 shape in minbpe/base.py lines 74-82 and minbpe/regex.py lines 388-390. Run perf encode_ir before more edits. Watch decode_ir; evaluation 5 had ratio 1.0041.
+>
+> 2026-10-13, episode `f0c24f92817e` (no candidate)
 
 > I changed the str-based encode paths in minbpe/basic.py lines 161-166 and minbpe/regex.py lines 340-343. I removed the membership test before ordered merge replacement and let str.replace return the unchanged string.
 > Sandbox eval perf encode_ir was accepted. Guard ok, 2 files, 6 lines. Build base ok, candidate ok. Equivalence identical outputs. encode_ir parent 751875480, candidate 737516903, ratio 0.9809. train_basic_ir ratio 0.9999. train_regex_ir ratio 0.9998. decode_ir ratio 0.9990. save_load_ir ratio 0.9998.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try a different save_load_ir shape in Tokenizer.save and Tokenizer.load, or leave save/load alone and look for a larger encode_ir change than the 3 line edit.
 >
 > 2026-10-13, episode `997561bd32d4` (no candidate)
-
-> I changed minbpe/base.py in _build_vocab. Lines 23-25 went from 3 lines to 4. Lines 179-187 went from 9 lines to 24. The cache stores the most recently built merge-only vocabulary prefix, copies it, then applies special tokens.
-> Sandbox evaluation 1 on perf save_load_ir was accepted. Guard ok, 1 files, 20 lines. Base ok, candidate ok. Outputs were identical. save_load_ir moved from 476987097 to 458915028, ratio 0.9621. train_basic_ir ratio 1.0017. train_regex_ir ratio 1.0016. encode_ir ratio 1.0056. decode_ir ratio 1.0006.
-> I now believe _build_vocab repeats byte concatenations on growing merge prefixes. The cache changed that path. It did not change outputs in the sandbox. The guarded metrics outside the target moved up.
-> The candidate was submitted and revealed with status queued. Its verdict comes later from independent replays. Next, check the replay result for save_load_ir and the guarded metrics before changing this path again.
->
-> 2026-10-13, episode `7f363b3a905c` (accepted)
 
 ## Licence
 
