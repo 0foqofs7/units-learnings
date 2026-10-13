@@ -1,6 +1,6 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 21 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 22 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,17 +16,24 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_ir
 
-- Attempts: 11 (7 accepted, 2 rejected, 2 no candidate)
+- Attempts: 12 (8 accepted, 2 rejected, 2 no candidate)
 - Best accepted effect: 15.17% (ratio 0.8483), episode `0bada18988c2`
-- Accepted effects: 15.17%, 14.04%, 6.05%, 4.39%, 3.36%, 1.94%, 1.38%
+- Accepted effects: 15.17%, 14.04%, 7.01%, 6.05%, 4.39%, 3.36%, 1.94%, 1.38%
 - Why candidates failed: no_improvement (1), stale_conflict (1)
-- Files changed by accepted candidates: `minbpe/base.py`, `minbpe/regex.py`
+- Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.2781 USD (over 11 attempts with a recorded cost)
+- Median model spend per attempt: 0.2923 USD (over 12 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Changed minbpe/basic.py BasicTokenizer.train. It now keeps a lazy max-heap of pair counts and updates changed pairs. It counts neighboring tokens directly instead of building slice strings through itemgetter. Changed minbpe/regex.py RegexTokenizer.train tie handling. It avoids re-adding the selected tied pair and uses set membership while collecting ties.
+> evaluation 1 was rejected: train_ir parent 351888298, candidate 351605832, ratio 0.9992. evaluation 3 was rejected: train_ir parent 351887762, candidate 351412531, ratio 0.9986. evaluation 5 was rejected: train_ir parent 351887762, candidate 351061574, ratio 0.9977. evaluation 7 was accepted: train_ir parent 351887762, candidate 328187633, ratio 0.9326; encode_ir parent 402925104, candidate 404523626, ratio 1.0040. All listed runs had identical outputs.
+> The small cleanups did not help enough. The heap in BasicTokenizer.train is the useful change in this session.
+> Try reducing the encode_ir cost from the heap version. Check if RegexTokenizer.train can share the direct neighbor count path without changing output.
+>
+> 2026-10-13, episode `d2e04e107e89` (accepted)
 
 > I tried ordered merge lookup and chunk cache edits on encode_ir. Edits touched minbpe/regex.py, minbpe/basic.py, and minbpe/base.py. The encode functions touched were RegexTokenizer.encode and BasicTokenizer.encode.
 > evaluation 1 was rejected, ratio 0.9980. evaluation 3 was rejected, ratio 0.9981. evaluation 5 was rejected, ratio 5.8208. evaluation 7 was rejected, ratio 0.9964. All had identical outputs. The best measured encode_ir change was below the 1% requirement.
@@ -55,13 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try a narrower change in minbpe/regex.py lines 224-226 or minbpe/basic.py lines 61-66. Measure encode_ir and train_ir together. Drop changes that move train_ir up without crossing 0.9900.
 >
 > 2026-10-13, episode `31dc035a5ef5` (no candidate)
-
-> Tried edits in minbpe/regex.py and minbpe/basic.py after reading minbpe/base.py lines 1-208, minbpe/regex.py lines 1-233, minbpe/basic.py lines 1-95, and lineage_bench.py lines 1-107. The target was perf train_ir.
-> Evaluation 1 was rejected: train_ir parent 2600031455, candidate 2616236728, ratio 1.0062. Evaluation 3 was rejected: ratio 1.0768. Evaluation 5 was rejected: ratio 0.9939. Evaluation 7 was rejected: ratio 0.9937. Every build was base ok and candidate ok. Equivalence was identical outputs.
-> No measured candidate met the required train_ir improvement before the evaluation limit was reached. The best accepted-equivalent attempt improved train_ir by only about 0.6%, below the 1.0% threshold. No candidate was submitted.
-> Next try a change outside these edited lines, still measured by perf train_ir. If it misses required 0.9900, stop earlier.
->
-> 2026-10-13, episode `64e0edb30661` (no candidate)
 
 ## Licence
 
