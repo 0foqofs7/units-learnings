@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 61 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 62 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -32,13 +32,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 20 (3 rejected, 16 accepted, 1 no candidate)
+- Attempts: 21 (3 rejected, 16 accepted, 2 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
 - Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 12.89%, 10.30%, 10.08%, 7.37%, 6.30%, 4.72%, 3.11%, 3.08%, 2.81%, 2.48%, 1.41%, 1.11%
 - Why candidates failed: stale (2), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/__init__.py`, `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.3356 USD (over 20 attempts with a recorded cost)
+- Median model spend per attempt: 0.3368 USD (over 21 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -53,6 +53,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried save/load caching variants in minbpe/base.py and a regex training counting/replacement rewrite in minbpe/regex.py. The edits touched base.py lines 1-2, 7-10, 14-16, 23-26, 72-76, 148-167, 217-223, 273-295, 308-325, and regex.py lines 88-100.
+> save_load_ir was rejected twice: 1.0254 and 1.0008 vs required 0.9900. decode_ir was rejected at 1.0004. train_regex_ir was rejected at 1.1635. Builds were ok. Equivalence was identical outputs. Guards were ok.
+> I now believe these variants did not help this code. The save/load changes moved too little or got slower. The regex rewrite made train_regex_ir slower.
+> Next try a smaller change around encode_ir, since it showed 0.9989, 0.9987, and 0.9994 in rejected runs. Do not carry over the regex rewrite.
+>
+> 2026-10-13, episode `abb69b21704c` (no candidate)
 
 > Tried BasicTokenizer.train changes in minbpe/basic.py: replace most_common with max, reuse BYTE_VOCAB, and adjust loop lines. Tried base._build_vocab prefix caching in minbpe/base.py. Tried RegexTokenizer.train short-chunk filtering in minbpe/regex.py.
 > evaluation 1 train_basic_ir was rejected: train_basic_ir ratio 1.0110. evaluation 3 train_basic_ir was rejected: train_basic_ir ratio 0.9995. evaluation 5 save_load_ir was rejected: save_load_ir ratio 1.0258. evaluation 7 train_regex_ir was rejected: train_regex_ir ratio 1.0542. Each build was base ok, candidate ok, with identical outputs.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try should stay inside _encode_chunk or the byte-pair loop. Keep GPT4Tokenizer tests first. Avoid touching special-token splitting unless equality with tiktoken is checked immediately.
 >
 > 2026-10-13, episode `012322d66144` (no candidate)
-
-> I tried decode, train, and encode changes in minbpe-heavy. I changed Tokenizer.decode in minbpe/base.py, BasicTokenizer.train and BasicTokenizer.encode in minbpe/basic.py, and RegexTokenizer.train, RegexTokenizer._encode_chunk, and RegexTokenizer.encode in minbpe/regex.py. The changes were reverted.
-> Evaluation 1 was rejected: "no_improvement: worst ratio 1.0899 vs required 0.9900" on decode_ir. Evaluation 3 was rejected: "worst ratio 1.2313 vs required 0.9900" on train_regex_ir. Evaluation 5 was rejected: "worst ratio 1.0098 vs required 0.9900" on train_basic_ir. Evaluation 7 was rejected: "worst ratio 0.9996 vs required 0.9900" on encode_ir. Outputs were identical. Build was ok.
-> I think the simple local rewrites in decode, pair selection, and regex training do not move this code enough. Some moved the wrong way. They did not help.
-> Next try a smaller change with a clearer target. Start from one hot loop only. Keep guards small. No candidate was submitted.
->
-> 2026-10-13, episode `5dfdd39e072f` (no candidate)
 
 ## Licence
 
