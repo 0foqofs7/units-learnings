@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 42 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 43 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -32,13 +32,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 10 (2 rejected, 7 accepted, 1 no candidate)
+- Attempts: 11 (2 rejected, 8 accepted, 1 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
-- Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 10.08%, 6.30%, 1.41%
+- Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 10.08%, 6.30%, 2.48%, 1.41%
 - Why candidates failed: stale (1), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.2485 USD (over 10 attempts with a recorded cost)
+- Median model spend per attempt: 0.2488 USD (over 11 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -53,6 +53,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried changes in minbpe/base.py, minbpe/basic.py, and minbpe/regex.py. I first changed save and load paths. I then changed encode paths. The submitted change stayed in minbpe/base.py and changed Tokenizer.save to cache rendered model merge lines by merge pair.
+> evaluation 1 was rejected: save_load_ir ratio 1.0350. evaluation 3 was rejected: encode_ir ratio 0.9971. evaluation 5 was accepted in the sandbox: save_load_ir parent 1027305800, candidate 1001945800, ratio 0.9753. Outputs were identical.
+> I believe repeated saves were paying for formatting the same merge pair lines again. The encode change did not help enough. The first save/load change made save_load_ir worse.
+> Next try the same cache shape only where merge dictionaries overlap. Check train_basic_ir, where evaluation 5 had ratio 1.0039. The submitted save_load_ir candidate is queued. Its verdict comes later from independent replays.
+>
+> 2026-10-13, episode `385c268c9b50` (accepted)
 
 > I tried a mutation-safe last-list decode cache in BasicTokenizer.decode and RegexTokenizer.decode. The edits were in minbpe/basic.py and minbpe/regex.py. The cache stores a snapshot of the last decoded list and reuses text when the current list compares equal.
 > Own perf decode_ir run: outcome: accepted. Equivalence: identical outputs. Guard ok, 2 files, 22 lines. decode_ir parent 860933985, candidate 769899691, ratio 0.8943. train_basic_ir ratio 1.0001. train_regex_ir ratio 1.0005. encode_ir ratio 1.0009. save_load_ir ratio 1.0015.
@@ -81,13 +88,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replay on the submitted decode_ir candidate. If it fails, inspect the cache key and mutation path in RegexTokenizer.decode before adding more changes.
 >
 > 2026-10-13, episode `cea9559a2d89` (rejected)
-
-> I changed minbpe/base.py. I changed render_token. I added a bounded module-level cache for token bytes. I also changed the save path to reuse cached rendered tokens.
-> perf save_load_ir returned outcome: accepted. Guard: ok, 1 files, 8 lines. Build: base ok, candidate ok. Equivalence: identical outputs. train_basic_ir ratio 1.0008. train_regex_ir ratio 1.0004. encode_ir ratio 0.9998. decode_ir ratio 1.0012. save_load_ir parent 1367474013, candidate 1026081136, ratio 0.7503.
-> I think save_load_ir was paying to decode and scan the same byte tokens across overlapping vocabularies. The cache helped that target. The guarded metrics stayed within limits in this sandbox run.
-> Next, wait for independent replay. If it holds, check whether regex.py has similar repeated render or decode work in save and load paths.
->
-> 2026-10-13, episode `ba5a0f589b0e` (accepted)
 
 ## Licence
 
