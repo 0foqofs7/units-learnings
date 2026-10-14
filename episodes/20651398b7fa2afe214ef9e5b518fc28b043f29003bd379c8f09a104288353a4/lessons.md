@@ -1,18 +1,18 @@
 # Lessons: minbpe
 
-Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 23 published attempts.
+Lineage `20651398b7fa2afe214ef9e5b518fc28b043f29003bd379c8f09a104288353a4` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 24 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target perf:encode_ir
 
-- Attempts: 10 (5 accepted, 2 rejected, 3 no candidate)
+- Attempts: 11 (5 accepted, 2 rejected, 4 no candidate)
 - Best accepted effect: 34.31% (ratio 0.6569), episode `4297b89143e7`
 - Accepted effects: 34.31%, 12.19%, 3.74%, 1.35%, 1.12%
 - Why candidates failed: stale_conflict (2)
 - Files changed by accepted candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/gpt4.py`, `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/base.py`, `minbpe/basic.py`, `minbpe/regex.py`
-- Median model spend per attempt: 0.4015 USD (over 10 attempts with a recorded cost)
+- Median model spend per attempt: 0.4618 USD (over 11 attempts with a recorded cost)
 
 ## Target perf:train_ir
 
@@ -27,6 +27,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I edited minbpe/regex.py at lines 273-288, 297-306, 257-261, 280-292, 257-264, 277-289, 376-381, and 249-263. I also edited minbpe/basic.py lines 152-163 and minbpe/base.py lines 109-112.
+> evaluation 1 was rejected: encode_ir ratio 0.9988, train_ir ratio 0.9988. evaluation 3 was rejected: encode_ir ratio 1.0180, train_ir ratio 0.9996. evaluation 5 was rejected: encode_ir ratio 0.9988, train_ir ratio 0.9974. evaluation 7 was rejected: encode_ir ratio 0.9995, train_ir ratio 0.9979. All had identical outputs.
+> I now believe these edits did not help enough. The best evaluated variant was about 0.12% faster. No measured encode_ir change reached the required 1% improvement.
+> Next try a different change in the encode path. Keep equivalence identical. Stop if the ratios stay near 0.9988 or 0.9995.
+>
+> 2026-10-13, episode `b35adaa30a4b` (no candidate)
 
 > Changed minbpe/basic.py in BasicTokenizer.train for two-character string pair keys. Changed minbpe/regex.py in RegexTokenizer.train for initial stats during where construction, duplicate chunk skip while replacing selected regex pairs, and singleton weighted-count fast paths.
 > train_ir runs were rejected. eval 1 ratio 1.0000, parent 320924637, candidate 320913915. eval 3 ratio 1.0008, parent 320924643, candidate 321183725. eval 5 ratio 1.0012, parent 320924643, candidate 321309607. eval 7 ratio 0.9998, parent 320924643, candidate 320856374. All preserved equivalence.
@@ -55,13 +62,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, wait for independent replays. If it holds, look at the encode path and the fallback integer-list path. Keep the same ordering and non-overlapping merge behavior.
 >
 > 2026-10-13, episode `d6f96f22458a` (rejected)
-
-> I tried cached merge lookup in minbpe/base.py, minbpe/basic.py, and minbpe/regex.py. I changed build_merge_lookup, BasicTokenizer.encode, and RegexTokenizer._encode_chunk to use a list indexed by the first token during encoding.
-> Evaluation 1 was rejected: encode_ir ratio 0.9997. Evaluation 3 was rejected: encode_ir ratio 0.9990. Evaluation 5 was rejected: encode_ir ratio 0.9993. Those changes did not help enough. Evaluation 7 was accepted in sandbox: train_ir ratio 1.0006, encode_ir ratio 0.9492, equivalence identical outputs, guard ok, 3 files, 65 lines.
-> I now believe the cost is in the adjacent-pair scan in BasicTokenizer.encode and RegexTokenizer._encode_chunk. The list indexed by first token cuts repeated outer dictionary lookup while keeping merge order and output unchanged.
-> Next, wait for independent replay. If it fails, check the encoded pair scan again before touching training.
->
-> 2026-10-13, episode `1f8aa9edd981` (rejected)
 
 ## Licence
 
