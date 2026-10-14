@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 108 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 109 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -46,17 +46,24 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_basic_ir
 
-- Attempts: 19 (5 accepted, 12 no candidate, 2 rejected)
+- Attempts: 20 (5 accepted, 13 no candidate, 2 rejected)
 - Best accepted effect: 15.23% (ratio 0.8477), episode `0bddfdfcf08a`
 - Accepted effects: 15.23%, 12.34%, 2.67%, 1.33%, 1.14%
 - Why candidates failed: stale_conflict (1), no_improvement (1)
 - Files changed by accepted candidates: `minbpe/basic.py`
 - Files changed by rejected candidates: `minbpe/basic.py`
-- Median model spend per attempt: 0.7098 USD (over 19 attempts with a recorded cost)
+- Median model spend per attempt: 0.7464 USD (over 20 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I read minbpe/basic.py, minbpe/base.py, lineage_bench.py, minbpe/regex.py, and minbpe/__init__.py. I searched "TODO|cache|heap|train_basic". I changed BasicTokenizer.train variants in minbpe/basic.py and one regex.py path.
+> evaluation 1 train_basic_ir was parent 268417699, candidate 268957295, ratio 1.0020. Outcome: rejected, no_improvement. evaluation 3 train_basic_ir was parent 268417699, candidate 268514082, ratio 1.0004. Outcome: rejected, no_improvement. Builds passed. Equivalence was identical outputs. Guards were ok.
+> These BasicTokenizer.train edits were neutral or slower. The local rewrites did not move train_basic_ir enough. The regex.py edit did not matter for the target.
+> Try a different shape in BasicTokenizer.train. Do not keep the tested variants. The session stopped without submitting a change.
+>
+> 2026-10-14, episode `b842dfad01ea` (no candidate)
 
 > I changed RegexTokenizer.encode for special-token pattern caching. I changed merge and Tokenizer.__init__ in minbpe/base.py for ordered merge cache validation. I changed BasicTokenizer.train for a small count tweak.
 > evaluation 1: outcome: rejected, worst ratio 1.0047 vs required 0.9900. evaluation 3: outcome: rejected, worst ratio 1.0039 vs required 0.9900. evaluation 5: outcome: rejected, worst ratio 0.9993 vs required 0.9900. evaluation 7: outcome: rejected, worst ratio 1.2940 vs required 0.9900. Equivalence was identical outputs.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try: avoid the decode cache path. Measure each basic.py train or encode change apart. Stop if the target reads like evaluation 3 or evaluation 5.
 >
 > 2026-10-13, episode `d586fa494cf6` (no candidate)
-
-> I tried encode-path cuts in minbpe/basic.py BasicTokenizer.encode, minbpe/regex.py RegexTokenizer.encode, and minbpe/base.py ordered_merge_steps. I removed the merge-step string length check, tried direct special-token string searches, and changed cache-hit work for an unchanged merges dict.
-> evaluation 1 was rejected: worst ratio 0.9985 vs required 0.9900. evaluation 3 was rejected: worst ratio 1.0006. evaluation 5 was rejected: worst ratio 0.9954. evaluation 7 was accepted: encode_ir parent 628170162, candidate 621120431, ratio 0.9888. Equivalence was identical outputs. Guard was ok, 3 files, 50 lines. Status is queued.
-> The early changes did not help enough. The submitted change reduced encode_ir in the sandbox while train_basic_ir ratio 1.0030, train_regex_ir ratio 1.0025, decode_ir ratio 1.0000, and save_load_ir ratio 1.0019 stayed within guard limits.
-> Next, wait for independent replays. If the result holds, inspect more encode_ir overhead in special-token splitting and ordered merge setup.
->
-> 2026-10-13, episode `3481dc55f8a0` (rejected)
 
 ## Licence
 
