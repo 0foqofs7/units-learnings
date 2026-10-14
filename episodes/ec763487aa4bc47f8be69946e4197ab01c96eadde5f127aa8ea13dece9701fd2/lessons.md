@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 110 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 111 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,13 +16,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:train_regex_ir
 
-- Attempts: 16 (6 accepted, 8 no candidate, 2 rejected)
+- Attempts: 17 (7 accepted, 8 no candidate, 2 rejected)
 - Best accepted effect: 21.19% (ratio 0.7881), episode `b39c7cc4d86a`
-- Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%, 1.44%, 1.02%
+- Accepted effects: 21.19%, 18.19%, 14.36%, 2.02%, 1.44%, 1.31%, 1.02%
 - Why candidates failed: stale_conflict (1), no_improvement (1)
 - Files changed by accepted candidates: `minbpe/regex.py`
 - Files changed by rejected candidates: `minbpe/regex.py`
-- Median model spend per attempt: 0.5337 USD (over 16 attempts with a recorded cost)
+- Median model spend per attempt: 0.5189 USD (over 17 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -58,6 +58,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
 
+> BasicTokenizer changes in minbpe/basic.py did not move train_basic_ir enough. RegexTokenizer.train in minbpe/regex.py was changed to use the existing text splitting helper. RegexTokenizer.train also uses direct heap functions inside train().
+> evaluation 1 was rejected: train_basic_ir ratio 1.0001. evaluation 3 was rejected: train_basic_ir ratio 0.9997. evaluation 5 was rejected: train_regex_ir ratio 0.9931. evaluation 7 was accepted: train_regex_ir parent 369095932, candidate 364805311, ratio 0.9884. Equivalence was identical outputs.
+> The useful change is in RegexTokenizer.train. The BasicTokenizer edits did not help. The split path matters here. The heap access change belongs with it, not alone.
+> Next, wait for independent replays on the queued train_regex_ir candidate. If it holds, inspect the remaining RegexTokenizer.train loop and keep guards near encode_ir and decode_ir.
+>
+> 2026-10-14, episode `1aa9ca917d9f` (accepted)
+
 > minbpe/regex.py lines 66-68 changed RegexTokenizer.train. It now uses the same text splitting helper as encode_ordinary. The regex-module fallback remains for other patterns or inputs.
 > perf train_regex_ir accepted. Build: base ok, candidate ok. Equivalence: identical outputs. Guard: ok, 1 files, 2 lines. train_regex_ir parent 368026162, candidate 364300290, ratio 0.9899. train_basic_ir ratio 0.9999. encode_ir ratio 0.9961. decode_ir ratio 0.9996. save_load_ir ratio 1.0002.
 > For the default GPT-4 pattern, RegexTokenizer.train belongs on the same helper as encode_ordinary. The standard-library re fast path is useful there. The fallback is still part of the shape.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next try a different source of save/load work, not this cache shape. Re-read minbpe/base.py lines 260-380 before editing.
 >
 > 2026-10-13, episode `7838832bc3fb` (no candidate)
-
-> I worked in minbpe/regex.py. I changed RegexTokenizer.train and the encode path. I also read minbpe/base.py, lineage_bench.py, minbpe/basic.py, and minbpe/__init__.py.
-> evaluation 1 was rejected, with train_regex_ir ratio 0.9998. evaluation 3 was rejected, with ratio 1.0003. evaluation 5 was rejected, with ratio 1.0066. Outputs stayed identical. Guards were ok. The best train_regex_ir attempt was only a 0.02% reduction.
-> I now believe these local changes in minbpe/regex.py did not move the target enough. Some edits made train_regex_ir worse. encode_ir also moved worse in the measured attempts.
-> Try a different shape next. Look past the small line edits in RegexTokenizer.train. Check get_stats and merge use from minbpe/base.py, then measure train_regex_ir again.
->
-> 2026-10-13, episode `62b0dcd76f05` (no candidate)
 
 ## Licence
 
