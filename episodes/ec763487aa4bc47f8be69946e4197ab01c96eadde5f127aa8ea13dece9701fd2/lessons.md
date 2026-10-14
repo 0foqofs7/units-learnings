@@ -1,6 +1,6 @@
 # Lessons: minbpe-heavy
 
-Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 111 published attempts.
+Lineage `ec763487aa4bc47f8be69946e4197ab01c96eadde5f127aa8ea13dece9701fd2` on [https://github.com/karpathy/minbpe](https://github.com/karpathy/minbpe) at `1acefe89412b20245db5a22d2a02001e547dc602`. 112 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -36,13 +36,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:save_load_ir
 
-- Attempts: 32 (3 rejected, 17 accepted, 12 no candidate)
+- Attempts: 33 (3 rejected, 17 accepted, 13 no candidate)
 - Best accepted effect: 32.82% (ratio 0.6718), episode `fb1a4124d661`
 - Accepted effects: 32.82%, 30.47%, 24.17%, 16.02%, 12.89%, 10.30%, 10.08%, 7.37%, 6.30%, 4.72%, 3.80%, 3.11%, 3.08%, 2.81%, 2.48%, 1.41%, 1.11%
 - Why candidates failed: stale (2), dependency_failed (1)
 - Files changed by accepted candidates: `minbpe/__init__.py`, `minbpe/base.py`
 - Files changed by rejected candidates: `minbpe/base.py`
-- Median model spend per attempt: 0.4027 USD (over 32 attempts with a recorded cost)
+- Median model spend per attempt: 0.4095 USD (over 33 attempts with a recorded cost)
 
 ## Target perf:train_basic_ir
 
@@ -57,6 +57,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I tried cache changes in minbpe/base.py on the save/load path. I changed Tokenizer.save and Tokenizer.load around model_text, _MODEL_BYTES_PREFIX_CACHE, and _LOAD_CACHE, then backed part of it out and tried a smaller form.
+> evaluation 1 was rejected. save_load_ir was parent 448006623, candidate 448709395, ratio 1.0016. evaluation 3 was rejected. save_load_ir was parent 448006625, candidate 447273071, ratio 0.9984. Outputs were identical. Build was ok.
+> I believe this cache shape is not enough for save_load_ir. It preserved behavior but did not reach the required 0.9900.
+> Try a narrower change in minbpe/base.py. Measure save/load text construction and merge parsing separately before changing caches again.
+>
+> 2026-10-14, episode `51ce8148fdc4` (no candidate)
 
 > BasicTokenizer changes in minbpe/basic.py did not move train_basic_ir enough. RegexTokenizer.train in minbpe/regex.py was changed to use the existing text splitting helper. RegexTokenizer.train also uses direct heap functions inside train().
 > evaluation 1 was rejected: train_basic_ir ratio 1.0001. evaluation 3 was rejected: train_basic_ir ratio 0.9997. evaluation 5 was rejected: train_regex_ir ratio 0.9931. evaluation 7 was accepted: train_regex_ir parent 369095932, candidate 364805311, ratio 0.9884. Equivalence was identical outputs.
@@ -85,13 +92,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Try a different path in BasicTokenizer.train or RegexTokenizer.encode_ordinary. Do not keep the cache changes from this session.
 >
 > 2026-10-13, episode `8f1cb2209d23` (no candidate)
-
-> I tried one save/load cache change in minbpe/base.py. I touched the def save and def load path and the _LOAD_CACHE, _MODEL_BYTES_PREFIX_CACHE, and _VOCAB_BYTES_PREFIX_CACHE area.
-> evaluation 1: perf save_load_ir returned outcome: rejected (no_improvement: worst ratio 1.0013 vs required 0.9900). Outputs were identical. save_load_ir was parent 437674408, candidate 438231692, ratio 1.0013. train_basic_ir ratio 1.0025, train_regex_ir ratio 1.0018, encode_ir ratio 1.0003, decode_ir ratio 1.0018.
-> I now believe this cache edit did not help. It made the target worse and did not break equivalence.
-> Next try a different source of save/load work, not this cache shape. Re-read minbpe/base.py lines 260-380 before editing.
->
-> 2026-10-13, episode `7838832bc3fb` (no candidate)
 
 ## Licence
 
